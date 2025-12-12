@@ -113,6 +113,78 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     padding: const EdgeInsets.all(Dimensions.space10),
                     child: Column(
                       children: [
+                        // Attendance Card
+                        if (controller.isPunchedIn)
+                          Container(
+                             margin: const EdgeInsets.all(10),
+                             padding: const EdgeInsets.all(15),
+                             decoration: BoxDecoration(
+                               color: ColorResources.primaryColor,
+                               borderRadius: BorderRadius.circular(10),
+                               boxShadow: [
+                                 BoxShadow(
+                                   color: Colors.grey.withOpacity(0.5),
+                                   spreadRadius: 2,
+                                   blurRadius: 5,
+                                   offset: const Offset(0, 3),
+                                 ),
+                               ],
+                             ),
+                             child: Row(
+                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                               children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        "Working Time",
+                                        style: TextStyle(color: Colors.white, fontSize: 16),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      GetBuilder<DashboardController>(
+                                        id: 'attendance_timer',
+                                        builder: (controller) => Text(
+                                          "${controller.workedDuration.inHours}:${(controller.workedDuration.inMinutes % 60).toString().padLeft(2, '0')}:${(controller.workedDuration.inSeconds % 60).toString().padLeft(2, '0')}",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      controller.punchOut();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: ColorResources.primaryColor,
+                                    ),
+                                    child: const Text("Punch Out"),
+                                  ),
+                               ],
+                             ),
+                          )
+                        else
+                          Container(
+                             margin: const EdgeInsets.all(10),
+                             width: double.infinity,
+                             child: ElevatedButton.icon(
+                               onPressed: () {
+                                 controller.punchIn();
+                               },
+                               icon: Icon(controller.isFaceIdAvailable ? Icons.face : Icons.fingerprint),
+                               label: const Text("Punch In"),
+                               style: ElevatedButton.styleFrom(
+                                 backgroundColor: ColorResources.primaryColor,
+                                 foregroundColor: Colors.white,
+                                 padding: const EdgeInsets.symmetric(vertical: 15),
+                               ),
+                             ),
+                          ),
+                          
                         Padding(
                           padding: const EdgeInsets.all(10),
                           child: Row(

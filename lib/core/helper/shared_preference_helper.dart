@@ -14,4 +14,8 @@ class SharedPreferenceHelper {
   static const String languageCode = 'language_code';
   static const String languageKey = 'language-key';
   static const String languageListKey = 'language-list-key';
+
+  static const String lastPunchDate = 'last_punch_date';
+  static const String punchInTime = 'punch_in_time';
+  static const String isPunchedIn = 'is_punched_in';
 }

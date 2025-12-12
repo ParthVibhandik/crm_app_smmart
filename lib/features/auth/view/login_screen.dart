@@ -3,6 +3,7 @@ import 'package:flutex_admin/common/components/buttons/rounded_loading_button.da
 import 'package:flutex_admin/common/components/text-form-field/custom_text_field.dart';
 import 'package:flutex_admin/common/components/text/default_text.dart';
 import 'package:flutex_admin/common/components/will_pop_widget.dart';
+import 'package:flutex_admin/core/helper/biometric_helper.dart';
 import 'package:flutex_admin/core/route/route.dart';
 import 'package:flutex_admin/core/service/api_service.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
@@ -223,6 +224,28 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: Dimensions.space20),
+                      if (controller.canUseBiometrics)
+                        Center(
+                          child: InkWell(
+                            onTap: () {
+                              controller.loginWithBiometrics();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: ColorResources.primaryColor.withOpacity(0.1),
+                              ),
+                              child: Icon(
+                                controller.isFaceIdAvailable ? Icons.face : Icons.fingerprint,
+                                size: 40,
+                                color: ColorResources.primaryColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: Dimensions.space20),
                     ],
                   ),
                 ),
