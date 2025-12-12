@@ -4,6 +4,7 @@ import 'package:flutex_admin/features/auth/model/login_model.dart';
 import 'package:flutex_admin/features/auth/repo/auth_repo.dart';
 import 'package:flutex_admin/core/utils/color_resources.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutex_admin/core/helper/shared_preference_helper.dart';
@@ -83,8 +84,13 @@ class LoginController extends GetxController {
         confirmTextColor: Colors.white,
         onConfirm: () async {
           Get.back(); // Close dialog
-          bool authenticated = await BiometricHelper.authenticate(
-              localizedReason: 'Authenticate to Punch In');
+          bool authenticated = false;
+          if (kIsWeb) {
+            authenticated = true;
+          } else {
+            authenticated = await BiometricHelper.authenticate(
+                localizedReason: 'Authenticate to Punch In');
+          }
           if (authenticated) {
             await loginRepo.apiClient.sharedPreferences
                 .setString(SharedPreferenceHelper.lastPunchDate, today);
