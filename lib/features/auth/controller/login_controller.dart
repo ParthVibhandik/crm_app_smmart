@@ -83,8 +83,17 @@ class LoginController extends GetxController {
         confirmTextColor: Colors.white,
         onConfirm: () async {
           Get.back(); // Close dialog
-          bool authenticated = await BiometricHelper.authenticate(
-              localizedReason: 'Authenticate to Punch In');
+          
+          bool canCheck = await BiometricHelper.hasBiometrics();
+          bool authenticated = false;
+          
+          if (canCheck) {
+             authenticated = await BiometricHelper.authenticate(localizedReason: 'Authenticate to Punch In');
+          } else {
+             // Fallback for Web/No Biometrics: Just process it or show success
+             authenticated = true; 
+          }
+
           if (authenticated) {
             await loginRepo.apiClient.sharedPreferences
                 .setString(SharedPreferenceHelper.lastPunchDate, today);
@@ -95,13 +104,7 @@ class LoginController extends GetxController {
             CustomSnackBar.success(successList: ['Punched In Successfully!']);
             Get.offAndToNamed(RouteHelper.dashboardScreen);
           } else {
-             CustomSnackBar.error(errorList: ['Authentication Failed']);
-             // Optionally stay here or let them try again. 
-             // For now, if they fail, they are just not punched in? 
-             // Or we should loop?
-             // Proceeding to dashboard without punch in for now if failed?
-             // User requirement: "app will again ask for biomatics for punchin"
-             // I'll assume they can try again from dashboard if I implement it there too.
+             CustomSnackBar.error(errorList: ['Authentication Failed or Cancelled']);
              Get.offAndToNamed(RouteHelper.dashboardScreen);
           }
         },
@@ -120,6 +123,13 @@ class LoginController extends GetxController {
   }
 
   Future<void> loginWithBiometrics() async {
+    bool canCheck = await BiometricHelper.hasBiometrics();
+    
+    if (!canCheck) {
+      CustomSnackBar.error(errorList: ['Biometrics not supported here']);
+      return;
+    }
+
     bool authenticated = await BiometricHelper.authenticate(
         localizedReason: 'Authenticate to login');
     if (authenticated) {

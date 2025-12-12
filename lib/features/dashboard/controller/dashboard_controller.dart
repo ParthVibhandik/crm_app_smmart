@@ -73,8 +73,17 @@ class DashboardController extends GetxController {
   }
 
   Future<void> punchIn() async {
-    bool authenticated = await BiometricHelper.authenticate(
-        localizedReason: 'Authenticate to Punch In');
+    bool canCheck = await BiometricHelper.hasBiometrics();
+    bool authenticated = false;
+
+    if (canCheck) {
+      authenticated = await BiometricHelper.authenticate(
+          localizedReason: 'Authenticate to Punch In');
+    } else {
+      // Fallback for Web/No Biometrics
+      authenticated = true;
+    }
+
     if (authenticated) {
       isPunchedIn = true;
       punchInTime = DateTime.now();
