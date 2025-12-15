@@ -123,7 +123,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 radius: 32,
                                 child: CircleImageWidget(
                                   imagePath: controller
-                                          .homeModel.staff?.profileImage ??
+                                          .homeModel.staff?.formattedProfileImage ??
                                       '',
                                   isAsset: false,
                                   isProfile: true,

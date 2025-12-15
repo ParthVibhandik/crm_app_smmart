@@ -35,11 +35,11 @@ class SplashController extends GetxController {
     isLoading = false;
     update();
 
-    if (isOnBoard == false) {
-      Future.delayed(const Duration(seconds: 1), () {
-        Get.offAndToNamed(RouteHelper.onboardScreen);
-      });
-    } else {
+    // if (isOnBoard == false) {
+    //   Future.delayed(const Duration(seconds: 1), () {
+    //     Get.offAndToNamed(RouteHelper.onboardScreen);
+    //   });
+    // } else {
       if (isRemember) {
         Future.delayed(const Duration(seconds: 1), () {
           Get.offAndToNamed(RouteHelper.dashboardScreen);
@@ -49,7 +49,7 @@ class SplashController extends GetxController {
           Get.offAndToNamed(RouteHelper.loginScreen);
         });
       }
-    }
+    // }
   }
 
   Future<bool> initSharedData() {

@@ -1,3 +1,5 @@
+import 'package:flutex_admin/core/utils/url_container.dart';
+
 class DashboardModel {
   DashboardModel({
     bool? status,
@@ -324,6 +326,19 @@ class Staff {
     map['phonenumber'] = _phoneNumber;
     map['profile_image'] = _profileImage;
     return map;
+  }
+
+  String get formattedProfileImage {
+    if (_profileImage == null || _profileImage!.isEmpty) {
+      return '';
+    }
+    if (_profileImage!.startsWith('http')) {
+      return _profileImage!;
+    }
+    if (_profileImage!.contains('uploads/')) {
+       return '${UrlContainer.domainUrl}/$_profileImage';
+    }
+    return '${UrlContainer.domainUrl}/uploads/staff_profile_images/$_staffId/$_profileImage';
   }
 }
 

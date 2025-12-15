@@ -37,7 +37,7 @@ class HomeDrawer extends StatelessWidget {
             },
             currentAccountPicture: CircleAvatar(
               child: CircleImageWidget(
-                imagePath: homeModel.staff?.profileImage ?? '',
+                imagePath: homeModel.staff?.formattedProfileImage ?? '',
                 isAsset: false,
                 isProfile: true,
                 width: 80,
@@ -267,11 +267,6 @@ class HomeDrawer extends StatelessWidget {
         style: regularDefault.copyWith(
           color: Theme.of(Get.context!).textTheme.bodyLarge!.color,
         ),
-      ),
-      trailing: Icon(
-        Icons.arrow_forward_ios_rounded,
-        size: Dimensions.space12,
-        color: Theme.of(Get.context!).textTheme.bodyLarge!.color,
       ),
       onTap: onTap,
     );

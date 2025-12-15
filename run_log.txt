@@ -1,0 +1,132 @@
+﻿Resolving dependencies...
+Downloading packages...
+  characters 1.4.0 (1.4.1 available)
+  connectivity_plus 6.1.5 (7.0.0 available)
+  cross_file 0.3.4+2 (0.3.5+1 available)
+  crypto 3.0.6 (3.0.7 available)
+  file_picker 10.3.3 (10.3.7 available)
+  file_selector_linux 0.9.3+2 (0.9.4 available)
+  file_selector_macos 0.9.4+4 (0.9.5 available)
+  file_selector_platform_interface 2.6.2 (2.7.0 available)
+  file_selector_windows 0.9.3+4 (0.9.3+5 available)
+  flutter_boardview 0.2.1 (0.3.0 available)
+  flutter_lints 5.0.0 (6.0.0 available)
+  flutter_local_notifications 19.4.2 (19.5.0 available)
+  flutter_plugin_android_lifecycle 2.0.30 (2.0.33 available)
+  flutter_svg 2.2.1 (2.2.3 available)
+  flutter_widget_from_html 0.16.1 (0.17.1 available)
+  get 4.7.2 (4.7.3 available)
+  http 1.5.0 (1.6.0 available)
+  image_picker 1.2.0 (1.2.1 available)
+  image_picker_android 0.8.13+3 (0.8.13+10 available)
+  image_picker_for_web 3.1.0 (3.1.1 available)
+  image_picker_ios 0.8.13 (0.8.13+3 available)
+  image_picker_macos 0.2.2 (0.2.2+1 available)
+  image_picker_platform_interface 2.11.0 (2.11.1 available)
+  introduction_screen 3.1.17 (4.0.0 available)
+  lints 5.1.1 (6.0.0 available)
+  matcher 0.12.17 (0.12.18 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  path_provider_android 2.2.18 (2.2.22 available)
+  path_provider_foundation 2.4.2 (2.5.1 available)
+  shared_preferences 2.5.3 (2.5.4 available)
+  shared_preferences_android 2.4.14 (2.4.18 available)
+  shared_preferences_foundation 2.5.4 (2.5.6 available)
+  syncfusion_flutter_charts 29.2.11 (31.2.18 available)
+  syncfusion_flutter_core 29.2.11 (31.2.18 available)
+  test_api 0.7.7 (0.7.8 available)
+  timelines_plus 1.0.7 (1.0.8 available)
+  url_launcher_android 6.3.23 (6.3.28 available)
+  url_launcher_ios 6.3.4 (6.3.6 available)
+  url_launcher_linux 3.2.1 (3.2.2 available)
+  url_launcher_macos 3.2.3 (3.2.5 available)
+  url_launcher_windows 3.1.4 (3.1.5 available)
+  uuid 4.5.1 (4.5.2 available)
+  video_player 2.10.0 (2.10.1 available)
+  video_player_android 2.8.14 (2.8.22 available)
+  video_player_avfoundation 2.8.4 (2.8.8 available)
+  video_player_platform_interface 6.4.0 (6.6.0 available)
+  webview_flutter_android 4.10.3 (4.10.11 available)
+  webview_flutter_wkwebview 3.23.1 (3.23.5 available)
+  win32 5.14.0 (5.15.0 available)
+Got dependencies!
+49 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Launching lib\main.dart on sdk gphone64 x86 64 in debug mode...
+Running Gradle task 'assembleDebug'...                          
+flutter : warning: 
+[options] source 
+value 8 is obsolete 
+and will be removed 
+in a future release
+At line:1 char:1
++ flutter run -d 
+emulator-5554 2>&1 | 
+Out-File -Encoding 
+utf8 run_log.t ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo   
+           : 
+NotSpecified: (w    
+arning: [optio... 
+fut    ure 
+release:String) [    
+], RemoteException
+    + 
+FullyQualifiedError  
+  Id : 
+NativeCommandErr    
+or
+ 
+warning: [options] 
+target value 8 is 
+obsolete and will be 
+removed in a future 
+release
+warning: [options] 
+To suppress warnings 
+about obsolete 
+options, use 
+-Xlint:-options.
+3 warnings
+D/FlutterJNI( 7445): Beginning load of flutter...
+D/FlutterJNI( 7445): flutter (null) was loaded normally!
+I/flutter ( 7445): [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+Running Gradle task 'assembleDebug'...                            143.0s
+ΓêÜ Built build\app\outputs\flutter-apk\app-debug.apk
+Installing build\app\outputs\flutter-apk\app-debug.apk...        1,658ms
+D/FlutterJNI( 7537): Beginning load of flutter...
+D/FlutterJNI( 7537): flutter (null) was loaded normally!
+I/flutter ( 7537): [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+D/AudioSystem( 7537): onNewService: media.audio_policy service obtained 0x7bf176a70c30
+D/AudioSystem( 7537): getService: checking for service media.audio_policy: 0x7bf176a70c30
+Syncing files to device sdk gphone64 x86 64...                  
+D/CompatChangeReporter( 7537): Compat change id reported: 377864165; UID 10216; state: ENABLED
+I/om.flutex.admin( 7537): hiddenapi: Accessing hidden method Landroid/view/accessibility/AccessibilityNodeInfo;->getSourceNodeId()J (runtime_flags=0, domain=platform, api=unsupported,test-api) from Lio/flutter/view/AccessibilityViewEmbedder$ReflectionAccessors; (domain=app) using reflection: allowed
+I/om.flutex.admin( 7537): hiddenapi: Accessing hidden method Landroid/view/accessibility/AccessibilityRecord;->getSourceNodeId()J (runtime_flags=0, domain=platform, api=unsupported) from Lio/flutter/view/AccessibilityViewEmbedder$ReflectionAccessors; (domain=app) using reflection: allowed
+I/om.flutex.admin( 7537): hiddenapi: Accessing hidden field Landroid/view/accessibility/AccessibilityNodeInfo;->mChildNodeIds:Landroid/util/LongArray; (runtime_flags=0, domain=platform, api=unsupported) from Lio/flutter/view/AccessibilityViewEmbedder$ReflectionAccessors; (domain=app) using reflection: allowed
+I/om.flutex.admin( 7537): hiddenapi: Accessing hidden method Landroid/util/LongArray;->get(I)J (runtime_flags=0, domain=platform, api=unsupported) from Lio/flutter/view/AccessibilityViewEmbedder$ReflectionAccessors; (domain=app) using reflection: allowed
+Syncing files to device sdk gphone64 x86 64...                     174ms
+
+Flutter run key commands.
+r Hot reload. 
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "flutter run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on sdk gphone64 x86 64 is available at: http://127.0.0.1:61665/rZGimh0trd0=/
+The Flutter DevTools debugger and profiler on sdk gphone64 x86 64 is available at: http://127.0.0.1:61665/rZGimh0trd0=/devtools/?uri=ws://127.0.0.1:61665/rZGimh0trd0=/ws
+W/HWUI    ( 7537): Unknown dataspace 0
+D/ProfileInstaller( 7537): Installing profile for com.flutex.admin
+I/Choreographer( 7537): Skipped 59 frames!  The application may be doing too much work on its main thread.
+I/WindowExtensionsImpl( 7537): Initializing Window Extensions, vendor API level=9, activity embedding enabled=true
+I/om.flutex.admin( 7537): Compiler allocated 5042KB to compile void android.view.ViewRootImpl.performTraversals()
+D/WindowLayoutComponentImpl( 7537): Register WindowLayoutInfoListener on Context=com.flutex.admin.MainActivity@942757d, of which baseContext=android.app.ContextImpl@2efd735
+D/InsetsController( 7537): hide(ime(), fromIme=false)
+I/ImeTracker( 7537): com.flutex.admin:610c617a: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+D/InsetsController( 7537): hide(ime(), fromIme=false)
+I/ImeTracker( 7537): com.flutex.admin:16a4d1b8: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+Lost connection to device.
