@@ -45,23 +45,29 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<ThemeController>(builder: (theme) {
-      return GetBuilder<LocalizationController>(builder: (localizeController) {
-        return GetMaterialApp(
-          title: LocalStrings.appName.tr,
-          debugShowCheckedModeBanner: false,
-          defaultTransition: Transition.fadeIn,
-          transitionDuration: const Duration(milliseconds: 200),
-          initialRoute: RouteHelper.splashScreen,
-          navigatorKey: Get.key,
-          theme: theme.darkTheme ? dark : light,
-          getPages: RouteHelper().routes,
-          locale: localizeController.locale,
-          translations: Messages(languages: languages),
-          fallbackLocale: Locale(localizeController.locale.languageCode,
-              localizeController.locale.countryCode),
+    return GetBuilder<ThemeController>(
+      builder: (theme) {
+        return GetBuilder<LocalizationController>(
+          builder: (localizeController) {
+            return GetMaterialApp(
+              title: LocalStrings.appName.tr,
+              debugShowCheckedModeBanner: false,
+              defaultTransition: Transition.fadeIn,
+              transitionDuration: const Duration(milliseconds: 200),
+              initialRoute: RouteHelper.splashScreen,
+              navigatorKey: Get.key,
+              theme: theme.darkTheme ? dark : light,
+              getPages: RouteHelper().routes,
+              locale: localizeController.locale,
+              translations: Messages(languages: languages),
+              fallbackLocale: Locale(
+                localizeController.locale.languageCode,
+                localizeController.locale.countryCode,
+              ),
+            );
+          },
         );
-      });
-    });
+      },
+    );
   }
 }
