@@ -55,12 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 Container(
                   decoration: const BoxDecoration(
-                    color: ColorResources.appBarColor,
-                    image: DecorationImage(
-                      alignment: Alignment.topCenter,
-                      image: AssetImage(MyImages.login),
-                      fit: BoxFit.fitWidth,
-                    ),
+                    color: ColorResources.colorWhite,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,8 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: Center(
                           child: Image.asset(
-                            MyImages.appLogo,
-                            color: ColorResources.colorWhite,
+                            MyImages.smmartLogo,
                             height: 60,
                           ),
                         ),
@@ -89,13 +83,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               Text(
                                 LocalStrings.login.tr,
                                 style: mediumMegaLarge.copyWith(
-                                  color: Colors.white,
+                                  color: ColorResources.getHeadingTextColor(),
                                 ),
                               ),
                               Text(
                                 LocalStrings.loginDesc.tr,
                                 style: regularDefault.copyWith(
-                                  color: Colors.white,
+                                  color: ColorResources.getContentTextColor(),
                                 ),
                               ),
                             ],

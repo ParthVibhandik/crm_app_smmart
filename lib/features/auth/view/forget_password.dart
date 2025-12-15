@@ -46,11 +46,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
             children: [
               Container(
                 decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    alignment: Alignment.topCenter,
-                    image: AssetImage(MyImages.login),
-                    fit: BoxFit.fitWidth,
-                  ),
+                  color: ColorResources.colorWhite,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,11 +55,10 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 140.0, bottom: 30.0),
                       child: Center(
-                        child: Image.asset(
-                          MyImages.appLogo,
-                          color: ColorResources.colorWhite,
-                          height: 60,
-                        ),
+                          child: Image.asset(
+                            MyImages.smmartLogo,
+                            height: 60,
+                          ),
                       ),
                     ),
                     SizedBox(
@@ -76,13 +71,13 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                             Text(
                               LocalStrings.forgotPasswordTitle.tr,
                               style: mediumMegaLarge.copyWith(
-                                color: Colors.white,
+                                color: ColorResources.getHeadingTextColor(),
                               ),
                             ),
                             Text(
                               LocalStrings.forgotPasswordDesc.tr,
                               style: regularDefault.copyWith(
-                                color: Colors.white,
+                                color: ColorResources.getContentTextColor(),
                               ),
                             ),
                           ],

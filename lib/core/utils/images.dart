@@ -1,5 +1,6 @@
 class MyImages {
   static const String appLogo = "assets/images/app_logo.png";
+  static const String smmartLogo = "assets/images/smmart_logo.png";
   static const String appLogoWhite = "assets/images/app_logo_white.png";
   static const String warningImage = 'assets/images/warning.png';
   static const String crossImage = 'assets/images/cross.png';
