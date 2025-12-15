@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'attendance_status.dart';
+import 'biometric_service.dart';
 
 class AttendanceService {
   final Dio _dio;
+  final BiometricService _biometric = BiometricService();
 
   AttendanceService(String token)
     : _dio = Dio(
@@ -25,7 +27,20 @@ class AttendanceService {
     return AttendanceStatus.fromJson(response.data);
   }
 
+  /// ✅ Punch In (Biometric REQUIRED if available)
   Future<void> punchIn({String location = 'Office'}) async {
+    final biometricAvailable = await _biometric.isBiometricAvailable();
+
+    if (biometricAvailable) {
+      final authenticated = await _biometric.authenticate(
+        'Authenticate to punch in',
+      );
+
+      if (!authenticated) {
+        throw Exception('Biometric authentication failed');
+      }
+    }
+
     final response = await _dio.post(
       '/flutex_admin_api/attendance/punch-in',
       data: {'location': location},
@@ -36,7 +51,20 @@ class AttendanceService {
     }
   }
 
+  /// ✅ Punch Out (Biometric REQUIRED if available)
   Future<void> punchOut() async {
+    final biometricAvailable = await _biometric.isBiometricAvailable();
+
+    if (biometricAvailable) {
+      final authenticated = await _biometric.authenticate(
+        'Authenticate to punch out',
+      );
+
+      if (!authenticated) {
+        throw Exception('Biometric authentication failed');
+      }
+    }
+
     final response = await _dio.post('/flutex_admin_api/attendance/punch-out');
 
     if (response.data['status'] != true) {
