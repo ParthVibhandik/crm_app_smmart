@@ -20,7 +20,7 @@ class BiometricService {
         localizedReason: reason,
         options: const AuthenticationOptions(
           stickyAuth: true,
-          biometricOnly: false,
+          biometricOnly: true,
         ),
       );
     } on PlatformException catch (e) {
