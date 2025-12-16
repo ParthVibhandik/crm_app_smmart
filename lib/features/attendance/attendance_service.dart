@@ -27,7 +27,7 @@ class AttendanceService {
     return AttendanceStatus.fromJson(response.data);
   }
 
-  /// ✅ Punch In (Biometric REQUIRED if available)
+  // Punch In (Biometric REQUIRED if available)
   Future<void> punchIn({String location = 'Office'}) async {
     final biometricAvailable = await _biometric.isBiometricAvailable();
 
@@ -41,6 +41,10 @@ class AttendanceService {
       }
     }
 
+    // face capture can be added here in future
+    // in the request body as 'face_image'
+  
+
     final response = await _dio.post(
       '/flutex_admin_api/attendance/punch-in',
       data: {'location': location},
@@ -49,9 +53,13 @@ class AttendanceService {
     if (response.data['status'] != true) {
       throw Exception(response.data['message'] ?? 'Punch-in failed');
     }
+
+    // punched in successfully -> now start tracking location and battery info every 15 minutes 
+    // TODO: Implement location and battery tracking
+
   }
 
-  /// ✅ Punch Out (Biometric REQUIRED if available)
+  /// Punch Out (Biometric REQUIRED if available)
   Future<void> punchOut() async {
     final biometricAvailable = await _biometric.isBiometricAvailable();
 
