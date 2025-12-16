@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutex_admin/core/service/notification_service.dart';
-import 'package:flutex_admin/features/attendance/background_service.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
 import 'package:flutex_admin/core/utils/themes.dart';
 import 'package:flutex_admin/common/controllers/localization_controller.dart';
@@ -29,8 +28,7 @@ Future<void> main() async {
 
   HttpOverrides.global = MyHttpOverrides();
   
-  // Initialize Background Service
-  BackgroundService.initialize();
+
   
   runApp(MyApp(languages: languages));
 }

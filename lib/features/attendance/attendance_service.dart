@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
-import 'background_service.dart';
+
 import 'attendance_status.dart';
 import 'biometric_service.dart';
 
@@ -10,16 +10,17 @@ class AttendanceService {
   final BiometricService _biometric = BiometricService();
 
   AttendanceService(String token)
-    : _dio = Dio(
-        BaseOptions(
-          baseUrl: 'https://smmartcrm.in',
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Accept': 'application/json',
-          },
-        ),
-      );
+      : _dio = Dio(
+          BaseOptions(
+            baseUrl: 'https://smmartcrm.in',
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Accept': 'application/json',
+            },
+          ),
+        );
 
+  /// Get today's attendance status
   Future<AttendanceStatus> getTodayStatus() async {
     final response = await _dio.get('/flutex_admin_api/attendance/today');
 
@@ -30,7 +31,7 @@ class AttendanceService {
     return AttendanceStatus.fromJson(response.data);
   }
 
-  // 👇 ADD THIS
+  /// Get high-accuracy GPS location
   Future<Position> _getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
 
@@ -47,19 +48,20 @@ class AttendanceService {
       );
     }
 
-    return await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+    return Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
     );
   }
 
-  // Punch In (Biometric REQUIRED, Selfie REQUIRED, Location REQUIRED)
+  /// Punch In (Biometric + Selfie + GPS required)
   Future<void> punchIn() async {
     // 1. Biometric Authentication
     final biometricAvailable = await _biometric.isBiometricAvailable();
     if (biometricAvailable) {
-      final authenticated = await _biometric.authenticate(
-        'Authenticate to punch in',
-      );
+      final authenticated =
+          await _biometric.authenticate('Authenticate to punch in');
       if (!authenticated) {
         throw Exception('Biometric authentication failed');
       }
@@ -70,7 +72,7 @@ class AttendanceService {
     final XFile? photo = await picker.pickImage(
       source: ImageSource.camera,
       preferredCameraDevice: CameraDevice.front,
-      maxWidth: 600, // Optimize size
+      maxWidth: 600,
     );
 
     if (photo == null) {
@@ -78,75 +80,48 @@ class AttendanceService {
     }
 
     // 3. Location Capture
-    // Check permission
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        throw Exception('Location permission denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      throw Exception(
-        'Location permissions are permanently denied, we cannot request permissions.',
-      );
-    }
-
-    final Position position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
-    );
+    final Position position = await _getCurrentLocation();
 
     // 4. Send to Backend
-    String fileName = photo.path.split('/').last;
-    FormData formData = FormData.fromMap({
-      'image': await MultipartFile.fromFile(photo.path, filename: fileName),
+    final String fileName = photo.path.split('/').last;
+
+    final FormData formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile(
+        photo.path,
+        filename: fileName,
+      ),
       'punch_time': DateTime.now().toIso8601String(),
       'latitude': position.latitude,
       'longitude': position.longitude,
     });
 
-    try {
-      final response = await _dio.post(
-        '/flutex_admin_api/attendance/punch-in',
-        data: formData,
-      );
+    final response = await _dio.post(
+      '/flutex_admin_api/attendance/punch-in',
+      data: formData,
+    );
 
-      if (response.data['status'] != true) {
-        throw Exception(response.data['message'] ?? 'Punch-in failed');
-      }
-    } catch (e) {
-      rethrow;
+    if (response.data['status'] != true) {
+      throw Exception(response.data['message'] ?? 'Punch-in failed');
     }
-
-    // 5. Start Background Tracking
-    // We need the token. Since it's in the header, we can extract it or simpler:
-    // refactor the class to store it. For now, assuming we can get it from headers:
-    final authHeader = _dio.options.headers['Authorization'] as String;
-    final token = authHeader.replaceFirst('Bearer ', '');
-    BackgroundService.startTracking(token);
   }
 
-  /// Punch Out (Biometric REQUIRED if available)
+  /// Punch Out (Biometric + GPS required)
   Future<void> punchOut() async {
     // 1. Biometric Authentication
     final biometricAvailable = await _biometric.isBiometricAvailable();
-
     if (biometricAvailable) {
-      final authenticated = await _biometric.authenticate(
-        'Authenticate to punch out',
-      );
-
+      final authenticated =
+          await _biometric.authenticate('Authenticate to punch out');
       if (!authenticated) {
         throw Exception('Biometric authentication failed');
       }
     }
 
-    // 2. Location Capture (NEW)
+    // 2. Location Capture
     final Position position = await _getCurrentLocation();
 
     // 3. Send to Backend
-    final formData = FormData.fromMap({
+    final FormData formData = FormData.fromMap({
       'latitude': position.latitude.toString(),
       'longitude': position.longitude.toString(),
     });
