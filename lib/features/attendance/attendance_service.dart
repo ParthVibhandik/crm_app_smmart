@@ -10,15 +10,15 @@ class AttendanceService {
   final BiometricService _biometric = BiometricService();
 
   AttendanceService(String token)
-      : _dio = Dio(
-          BaseOptions(
-            baseUrl: 'https://smmartcrm.in',
-            headers: {
-              'Authorization': 'Bearer $token',
-              'Accept': 'application/json',
-            },
-          ),
-        );
+    : _dio = Dio(
+        BaseOptions(
+          baseUrl: 'https://smmartcrm.in',
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Accept': 'application/json',
+          },
+        ),
+      );
 
   Future<AttendanceStatus> getTodayStatus() async {
     final response = await _dio.get('/flutex_admin_api/attendance/today');
@@ -48,9 +48,7 @@ class AttendanceService {
     }
 
     return await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-      ),
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
     );
   }
 
@@ -88,9 +86,11 @@ class AttendanceService {
         throw Exception('Location permission denied');
       }
     }
-    
+
     if (permission == LocationPermission.deniedForever) {
-      throw Exception('Location permissions are permanently denied, we cannot request permissions.');
+      throw Exception(
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
     }
 
     final Position position = await Geolocator.getCurrentPosition(
@@ -104,7 +104,7 @@ class AttendanceService {
       'punch_time': DateTime.now().toIso8601String(),
       'latitude': position.latitude,
       'longitude': position.longitude,
-     });
+    });
 
     try {
       final response = await _dio.post(
@@ -129,35 +129,35 @@ class AttendanceService {
 
   /// Punch Out (Biometric REQUIRED if available)
   Future<void> punchOut() async {
-  // 1. Biometric Authentication
-  final biometricAvailable = await _biometric.isBiometricAvailable();
+    // 1. Biometric Authentication
+    final biometricAvailable = await _biometric.isBiometricAvailable();
 
-  if (biometricAvailable) {
-    final authenticated = await _biometric.authenticate(
-      'Authenticate to punch out',
+    if (biometricAvailable) {
+      final authenticated = await _biometric.authenticate(
+        'Authenticate to punch out',
+      );
+
+      if (!authenticated) {
+        throw Exception('Biometric authentication failed');
+      }
+    }
+
+    // 2. Location Capture (NEW)
+    final Position position = await _getCurrentLocation();
+
+    // 3. Send to Backend
+    final formData = FormData.fromMap({
+      'latitude': position.latitude.toString(),
+      'longitude': position.longitude.toString(),
+    });
+
+    final response = await _dio.post(
+      '/flutex_admin_api/attendance/punch-out',
+      data: formData,
     );
 
-    if (!authenticated) {
-      throw Exception('Biometric authentication failed');
+    if (response.data['status'] != true) {
+      throw Exception(response.data['message'] ?? 'Punch-out failed');
     }
   }
-
-  // 2. Location Capture (NEW)
-  final Position position = await _getCurrentLocation();
-
-  // 3. Send to Backend
-  final response = await _dio.post(
-    '/flutex_admin_api/attendance/punch-out',
-    data: {
-      'punch_time': DateTime.now().toIso8601String(),
-      'latitude': position.latitude,
-      'longitude': position.longitude,
-    },
-  );
-
-  if (response.data['status'] != true) {
-    throw Exception(response.data['message'] ?? 'Punch-out failed');
-  }
-}
-
 }
