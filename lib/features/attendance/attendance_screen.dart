@@ -51,36 +51,137 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-
-    if (error != null) {
-      return Scaffold(body: Center(child: Text(error!)));
-    }
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Attendance')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            if (!status!.punchedIn)
-              ElevatedButton(onPressed: punchIn, child: const Text('Punch In')),
+      appBar: AppBar(title: const Text('Attendance'), centerTitle: true),
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : error != null
+          ? Center(child: Text(error!))
+          : Padding(
+              padding: const EdgeInsets.all(16),
+              child: Center(
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _StatusHeader(status!),
+                        const SizedBox(height: 24),
 
-            if (status!.punchedIn && !status!.punchedOut) ...[
-              Text('Punched in at: ${status!.punchInTime ?? '--'}'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: punchOut,
-                child: const Text('Punch Out'),
+                        if (!status!.punchedIn)
+                          _PrimaryButton(
+                            text: 'Punch In',
+                            icon: Icons.login,
+                            onPressed: punchIn,
+                          ),
+
+                        if (status!.punchedIn && !status!.punchedOut) ...[
+                          Text(
+                            'Punched in at',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            status!.punchInTime ?? '--',
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 24),
+                          _PrimaryButton(
+                            text: 'Punch Out',
+                            icon: Icons.logout,
+                            onPressed: punchOut,
+                          ),
+                        ],
+
+                        if (status!.punchedIn && status!.punchedOut)
+                          const Text(
+                            'You have completed attendance for today',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ],
+            ),
+    );
+  }
+}
 
-            if (status!.punchedIn && status!.punchedOut)
-              const Text('You have punched out for today'),
-          ],
+/* -------------------- Widgets -------------------- */
+
+class _StatusHeader extends StatelessWidget {
+  final AttendanceStatus status;
+
+  const _StatusHeader(this.status);
+
+  @override
+  Widget build(BuildContext context) {
+    final label = status.statusLabel ?? 'Today';
+    return Column(
+      children: [
+        Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.blue.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            status.punchedOut
+                ? 'Completed'
+                : status.punchedIn
+                ? 'In Progress'
+                : 'Not Started',
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Colors.blue,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PrimaryButton extends StatelessWidget {
+  final String text;
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const _PrimaryButton({
+    required this.text,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: ElevatedButton.icon(
+        icon: Icon(icon),
+        label: Text(text),
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        onPressed: onPressed,
       ),
     );
   }
