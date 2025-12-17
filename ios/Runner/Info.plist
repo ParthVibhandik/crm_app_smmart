@@ -27,17 +27,19 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera is required to take selfies for attendance verification.</string>
+	<string>This app needs camera access to take selfie photos for attendance verification</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Face ID is used for secure biometric authentication to access the app.</string>
+	<string>We use Face ID/Touch ID to secure your data</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Location is required for attendance tracking even when the app is closed.</string>
+	<string>This app needs location access to track attendance and verify your location during punch-in/punch-out</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Location is required for background attendance tracking.</string>
+	<string>This app needs location access to track attendance and verify your location</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Location is required to mark attendance.</string>
+	<string>This app needs location access to verify your location during punch-in/punch-out</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app may need microphone access for camera functionality</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Photo library access is required to save and manage attendance photos.</string>
+	<string>This app needs photo library access to save or select images for attendance</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>LSApplicationQueriesSchemes</key>
