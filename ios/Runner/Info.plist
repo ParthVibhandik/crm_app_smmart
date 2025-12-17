@@ -26,8 +26,20 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to take selfie photos for attendance verification</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>We use Face ID/Touch ID to secure your data</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs location access to track attendance and verify your location during punch-in/punch-out</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs location access to track attendance and verify your location</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs location access to verify your location during punch-in/punch-out</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app may need microphone access for camera functionality</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs photo library access to save or select images for attendance</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
