@@ -11,12 +11,14 @@ import 'package:get/get.dart';
 import 'package:flutex_admin/core/route/route.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/service/di_services.dart' as services;
+import 'features/attendance/attendance_tracking_service.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 AndroidNotificationChannel? channel;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initTrackingService();
   try {
     await NotificationService.initialize(flutterLocalNotificationsPlugin);
   } catch (e) {
@@ -27,9 +29,7 @@ Future<void> main() async {
   Map<String, Map<String, String>> languages = await services.init();
 
   HttpOverrides.global = MyHttpOverrides();
-  
 
-  
   runApp(MyApp(languages: languages));
 }
 

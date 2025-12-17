@@ -29,8 +29,9 @@ class DashboardController extends GetxController {
   Future<dynamic> loadData() async {
     ResponseModel responseModel = await dashboardRepo.getData();
     if (responseModel.status) {
-      homeModel =
-          DashboardModel.fromJson(jsonDecode(responseModel.responseJson));
+      homeModel = DashboardModel.fromJson(
+        jsonDecode(responseModel.responseJson),
+      );
     } else {
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
@@ -45,10 +46,17 @@ class DashboardController extends GetxController {
     ResponseModel responseModel = await dashboardRepo.logout();
 
     if (responseModel.status) {
-      await dashboardRepo.apiClient.sharedPreferences
-          .setString(SharedPreferenceHelper.accessTokenKey, '');
-      await dashboardRepo.apiClient.sharedPreferences
-          .setBool(SharedPreferenceHelper.rememberMeKey, false);
+      await dashboardRepo.apiClient.sharedPreferences.setString(
+        SharedPreferenceHelper.accessTokenKey,
+        '',
+      );
+      await dashboardRepo.apiClient.sharedPreferences.setBool(
+        SharedPreferenceHelper.rememberMeKey,
+        false,
+      );
+      // Clear attendance tracking prefs on logout to avoid stale background tracking
+      await dashboardRepo.apiClient.sharedPreferences.remove('attendance_id');
+      await dashboardRepo.apiClient.sharedPreferences.remove('token');
       CustomSnackBar.success(successList: [responseModel.message.tr]);
       Get.offAllNamed(RouteHelper.loginScreen);
     } else {

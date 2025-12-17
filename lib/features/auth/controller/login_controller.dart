@@ -15,10 +15,8 @@ class LoginController extends GetxController {
   final FocusNode emailFocusNode = FocusNode();
   final FocusNode passwordFocusNode = FocusNode();
 
-  TextEditingController emailController =
-      TextEditingController();
-  TextEditingController passwordController =
-      TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   String? email;
   String? password;
@@ -28,20 +26,27 @@ class LoginController extends GetxController {
 
   Future<void> checkAndGotoNextStep(LoginModel responseModel) async {
     if (remember) {
-      await loginRepo.apiClient.sharedPreferences
-          .setBool(SharedPreferenceHelper.rememberMeKey, true);
+      await loginRepo.apiClient.sharedPreferences.setBool(
+        SharedPreferenceHelper.rememberMeKey,
+        true,
+      );
     } else {
-      await loginRepo.apiClient.sharedPreferences
-          .setBool(SharedPreferenceHelper.rememberMeKey, false);
+      await loginRepo.apiClient.sharedPreferences.setBool(
+        SharedPreferenceHelper.rememberMeKey,
+        false,
+      );
     }
 
     await loginRepo.apiClient.sharedPreferences.setString(
-        SharedPreferenceHelper.userIdKey,
-        responseModel.data?.staffId.toString() ?? '-1');
+      SharedPreferenceHelper.userIdKey,
+      responseModel.data?.staffId.toString() ?? '-1',
+    );
     await loginRepo.apiClient.sharedPreferences.setString(
-        SharedPreferenceHelper.accessTokenKey,
-        responseModel.data?.accessToken.toString() ?? '');
-
+      SharedPreferenceHelper.accessTokenKey,
+      responseModel.data?.accessToken.toString() ?? '',
+    );
+    String? token = responseModel.data?.accessToken.toString() ?? '';
+    print('Access Token: $token');
     Get.offAndToNamed(RouteHelper.dashboardScreen);
 
     if (remember) {
@@ -56,11 +61,14 @@ class LoginController extends GetxController {
     update();
 
     ResponseModel responseModel = await loginRepo.loginUser(
-        emailController.text.toString(), passwordController.text.toString());
+      emailController.text.toString(),
+      passwordController.text.toString(),
+    );
 
     if (responseModel.status) {
-      LoginModel loginModel =
-          LoginModel.fromJson(jsonDecode(responseModel.responseJson));
+      LoginModel loginModel = LoginModel.fromJson(
+        jsonDecode(responseModel.responseJson),
+      );
       checkAndGotoNextStep(loginModel);
     } else {
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
