@@ -40,13 +40,33 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   }
 
   Future<void> punchIn() async {
-    await service.punchIn();
-    await loadStatus();
+    setState(() => loading = true);
+    try {
+      await service.punchIn();
+      await loadStatus();
+    } catch (e) {
+      setState(() => loading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Punch In Failed: $e')),
+        );
+      }
+    }
   }
 
   Future<void> punchOut() async {
-    await service.punchOut();
-    await loadStatus();
+    setState(() => loading = true);
+    try {
+      await service.punchOut();
+      await loadStatus();
+    } catch (e) {
+      setState(() => loading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Punch Out Failed: $e')),
+        );
+      }
+    }
   }
 
   @override
