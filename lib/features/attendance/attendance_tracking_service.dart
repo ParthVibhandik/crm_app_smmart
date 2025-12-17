@@ -6,6 +6,9 @@ import 'package:dio/dio.dart';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+Position? _lastKnownPosition;
+StreamSubscription<Position>? _positionSub;
+
 const String BASE_URL = 'https://smmartcrm.in';
 const String TRACK_API = '/flutex_admin_api/attendance/track';
 
@@ -31,11 +34,28 @@ Future<void> initTrackingService() async {
 @pragma('vm:entry-point')
 void trackingServiceStart(ServiceInstance service) async {
   if (service is AndroidServiceInstance) {
+    // Make sure we enter true foreground mode so OEMs don't suspend the service when screen is off
+    service.setAsForegroundService();
     service.setForegroundNotificationInfo(
       title: 'Attendance Tracking',
       content: 'Location tracking running',
     );
   }
+
+  _positionSub =
+      Geolocator.getPositionStream(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 10,
+        ),
+      ).listen(
+        (position) {
+          _lastKnownPosition = position;
+        },
+        onError: (e) {
+          print('[Attendance Tracking] Location stream error: $e');
+        },
+      );
 
   final dio = Dio();
   final battery = Battery();
@@ -70,10 +90,12 @@ void trackingServiceStart(ServiceInstance service) async {
         return;
       }
 
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 20),
-      );
+      final position = _lastKnownPosition;
+
+      if (position == null) {
+        print('[Attendance Tracking] No GPS fix yet, skipping...');
+        return;
+      }
 
       final batteryLevel = await battery.batteryLevel ?? 0;
       final charging = (await battery.batteryState) == BatteryState.charging
@@ -128,5 +150,11 @@ void trackingServiceStart(ServiceInstance service) async {
         print('[Attendance Tracking] Request data: ${e.requestOptions.data}');
       }
     }
+  });
+
+  service.on('stop').listen((event) {
+    _positionSub?.cancel();
+    _positionSub = null;
+    service.stopSelf();
   });
 }
