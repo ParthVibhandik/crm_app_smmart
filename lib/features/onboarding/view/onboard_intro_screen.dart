@@ -44,7 +44,7 @@ class _OnBoardIntroScreenState extends State<OnBoardIntroScreen> {
         alignment: Alignment.topCenter,
         child: Padding(
           padding: const EdgeInsetsDirectional.only(top: Dimensions.space100),
-          child: Image.asset(MyImages.appLogo, height: Dimensions.space60),
+          child: Image.asset(MyImages.smmartLogo, height: Dimensions.space60),
         ),
       ),
       showSkipButton: false,

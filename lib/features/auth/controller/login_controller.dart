@@ -47,7 +47,7 @@ class LoginController extends GetxController {
     );
     String? token = responseModel.data?.accessToken.toString() ?? '';
     print('Access Token: $token');
-    Get.offAndToNamed(RouteHelper.dashboardScreen);
+    Get.offAndToNamed(RouteHelper.workStatusScreen);
 
     if (remember) {
       changeRememberMe();

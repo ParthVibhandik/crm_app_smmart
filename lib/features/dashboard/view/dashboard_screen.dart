@@ -75,20 +75,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 },
               ),
               centerTitle: true,
-              title: CachedNetworkImage(
-                imageUrl: controller.homeModel.overview?.perfexLogo ?? '',
+              title: Image.asset(
+                MyImages.smmartLogo,
                 fit: BoxFit.cover,
                 height: 30,
-                errorWidget: (ctx, object, trx) {
-                  return Image.asset(
-                    MyImages.appLogoWhite,
-                    fit: BoxFit.cover,
-                    height: 30,
-                  );
-                },
-                placeholder: (ctx, trx) {
-                  return Image.asset(MyImages.appLogo);
-                },
               ),
               actions: [
                 ActionButtonIconWidget(

@@ -57,10 +57,12 @@ import 'package:flutex_admin/features/ticket/view/add_ticket_screen.dart';
 import 'package:flutex_admin/features/ticket/view/ticket_details_screen.dart';
 import 'package:flutex_admin/features/ticket/view/ticket_screen.dart';
 import 'package:flutex_admin/features/ticket/view/update_ticket_screen.dart';
+import 'package:flutex_admin/features/work_status/view/work_status_screen.dart';
 import 'package:get/get.dart';
 
 class RouteHelper {
   static const String splashScreen = "/splash_screen";
+  static const String workStatusScreen = "/work_status_screen";
   static const String onboardScreen = '/onboard_screen';
   static const String loginScreen = "/login_screen";
   static const String forgotPasswordScreen = "/forgot_password_screen";
@@ -256,5 +258,6 @@ class RouteHelper {
     GetPage(name: editProfileScreen, page: () => const EditProfileScreen()),
     GetPage(name: settingsScreen, page: () => const MenuScreen()),
     GetPage(name: privacyScreen, page: () => const PrivacyPolicyScreen()),
+    GetPage(name: workStatusScreen, page: () => const WorkStatusScreen()),
   ];
 }

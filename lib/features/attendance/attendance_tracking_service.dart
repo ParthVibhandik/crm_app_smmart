@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:geolocator/geolocator.dart';
@@ -12,20 +13,24 @@ const String TRACK_API = '/flutex_admin_api/attendance/track';
 Future<void> initTrackingService() async {
   final service = FlutterBackgroundService();
 
-  await service.configure(
-    androidConfiguration: AndroidConfiguration(
-      onStart: trackingServiceStart,
-      isForegroundMode: true,
-      autoStart: false,
-      notificationChannelId: 'attendance_tracking',
-      initialNotificationTitle: 'Attendance Tracking',
-      initialNotificationContent: 'Tracking active',
-    ),
-    iosConfiguration: IosConfiguration(
-      autoStart: false,
-      onForeground: trackingServiceStart,
-    ),
-  );
+  if (!kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS)) {
+    await service.configure(
+      androidConfiguration: AndroidConfiguration(
+        onStart: trackingServiceStart,
+        isForegroundMode: true,
+        autoStart: false,
+        notificationChannelId: 'attendance_tracking',
+        initialNotificationTitle: 'Attendance Tracking',
+        initialNotificationContent: 'Tracking active',
+      ),
+      iosConfiguration: IosConfiguration(
+        autoStart: false,
+        onForeground: trackingServiceStart,
+      ),
+    );
+  }
 }
 
 @pragma('vm:entry-point')

@@ -45,7 +45,16 @@ class _SplashScreenState extends State<SplashScreen> {
       builder: (controller) => Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
-          child: Image.asset(MyImages.appLogo, height: 60),
+          child: Text(
+            "Welcome To smmart",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black,
+            ),
+          ),
         ),
       ),
     );

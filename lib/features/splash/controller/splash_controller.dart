@@ -42,7 +42,7 @@ class SplashController extends GetxController {
     // } else {
       if (isRemember) {
         Future.delayed(const Duration(seconds: 1), () {
-          Get.offAndToNamed(RouteHelper.dashboardScreen);
+          Get.offAndToNamed(RouteHelper.workStatusScreen);
         });
       } else {
         Future.delayed(const Duration(seconds: 1), () {
