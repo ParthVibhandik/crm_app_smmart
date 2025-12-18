@@ -6,10 +6,12 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 
 import 'attendance_status.dart';
 import 'biometric_service.dart';
+import 'camera_service.dart';
 
 class AttendanceService {
   final Dio _dio;
   final BiometricService _biometric = BiometricService();
+  final CameraService _camera = CameraService();
 
   AttendanceService(String token)
     : _dio = Dio(
@@ -92,12 +94,7 @@ class AttendanceService {
     }
 
     // 2️⃣ Selfie
-    final ImagePicker picker = ImagePicker();
-    final XFile? photo = await picker.pickImage(
-      source: ImageSource.camera,
-      preferredCameraDevice: CameraDevice.front,
-      maxWidth: 600,
-    );
+    final XFile? photo = await _camera.takeSelfie(maxWidth: 600);
 
     if (photo == null) {
       throw Exception('Selfie is required to punch in');
