@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
@@ -6,12 +7,38 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:battery_plus/battery_plus.dart';
+import 'package:flutter/services.dart';
 
 const String BASE_URL = 'https://smmartcrm.in';
 const String TRACK_API = '/flutex_admin_api/attendance/track';
+const String IS_TRACKING_KEY = 'is_tracking_active';
+const MethodChannel _locationChannel =
+    MethodChannel('com.dhavalmodi.crm/location_service');
 
 StreamSubscription<Position>? _positionSub;
 DateTime? _lastSentAt;
+
+Future<void> _toggleIOSPersistentTracking(bool enabled) async {
+  if (Platform.isIOS) {
+    try {
+      // Force return early if we suspect we are in a background isolate and the channel is not ready.
+      // However, the best way is to try and catch MissingPluginException.
+      await _locationChannel.invokeMethod(enabled
+          ? 'enableSignificantLocationMonitoring'
+          : 'disableSignificantLocationMonitoring');
+      print('[Tracking] IOS Persistent tracking toggled: $enabled');
+    } on PlatformException catch (e) {
+      if (e.code == 'MissingPluginException' || e.message?.contains('No implementation found') == true) {
+        print('[Tracking] Note: Custom channel not available in background isolate, which is expected. Native AppDelegate handles SLC persistence.');
+      } else {
+        print('[Tracking] IOS PlatformException: $e');
+      }
+    } catch (e) {
+      print('[Tracking] Error toggling persistent tracking: $e');
+    }
+  }
+}
+
 
 Future<bool> _ensureLocationPermission(String platform) async {
   final serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -64,6 +91,14 @@ Future<void> initTrackingService() async {
       onBackground: trackingServiceStartIOS,
     ),
   );
+
+  // AUTO-RESUME LOGIC
+  final prefs = await SharedPreferences.getInstance();
+  final isTracking = prefs.getBool(IS_TRACKING_KEY) ?? false;
+  if (isTracking) {
+    print('[Tracking] Persistence detected → Auto-starting service');
+    service.startService();
+  }
 }
 
 /// ==============================
@@ -71,7 +106,7 @@ Future<void> initTrackingService() async {
 /// ==============================
 @pragma('vm:entry-point')
 Future<bool> trackingServiceStartIOS(ServiceInstance service) async {
-  print('[iOS] Background entry triggered');
+  print('[iOS] 🌙 Background entry triggered (App may be in background or waking up from SLC)');
   trackingServiceStart(service);
   return true;
 }
@@ -85,6 +120,13 @@ Future<void> trackingServiceStart(ServiceInstance service) async {
 
   _lastSentAt = null;
   await _positionSub?.cancel();
+
+  // Persist tracking state
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool(IS_TRACKING_KEY, true);
+
+  // Enable iOS persistent tracking if on iOS
+  await _toggleIOSPersistentTracking(true);
 
   if (service is AndroidServiceInstance) {
     print('[ANDROID] Initializing foreground service');
@@ -103,7 +145,7 @@ Future<void> trackingServiceStart(ServiceInstance service) async {
       platform: 'ANDROID',
     );
   } else {
-    print('[iOS] Initializing background tracking');
+    print('[iOS] 🍎 Initializing background tracking');
 
     _startLocationTracking(
       service: service,
@@ -113,8 +155,11 @@ Future<void> trackingServiceStart(ServiceInstance service) async {
     );
   }
 
-  service.on('stop').listen((event) {
+  service.on('stop').listen((event) async {
     print('[Tracking] Stop signal received');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(IS_TRACKING_KEY, false);
+    await _toggleIOSPersistentTracking(false);
     _positionSub?.cancel();
     service.stopSelf();
   });
@@ -135,34 +180,61 @@ Future<void> _startLocationTracking({
 
   if (attendanceId == null || token == null) {
     print('[$platform] No attendance_id found → stopping service');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(IS_TRACKING_KEY, false);
+    await _toggleIOSPersistentTracking(false);
     service.stopSelf();
     return;
   }
 
   if (!await _ensureLocationPermission(platform)) {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(IS_TRACKING_KEY, false);
+    await _toggleIOSPersistentTracking(false);
     service.stopSelf();
     return;
   }
 
   print('[$platform] Starting location stream');
+  
+  // Platform-specific settings for background tracking
+  late final LocationSettings locationSettings;
+  if (platform == 'IOS') {
+    locationSettings = AppleSettings(
+      accuracy: accuracy,
+      distanceFilter: distanceFilter,
+      pauseLocationUpdatesAutomatically: false,
+      showBackgroundLocationIndicator: true,
+      allowBackgroundLocationUpdates: true,
+      activityType: ActivityType.other, // Can be changed based on use case
+    );
+  } else {
+    locationSettings = AndroidSettings(
+      accuracy: accuracy,
+      distanceFilter: distanceFilter,
+      forceLocationManager: true, // Use LocationManager for better background performance on some Androids
+      intervalDuration: const Duration(seconds: 5),
+      foregroundNotificationConfig: const ForegroundNotificationConfig(
+        notificationText: "Attendance Tracking active",
+        notificationTitle: "Attendance Tracking",
+        enableWakeLock: true,
+      ),
+    );
+  }
 
   final dio = Dio();
   final battery = Battery();
 
   _positionSub?.cancel();
-  _positionSub =
-      Geolocator.getPositionStream(
-        locationSettings: LocationSettings(
-          accuracy: accuracy,
-          distanceFilter: distanceFilter,
-        ),
-      ).listen(
-        (position) async {
-          print(
-            '[$platform] Location update: '
-            '${position.latitude.toStringAsFixed(6)}, '
-            '${position.longitude.toStringAsFixed(6)}',
-          );
+  _positionSub = Geolocator.getPositionStream(
+    locationSettings: locationSettings,
+  ).listen(
+    (position) async {
+      print(
+        '[$platform] Location update: '
+        '${position.latitude.toStringAsFixed(6)}, '
+        '${position.longitude.toStringAsFixed(6)}',
+      );
 
           final prefs = await SharedPreferences.getInstance();
           final currentAttendanceId = prefs.getString('attendance_id');
@@ -170,6 +242,9 @@ Future<void> _startLocationTracking({
 
           if (currentAttendanceId == null || currentToken == null) {
             print('[$platform] Punch-out detected → stopping tracking');
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool(IS_TRACKING_KEY, false);
+            await _toggleIOSPersistentTracking(false);
             await _positionSub?.cancel();
             service.stopSelf();
             return;
@@ -219,6 +294,9 @@ Future<void> _startLocationTracking({
         },
         onError: (error) async {
           print('[$platform] ❌ Location stream error: $error');
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool(IS_TRACKING_KEY, false);
+          await _toggleIOSPersistentTracking(false);
           await _positionSub?.cancel();
           service.stopSelf();
         },
