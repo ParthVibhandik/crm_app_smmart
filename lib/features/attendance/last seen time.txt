@@ -1,0 +1,118 @@
+last seen time 
+
+void updateLastAliveTime() {
+  final now = DateTime.now();
+  lastAliveTime = now;
+  SharedPreferences.getInstance().then((prefs) {
+    prefs.setString('last_alive_time', now.toIso8601String());
+  });
+}
+3️⃣ Detect Interruption
+On app start / service restart:
+final prefs = await SharedPreferences.getInstance();
+final lastAliveStr = prefs.getString('last_alive_time');
+if (lastAliveStr != null) {
+  final lastAlive = DateTime.parse(lastAliveStr);
+  final gap = DateTime.now().difference(lastAlive);
+
+  Duration threshold = Platform.isIOS
+      ? Duration(minutes: 10)
+      : Duration(minutes: 3);
+
+  if (gap > threshold) {
+    reportTrackingInterruption(from: lastAlive, to: DateTime.now());
+  }
+}
+
+prefs.setString('last_alive_time', DateTime.now().toIso8601String());
+2️⃣ Where to update it
+a) In _startLocationTracking
+This is where your location stream is active, which runs while the service is alive.
+Inside the listener for location updates:
+
+_positionSub = Geolocator.getPositionStream(
+  locationSettings: locationSettings,
+).listen(
+  (position) async {
+    // ===============================
+    // 1️⃣ Update lastAliveTime
+    // ===============================
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('last_alive_time', DateTime.now().toIso8601String());
+
+    // ===============================
+    // 2️⃣ Your existing API logic
+    // ===============================
+    final currentAttendanceId = prefs.getString('attendance_id');
+    final currentToken = prefs.getString('token');
+
+    if (currentAttendanceId == null || currentToken == null) {
+      print('[$platform] Punch-out detected → stopping tracking');
+      await prefs.setBool(IS_TRACKING_KEY, false);
+      await _toggleIOSPersistentTracking(false);
+      await _positionSub?.cancel();
+      service.stopSelf();
+      return;
+    }
+
+    final now = DateTime.now();
+    if (_lastSentAt != null &&
+        now.difference(_lastSentAt!).inSeconds < 15) {
+      print('[$platform] Rate limited → skipping API call');
+      return;
+    }
+    _lastSentAt = now;
+
+    try {
+      final batteryLevel = await battery.batteryLevel;
+      final charging = (await battery.batteryState) == BatteryState.charging ? 1 : 0;
+
+      await dio.post(
+        '$BASE_URL$TRACK_API',
+        data: {
+          'attendance_id': currentAttendanceId,
+          'latitude': position.latitude.toString(),
+          'longitude': position.longitude.toString(),
+          'battery_percent': batteryLevel.toString(),
+          'is_charging': charging.toString(),
+        },
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+          headers: {
+            'Authorization': 'Bearer $currentToken',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      print('[$platform] ✅ Tracking sent successfully');
+    } catch (e) {
+      print('[$platform] ❌ API error: $e');
+    }
+  },
+);
+✅ This ensures lastAliveTime updates whenever location updates happen, independent of API throttling.
+b) Optional: Timer for Android
+Since Android services can run timers in background, you can update lastAliveTime every 1–2 minutes, even if the user is stationary:
+if (service is AndroidServiceInstance) {
+  Timer.periodic(Duration(minutes: 1), (_) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('last_alive_time', DateTime.now().toIso8601String());
+  });
+}
+iOS: skip timer — only rely on location/foreground updates.
+3️⃣ Check for app kill/interruption on start
+At the beginning of initTrackingService or trackingServiceStart:
+final prefs = await SharedPreferences.getInstance();
+final lastAliveStr = prefs.getString('last_alive_time');
+if (lastAliveStr != null) {
+  final lastAlive = DateTime.parse(lastAliveStr);
+  final gap = DateTime.now().difference(lastAlive);
+
+  Duration threshold = Platform.isIOS ? Duration(minutes: 10) : Duration(minutes: 3);
+
+  if (gap > threshold) {
+    print('[Tracking] ⚠️ App/service was inactive from $lastAlive to ${DateTime.now()}');
+    // Optionally send this info to backend
+  }
+}

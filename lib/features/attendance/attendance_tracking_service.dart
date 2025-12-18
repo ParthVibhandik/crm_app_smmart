@@ -52,15 +52,6 @@ Future<bool> _ensureLocationPermission(String platform) async {
     permission = await Geolocator.requestPermission();
   }
 
-  // On iOS background tracking needs Always; fall back if only whileInUse.
-  if (platform == 'IOS' && permission == LocationPermission.whileInUse) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.whileInUse) {
-      print('[$platform] Need "Always" location for background tracking');
-      return false;
-    }
-  }
-
   if (permission == LocationPermission.denied ||
       permission == LocationPermission.deniedForever) {
     print('[$platform] Location permission denied → stopping service');
@@ -252,7 +243,7 @@ Future<void> _startLocationTracking({
 
           final now = DateTime.now();
 
-          // ⏱ RATE LIMIT — 15 seconds
+          // ⏱ RATE LIMIT — 5 minutes
           if (_lastSentAt != null &&
               now.difference(_lastSentAt!).inSeconds < 15) {
             print('[$platform] Rate limited → skipping API call');
