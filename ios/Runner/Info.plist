@@ -26,10 +26,31 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera is required to take selfies for attendance verification.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>We use Face ID/Touch ID to secure your data</string>
+	<string>Face ID is used for secure biometric authentication to access the app.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Location is required for attendance tracking even when the app is closed.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Location is required for background attendance tracking.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location is required to mark attendance.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library access is required to save and manage attendance photos.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>mailto</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>fetch</string>
+		<string>processing</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

@@ -1270,7 +1270,7 @@ packages:
     source: hosted
     version: "0.7.0"
   url_launcher:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: url_launcher
       sha256: f6a7e5c4835bb4e3026a04793a4199ca2d14c739ec378fdfe23fc8075d0439f8
@@ -1422,7 +1422,7 @@ packages:
     source: hosted
     version: "15.0.2"
   wakelock_plus:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: wakelock_plus
       sha256: "9296d40c9adbedaba95d1e704f4e0b434be446e2792948d0e4aa977048104228"
