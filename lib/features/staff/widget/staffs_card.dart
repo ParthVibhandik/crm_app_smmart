@@ -5,6 +5,7 @@ import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
 import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/staff/model/staff_model.dart';
+import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -57,19 +58,39 @@ class StaffsCard extends StatelessWidget {
                 color: Theme.of(context).textTheme.bodyMedium!.color,
               ),
             ),
-            subtitle: Text(
-              staffModel.email ?? '',
-              style: regularSmall.copyWith(color: ColorResources.blueColor),
+            subtitle: InkWell(
+              onTap: () => UrlLauncherHelper.mail(staffModel.email),
+                child: Text(
+                  staffModel.email ?? '',
+                  overflow: TextOverflow.ellipsis,
+                  style: regularSmall.copyWith(color: ColorResources.blueColor),
+                ),
             ),
-            trailing: Text(
-              staffModel.active == '1'
-                  ? LocalStrings.active.tr
-                  : LocalStrings.disabled.tr,
-              style: regularSmall.copyWith(
-                color: staffModel.active == '1'
-                    ? ColorResources.greenColor
-                    : ColorResources.blueGreyColor,
-              ),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (staffModel.phoneNumber != null &&
+                    staffModel.phoneNumber!.isNotEmpty)
+                  IconButton(
+                    onPressed: () =>
+                        UrlLauncherHelper.call(staffModel.phoneNumber),
+                    icon: const Icon(Icons.call,
+                        size: 20, color: ColorResources.primaryColor),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                Text(
+                  staffModel.active == '1'
+                      ? LocalStrings.active.tr
+                      : LocalStrings.disabled.tr,
+                  style: regularSmall.copyWith(
+                    color: staffModel.active == '1'
+                        ? ColorResources.greenColor
+                        : ColorResources.blueGreyColor,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

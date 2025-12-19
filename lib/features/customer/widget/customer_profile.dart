@@ -4,6 +4,7 @@ import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
 import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/customer/model/customer_details_model.dart';
+import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -48,8 +49,27 @@ class CustomerProfile extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(customerModel.phoneNumber ?? ''),
-                    Text(customerModel.website ?? '-'),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () =>
+                            UrlLauncherHelper.call(customerModel.phoneNumber),
+                        child: Text(
+                          customerModel.phoneNumber ?? '',
+                          overflow: TextOverflow.ellipsis,
+                          style: regularDefault.copyWith(
+                              color: Theme.of(context).primaryColor,
+                              decoration: TextDecoration.underline),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: Dimensions.space10),
+                    Expanded(
+                      child: Text(
+                        customerModel.website ?? '-',
+                        textAlign: TextAlign.end,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
               ],

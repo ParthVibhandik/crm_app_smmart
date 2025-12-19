@@ -40,6 +40,11 @@
 	<string>Photo library access is required to save and manage attendance photos.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>mailto</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>

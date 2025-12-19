@@ -3,7 +3,7 @@ import 'package:flutex_admin/core/utils/color_resources.dart';
 import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/customer/model/contact_model.dart';
-
+import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 
 class ContactCard extends StatelessWidget {
@@ -48,9 +48,30 @@ class ContactCard extends StatelessWidget {
               color: Theme.of(context).textTheme.bodyMedium!.color,
             ),
           ),
-          subtitle: Text(
-            '${contactModel.data![index].email}',
-            style: regularSmall.copyWith(color: ColorResources.blueColor),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () =>
+                    UrlLauncherHelper.mail(contactModel.data![index].email),
+                child: Text(
+                  '${contactModel.data![index].email}',
+                  overflow: TextOverflow.ellipsis,
+                  style: regularSmall.copyWith(color: ColorResources.blueColor),
+                ),
+              ),
+              const SizedBox(height: Dimensions.space5),
+              InkWell(
+                onTap: () => UrlLauncherHelper.call(
+                    contactModel.data![index].phoneNumber),
+                child: Text(
+                  '${contactModel.data![index].phoneNumber}',
+                  overflow: TextOverflow.ellipsis,
+                  style:
+                      regularSmall.copyWith(color: ColorResources.primaryColor),
+                ),
+              ),
+            ],
           ),
           trailing: Switch(
             activeThumbColor: Colors.white,

@@ -5,6 +5,7 @@ import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
 import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/staff/model/staff_details_model.dart';
+import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -56,8 +57,32 @@ class StaffProfile extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(staffModel.email ?? ''),
-                    Text(staffModel.phoneNumber ?? ''),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => UrlLauncherHelper.mail(staffModel.email),
+                        child: Text(
+                          staffModel.email ?? '',
+                          overflow: TextOverflow.ellipsis,
+                          style: regularDefault.copyWith(
+                              color: Theme.of(context).primaryColor,
+                              decoration: TextDecoration.underline),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: Dimensions.space10),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => UrlLauncherHelper.call(staffModel.phoneNumber),
+                        child: Text(
+                          staffModel.phoneNumber ?? '',
+                          textAlign: TextAlign.end,
+                          overflow: TextOverflow.ellipsis,
+                          style: regularDefault.copyWith(
+                              color: Theme.of(context).primaryColor,
+                              decoration: TextDecoration.underline),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ],
