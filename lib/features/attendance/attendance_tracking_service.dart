@@ -8,19 +8,40 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutex_admin/core/service/notification_service.dart';
 
 const String BASE_URL = 'https://smmartcrm.in';
 const String TRACK_API = '/flutex_admin_api/attendance/track';
+const String GPS_OFF_API = '/flutex_admin_api/attendance/gpsClosed';
+
 const String IS_TRACKING_KEY = 'is_tracking_active';
 const String LAST_ALIVE_KEY = 'last_alive_time';
 const String PENDING_INTERRUPTION_KEY = 'pending_interruption';
+const String GPS_OFF_NOTIFIED_KEY = 'gps_off_notified';
 
 const MethodChannel _locationChannel = MethodChannel(
   'com.dhavalmodi.crm/location_service',
 );
 
 StreamSubscription<Position>? _positionSub;
+StreamSubscription<ServiceStatus>? _gpsServiceSub;
+
 DateTime? _lastSentAt;
+bool _gpsWasOn = true;
+bool _iosNotificationsReady = false;
+final FlutterLocalNotificationsPlugin _localFln =
+    FlutterLocalNotificationsPlugin();
+
+Future<void> _ensureIOSLocalNotifications() async {
+  if (_iosNotificationsReady) return;
+  try {
+    await NotificationService.initialize(_localFln);
+    _iosNotificationsReady = true;
+  } catch (e) {
+    print('[IOS] Local notification init failed: $e');
+  }
+}
 
 /// ==============================
 /// HEARTBEAT
@@ -28,6 +49,106 @@ DateTime? _lastSentAt;
 Future<void> _updateLastAlive() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString(LAST_ALIVE_KEY, DateTime.now().toIso8601String());
+}
+
+/// ==============================
+/// GPS OFF API (EDGE TRIGGER)
+/// ==============================
+Future<void> _notifyGpsOff(
+  String platform, {
+  AndroidServiceInstance? androidService,
+}) async {
+  final prefs = await SharedPreferences.getInstance();
+
+  final attendanceId = prefs.getString('attendance_id');
+  final token = prefs.getString('token');
+  final alreadyNotified = prefs.getBool(GPS_OFF_NOTIFIED_KEY) ?? false;
+
+  if (attendanceId == null || token == null || alreadyNotified) return;
+
+  try {
+    print('[$platform] ⚠️ gpsClosed → sending for attendance_id=$attendanceId');
+    if (androidService != null) {
+      androidService.setForegroundNotificationInfo(
+        title: 'Attendance Tracking',
+        content: 'GPS is turned off, please enable location services.',
+      );
+    }
+    await Dio().post(
+      '$BASE_URL$GPS_OFF_API',
+      data: {'attendance_id': attendanceId, 'is_gps_closed': '1'},
+      options: Options(
+        contentType: Headers.formUrlEncodedContentType,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      ),
+    );
+
+    await prefs.setBool(GPS_OFF_NOTIFIED_KEY, true);
+    print('[$platform] 🚫 GPS OFF → API hit success');
+
+    if (Platform.isIOS) {
+      await _ensureIOSLocalNotifications();
+      if (_iosNotificationsReady) {
+        await NotificationService.showBigTextNotification({
+          'title': 'GPS off',
+          'body': 'Tracking paused until you re-enable location.',
+        }, _localFln);
+      }
+    }
+  } catch (e) {
+    print('[$platform] ❌ GPS OFF API failed: $e');
+  }
+}
+
+/// ==============================
+/// GPS SERVICE STATE LISTENER
+/// ==============================
+Future<void> _startGpsServiceListener(
+  String platform,
+  ServiceInstance service,
+) async {
+  await _gpsServiceSub?.cancel();
+
+  _gpsServiceSub = Geolocator.getServiceStatusStream().listen((status) async {
+    final prefs = await SharedPreferences.getInstance();
+    final isPunchedIn = prefs.getString('attendance_id') != null;
+
+    if (!isPunchedIn) return;
+
+    if (_gpsWasOn && status == ServiceStatus.disabled) {
+      _gpsWasOn = false;
+      print('[$platform] GPS turned OFF (service status disabled)');
+      await _notifyGpsOff(
+        platform,
+        androidService: service is AndroidServiceInstance ? service : null,
+      );
+      await _positionSub?.cancel();
+      _positionSub = null;
+    }
+
+    if (status == ServiceStatus.enabled) {
+      _gpsWasOn = true;
+      print('[$platform] GPS turned ON (service status enabled)');
+      await prefs.setBool(GPS_OFF_NOTIFIED_KEY, false);
+      if (service is AndroidServiceInstance) {
+        service.setForegroundNotificationInfo(
+          title: 'Attendance Tracking',
+          content: 'Tracking active',
+        );
+      }
+      _startLocationTracking(
+        service: service,
+        accuracy: Platform.isIOS
+            ? LocationAccuracy.best
+            : LocationAccuracy.high,
+        distanceFilter: 1,
+        platform: platform,
+      );
+    }
+  });
 }
 
 /// ==============================
@@ -42,36 +163,26 @@ Future<void> _toggleIOSPersistentTracking(bool enabled) async {
           ? 'enableSignificantLocationMonitoring'
           : 'disableSignificantLocationMonitoring',
     );
-    print('[Tracking] IOS Persistent tracking toggled: $enabled');
-  } on PlatformException catch (e) {
-    if (e.code == 'MissingPluginException' ||
-        e.message?.contains('No implementation found') == true) {
-      print(
-        '[Tracking] Note: Custom channel not available in background isolate (expected)',
-      );
-    } else {
-      print('[Tracking] IOS PlatformException: $e');
-    }
-  } catch (e) {
-    print('[Tracking] Error toggling persistent tracking: $e');
-  }
+  } catch (_) {}
 }
 
 Future<bool> _ensureLocationPermission(String platform) async {
   final serviceEnabled = await Geolocator.isLocationServiceEnabled();
   if (!serviceEnabled) {
-    print('[$platform] Location services disabled → stopping service');
+    print('[$platform] ensurePermission: location service OFF');
     return false;
   }
 
   var permission = await Geolocator.checkPermission();
+  print('[$platform] ensurePermission: current perm=$permission');
   if (permission == LocationPermission.denied) {
     permission = await Geolocator.requestPermission();
+    print('[$platform] ensurePermission: requested perm -> $permission');
   }
 
   if (permission == LocationPermission.denied ||
       permission == LocationPermission.deniedForever) {
-    print('[$platform] Location permission denied → stopping service');
+    print('[$platform] ensurePermission: denied/forever');
     return false;
   }
 
@@ -88,7 +199,7 @@ Future<void> initTrackingService() async {
     androidConfiguration: AndroidConfiguration(
       onStart: trackingServiceStart,
       isForegroundMode: true,
-      autoStart: false,
+      autoStart: true,
       notificationChannelId: 'attendance_tracking',
       initialNotificationTitle: 'Attendance Tracking',
       initialNotificationContent: 'Tracking active',
@@ -101,9 +212,7 @@ Future<void> initTrackingService() async {
   );
 
   final prefs = await SharedPreferences.getInstance();
-  final isTracking = prefs.getBool(IS_TRACKING_KEY) ?? false;
-  if (isTracking) {
-    print('[Tracking] Persistence detected → Auto-starting service');
+  if (prefs.getBool(IS_TRACKING_KEY) ?? false) {
     service.startService();
   }
 }
@@ -113,7 +222,6 @@ Future<void> initTrackingService() async {
 /// ==============================
 @pragma('vm:entry-point')
 Future<bool> trackingServiceStartIOS(ServiceInstance service) async {
-  print('[iOS] 🌙 Background entry triggered');
   trackingServiceStart(service);
   return true;
 }
@@ -123,51 +231,43 @@ Future<bool> trackingServiceStartIOS(ServiceInstance service) async {
 /// ==============================
 @pragma('vm:entry-point')
 Future<void> trackingServiceStart(ServiceInstance service) async {
-  print('[Tracking] Service started');
-
   _lastSentAt = null;
   await _positionSub?.cancel();
+  await _gpsServiceSub?.cancel();
+  print('[Tracking] Service entry');
 
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool(IS_TRACKING_KEY, true);
 
   await _toggleIOSPersistentTracking(true);
-  await _updateLastAlive(); // initial heartbeat
+  await _updateLastAlive();
+
+  final platform = Platform.isIOS ? 'IOS' : 'ANDROID';
+  await _startGpsServiceListener(platform, service);
 
   if (service is AndroidServiceInstance) {
     service.setAsForegroundService();
-    service.setForegroundNotificationInfo(
-      title: 'Attendance Tracking',
-      content: 'Tracking active',
-    );
-
-    _startLocationTracking(
-      service: service,
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 1,
-      platform: 'ANDROID',
-    );
-  } else {
-    _startLocationTracking(
-      service: service,
-      accuracy: LocationAccuracy.best,
-      distanceFilter: 1,
-      platform: 'IOS',
-    );
   }
 
+  _startLocationTracking(
+    service: service,
+    accuracy: Platform.isIOS ? LocationAccuracy.best : LocationAccuracy.high,
+    distanceFilter: 1,
+    platform: platform,
+  );
+
   service.on('stop').listen((_) async {
-    print('[Tracking] Stop signal received');
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(IS_TRACKING_KEY, false);
     await _toggleIOSPersistentTracking(false);
     await _positionSub?.cancel();
+    await _gpsServiceSub?.cancel();
     service.stopSelf();
   });
 }
 
 /// ==============================
-/// LOCATION-BASED TRACKING
+/// LOCATION TRACKING
 /// ==============================
 Future<void> _startLocationTracking({
   required ServiceInstance service,
@@ -175,77 +275,53 @@ Future<void> _startLocationTracking({
   required int distanceFilter,
   required String platform,
 }) async {
+  await _positionSub?.cancel();
+  _positionSub = null;
+
   final prefs = await SharedPreferences.getInstance();
   final attendanceId = prefs.getString('attendance_id');
   final token = prefs.getString('token');
 
   if (attendanceId == null || token == null) {
-    print('[$platform] No attendance_id found → stopping service');
-    await prefs.setBool(IS_TRACKING_KEY, false);
-    await _toggleIOSPersistentTracking(false);
     service.stopSelf();
     return;
   }
 
   if (!await _ensureLocationPermission(platform)) {
-    await prefs.setBool(IS_TRACKING_KEY, false);
-    await _toggleIOSPersistentTracking(false);
-    service.stopSelf();
+    print(
+      '[$platform] startLocationTracking: permission/service missing, waiting',
+    );
     return;
   }
 
-  late final LocationSettings locationSettings;
-  if (platform == 'IOS') {
-    locationSettings = AppleSettings(
-      accuracy: accuracy,
-      distanceFilter: distanceFilter,
-      pauseLocationUpdatesAutomatically: false,
-      showBackgroundLocationIndicator: true,
-      allowBackgroundLocationUpdates: true,
-      activityType: ActivityType.other,
-    );
-  } else {
-    locationSettings = AndroidSettings(
-      accuracy: accuracy,
-      distanceFilter: distanceFilter,
-      forceLocationManager: true,
-      intervalDuration: const Duration(seconds: 5),
-      foregroundNotificationConfig: const ForegroundNotificationConfig(
-        notificationText: 'Attendance Tracking active',
-        notificationTitle: 'Attendance Tracking',
-        enableWakeLock: true,
-      ),
-    );
-  }
+  final locationSettings = Platform.isIOS
+      ? AppleSettings(
+          accuracy: accuracy,
+          distanceFilter: distanceFilter,
+          allowBackgroundLocationUpdates: true,
+          pauseLocationUpdatesAutomatically: false,
+        )
+      : AndroidSettings(
+          accuracy: accuracy,
+          distanceFilter: distanceFilter,
+          intervalDuration: const Duration(seconds: 5),
+          foregroundNotificationConfig: const ForegroundNotificationConfig(
+            notificationTitle: 'Attendance Tracking',
+            notificationText: 'Tracking active',
+            enableWakeLock: true,
+          ),
+        );
 
   final dio = Dio();
   final battery = Battery();
 
-  _positionSub?.cancel();
   _positionSub =
       Geolocator.getPositionStream(locationSettings: locationSettings).listen(
         (position) async {
-          await _updateLastAlive();
-
           print(
-            '[$platform] Location update: '
-            '${position.latitude.toStringAsFixed(6)}, '
-            '${position.longitude.toStringAsFixed(6)}',
+            '[$platform] position stream -> ${position.latitude},${position.longitude}',
           );
-
-          final prefs = await SharedPreferences.getInstance();
-          final currentAttendanceId = prefs.getString('attendance_id');
-          final currentToken = prefs.getString('token');
-          final interruption = prefs.getString(PENDING_INTERRUPTION_KEY);
-
-          if (currentAttendanceId == null || currentToken == null) {
-            print('[$platform] Punch-out detected → stopping tracking');
-            await prefs.setBool(IS_TRACKING_KEY, false);
-            await _toggleIOSPersistentTracking(false);
-            await _positionSub?.cancel();
-            service.stopSelf();
-            return;
-          }
+          await _updateLastAlive();
 
           if (_lastSentAt != null &&
               DateTime.now().difference(_lastSentAt!).inSeconds < 15) {
@@ -259,42 +335,37 @@ Future<void> _startLocationTracking({
             final charging =
                 (await battery.batteryState) == BatteryState.charging ? 1 : 0;
 
+            print('[$platform] posting track...');
             await dio.post(
               '$BASE_URL$TRACK_API',
               data: {
-                'attendance_id': currentAttendanceId,
+                'attendance_id': attendanceId,
                 'latitude': position.latitude.toString(),
                 'longitude': position.longitude.toString(),
                 'battery_percent': batteryLevel.toString(),
                 'is_charging': charging.toString(),
-                'interruption': interruption, // ✅ null or string
               },
               options: Options(
                 contentType: Headers.formUrlEncodedContentType,
-                headers: {
-                  'Authorization': 'Bearer $currentToken',
-                  'Accept': 'application/json',
-                },
+                headers: {'Authorization': 'Bearer $token'},
               ),
             );
-
-            if (interruption != null) {
-              await prefs.remove(PENDING_INTERRUPTION_KEY); // send once
-            }
-
-            print('[$platform] ✅ Tracking sent successfully');
-          } catch (e) {
-            print('[$platform] ❌ Tracking error: $e');
-          }
+            print('[$platform] ✅ track success');
+          } catch (_) {}
         },
-        onError: (error) async {
-          print('[$platform] ❌ Location stream error: $error');
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setBool(IS_TRACKING_KEY, false);
-          await _toggleIOSPersistentTracking(false);
+        onError: (_) async {
+          print('[$platform] position stream error, will retry in 5s');
           await _positionSub?.cancel();
-          service.stopSelf();
+          _positionSub = null;
+          // Keep service alive; attempt to restart tracking after a short delay.
+          Future.delayed(const Duration(seconds: 5), () {
+            _startLocationTracking(
+              service: service,
+              accuracy: accuracy,
+              distanceFilter: distanceFilter,
+              platform: platform,
+            );
+          });
         },
-        cancelOnError: false,
       );
 }

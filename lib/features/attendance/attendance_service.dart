@@ -13,6 +13,10 @@ class AttendanceService {
   final BiometricService _biometric = BiometricService();
   final CameraService _camera = CameraService();
 
+  // Backend verify endpoint (expects attendance_id query param)
+  static const String _verifyGpsEndpoint =
+      '/flutex_admin_api/attendance/verify';
+
   AttendanceService(String token)
     : _dio = Dio(
         BaseOptions(
@@ -150,7 +154,28 @@ class AttendanceService {
   /// ==============================
   /// PUNCH OUT
   /// ==============================
-  Future<void> punchOut() async {
+  Future<bool> _verifyGpsOffEvents() async {
+    final prefs = await SharedPreferences.getInstance();
+    final attendanceId = prefs.getString('attendance_id');
+    if (attendanceId == null || attendanceId.isEmpty) return false;
+
+    try {
+      final response = await _dio.get(
+        _verifyGpsEndpoint,
+        queryParameters: {'attendance_id': attendanceId},
+      );
+      print('GPS Off Verification Response: ${response.data}');
+      if (response.data is Map && response.data['status'] == true) {
+        return response.data['gps_closed_exists'] == true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  /// Exposed helper so UI can decide whether to collect a GPS-off reason.
+  Future<bool> requiresGpsOffReason() => _verifyGpsOffEvents();
+
+  Future<void> punchOut({String? gpsOffReason}) async {
     // 1️⃣ Biometric
     final biometricAvailable = await _biometric.isBiometricAvailable();
     if (biometricAvailable) {
@@ -162,13 +187,20 @@ class AttendanceService {
       }
     }
 
-    // 2️⃣ Location (single fetch)
+    // 2️⃣ Check if backend saw GPS-off events today; enforce reason if needed
+    final requiresReason = await _verifyGpsOffEvents();
+    if (requiresReason && (gpsOffReason == null || gpsOffReason.isEmpty)) {
+      throw Exception('Please provide reason for GPS off before punch-out.');
+    }
+
+    // 3️⃣ Location (single fetch)
     final Position position = await _getCurrentLocation();
 
-    // 3️⃣ API
+    // 4️⃣ API
     final FormData formData = FormData.fromMap({
       'latitude': position.latitude.toString(),
       'longitude': position.longitude.toString(),
+      if (requiresReason) 'gps_off_reason': gpsOffReason,
     });
 
     final response = await _dio.post(
