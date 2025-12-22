@@ -3,8 +3,8 @@ import "package:flutex_admin/core/utils/images.dart";
 import "package:get/get.dart";
 
 class LocalStrings {
-  static const String appName = "Flutex";
-  static const String topic = "Flutex";
+  static const String appName = "smmart";
+  static const String topic = "smmart";
 
   static List<LanguageModel> appLanguages = [
     LanguageModel(

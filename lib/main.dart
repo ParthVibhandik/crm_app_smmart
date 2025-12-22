@@ -55,8 +55,8 @@ class MyApp extends StatelessWidget {
             return GetMaterialApp(
               title: LocalStrings.appName.tr,
               debugShowCheckedModeBanner: false,
-              defaultTransition: Transition.fadeIn,
-              transitionDuration: const Duration(milliseconds: 200),
+              defaultTransition: Transition.cupertino,
+              transitionDuration: const Duration(milliseconds: 400),
               initialRoute: RouteHelper.splashScreen,
               navigatorKey: Get.key,
               theme: theme.darkTheme ? dark : light,

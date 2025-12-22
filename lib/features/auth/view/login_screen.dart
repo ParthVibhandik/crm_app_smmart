@@ -48,35 +48,68 @@ class _LoginScreenState extends State<LoginScreen> {
     return WillPopWidget(
       nextRoute: '',
       child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: GetBuilder<LoginController>(
-          builder: (controller) => SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  decoration: const BoxDecoration(
-                    color: ColorResources.colorWhite,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: 140.0,
-                          bottom: 30.0,
-                        ),
-                        child: Center(
-                          child: Image.asset(
-                            MyImages.smmartLogo,
-                            height: 60,
+          builder: (controller) => Stack(
+            children: [
+              // Background Animation
+              Positioned.fill(
+                child: RepaintBoundary(
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.0, end: 1.0),
+                    duration: const Duration(seconds: 15),
+                    builder: (context, value, child) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Theme.of(context).primaryColor, // Deep Blue
+                              ColorResources.secondaryColor.withValues(alpha: 0.3), // Solar Orange Splash
+                              Theme.of(context).primaryColor.withValues(alpha: 0.8),
+                              Theme.of(context).primaryColor,
+                            ],
+                            stops: [
+                              0.0,
+                              (value * 0.5 + 0.1),
+                              (value * 0.8 + 0.2),
+                              1.0,
+                            ],
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.sizeOf(context).width,
-                        child: Padding(
-                          padding: const EdgeInsets.all(Dimensions.space30),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              // Main Content
+              Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor.withValues(alpha: 0.85),
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: Dimensions.space50),
+                        Image.asset(
+                          MyImages.smmartLogo,
+                          height: 80,
+                        ),
+                        const SizedBox(height: Dimensions.space30),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: Dimensions.space30),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -95,133 +128,122 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           ),
                         ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20),
-                          ),
-                        ),
-                        padding: const EdgeInsets.all(Dimensions.space20),
-                        child: Form(
-                          key: formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              CustomTextField(
-                                labelText: LocalStrings.email.tr,
-                                controller: controller.emailController,
-                                onChanged: (value) {},
-                                focusNode: controller.emailFocusNode,
-                                nextFocus: controller.passwordFocusNode,
-                                textInputType: TextInputType.emailAddress,
-                                inputAction: TextInputAction.next,
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return LocalStrings.fieldErrorMsg.tr;
-                                  } else {
-                                    return null;
-                                  }
-                                },
-                              ),
-                              const SizedBox(height: Dimensions.space20),
-                              CustomTextField(
-                                labelText: LocalStrings.password.tr,
-                                controller: controller.passwordController,
-                                focusNode: controller.passwordFocusNode,
-                                onChanged: (value) {},
-                                isShowSuffixIcon: true,
-                                isPassword: true,
-                                textInputType: TextInputType.text,
-                                inputAction: TextInputAction.done,
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return LocalStrings.fieldErrorMsg.tr;
-                                  } else {
-                                    return null;
-                                  }
-                                },
-                              ),
-                              const SizedBox(height: Dimensions.space20),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 25,
-                                        height: 25,
-                                        child: Checkbox(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              Dimensions.defaultRadius,
+                        const SizedBox(height: Dimensions.space20),
+                        Container(
+                          padding: const EdgeInsets.all(Dimensions.space30),
+                          child: Form(
+                            key: formKey,
+                            child: Column(
+                              children: [
+                                CustomTextField(
+                                  labelText: LocalStrings.email.tr,
+                                  controller: controller.emailController,
+                                  onChanged: (value) {},
+                                  focusNode: controller.emailFocusNode,
+                                  nextFocus: controller.passwordFocusNode,
+                                  textInputType: TextInputType.emailAddress,
+                                  inputAction: TextInputAction.next,
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return LocalStrings.fieldErrorMsg.tr;
+                                    } else {
+                                      return null;
+                                    }
+                                  },
+                                ),
+                                const SizedBox(height: Dimensions.space20),
+                                CustomTextField(
+                                  labelText: LocalStrings.password.tr,
+                                  controller: controller.passwordController,
+                                  onChanged: (value) {},
+                                  focusNode: controller.passwordFocusNode,
+                                  isShowSuffixIcon: true,
+                                  isPassword: true,
+                                  textInputType: TextInputType.text,
+                                  inputAction: TextInputAction.done,
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return LocalStrings.fieldErrorMsg.tr;
+                                    } else {
+                                      return null;
+                                    }
+                                  },
+                                ),
+                                const SizedBox(height: Dimensions.space20),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 25,
+                                          height: 25,
+                                          child: Checkbox(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                Dimensions.defaultRadius,
+                                              ),
                                             ),
+                                            activeColor:
+                                                ColorResources.primaryColor,
+                                            checkColor:
+                                                ColorResources.colorWhite,
+                                            value: controller.remember,
+                                            onChanged: (value) {
+                                              controller.changeRememberMe();
+                                            },
                                           ),
-                                          activeColor:
-                                              ColorResources.primaryColor,
-                                          checkColor: ColorResources.colorWhite,
-                                          value: controller.remember,
-                                          side: WidgetStateBorderSide.resolveWith(
-                                            (states) => BorderSide(
-                                              width: 1.0,
-                                              color: controller.remember
-                                                  ? ColorResources.getTextFieldEnableBorder()
-                                                  : ColorResources.getTextFieldDisableBorder(),
-                                            ),
-                                          ),
-                                          onChanged: (value) {
-                                            controller.changeRememberMe();
-                                          },
                                         ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      DefaultText(
-                                        text: LocalStrings.rememberMe.tr,
-                                        textColor: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium!
-                                            .color!
-                                            .withValues(alpha: 0.5),
-                                      ),
-                                    ],
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      //controller.clearTextField();
-                                      Get.toNamed(
-                                        RouteHelper.forgotPasswordScreen,
-                                      );
-                                    },
-                                    child: DefaultText(
-                                      text: LocalStrings.forgotPassword.tr,
-                                      textColor: ColorResources.secondaryColor,
+                                        const SizedBox(width: 8),
+                                        DefaultText(
+                                          text: LocalStrings.rememberMe.tr,
+                                          textColor: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .color!
+                                              .withValues(alpha: 0.5),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: Dimensions.space20),
-                              controller.isSubmitLoading
-                                  ? const RoundedLoadingBtn()
-                                  : RoundedButton(
-                                      text: LocalStrings.signIn.tr,
-                                      press: () {
-                                        if (formKey.currentState!.validate()) {
-                                          controller.loginUser();
-                                        }
+                                    InkWell(
+                                      onTap: () {
+                                        Get.toNamed(
+                                          RouteHelper.forgotPasswordScreen,
+                                        );
                                       },
+                                      child: DefaultText(
+                                        text: LocalStrings.forgotPassword.tr,
+                                        textColor:
+                                            ColorResources.secondaryColor,
+                                      ),
                                     ),
-                            ],
+                                  ],
+                                ),
+                                const SizedBox(height: Dimensions.space20),
+                                controller.isSubmitLoading
+                                    ? const RoundedLoadingBtn()
+                                    : RoundedButton(
+                                        text: LocalStrings.signIn.tr,
+                                        press: () {
+                                          if (formKey.currentState!
+                                              .validate()) {
+                                            controller.loginUser();
+                                          }
+                                        },
+                                      ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: Dimensions.space20),
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

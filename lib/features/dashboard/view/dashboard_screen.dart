@@ -20,6 +20,7 @@ import 'package:flutex_admin/features/dashboard/widget/drawer.dart';
 import 'package:flutex_admin/features/dashboard/widget/home_estimates_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/home_invoices_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/home_proposals_card.dart';
+import 'package:flutex_admin/features/dashboard/widget/performance_chart.dart';
 import 'package:flutex_admin/features/attendance/attendance_screen.dart';
 import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,14 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  bool _isPrimaryLogo = true;
+
+  void _toggleLogo() {
+    setState(() {
+      _isPrimaryLogo = !_isPrimaryLogo;
+    });
+  }
+
   @override
   void initState() {
     Get.put(ApiClient(sharedPreferences: Get.find()));
@@ -76,20 +85,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 },
               ),
               centerTitle: true,
-              title: CachedNetworkImage(
-                imageUrl: controller.homeModel.overview?.perfexLogo ?? '',
-                fit: BoxFit.cover,
-                height: 30,
-                errorWidget: (ctx, object, trx) {
-                  return Image.asset(
-                    MyImages.appLogoWhite,
-                    fit: BoxFit.cover,
-                    height: 30,
-                  );
-                },
-                placeholder: (ctx, trx) {
-                  return Image.asset(MyImages.appLogo);
-                },
+              title: GestureDetector(
+                onTap: _toggleLogo,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15), // Glassy background
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 0.5),
+                  ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    transitionBuilder: (Widget child, Animation<double> animation) {
+                      return ScaleTransition(
+                        scale: animation,
+                        child: FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Image.asset(
+                      _isPrimaryLogo ? MyImages.appLogo : MyImages.secondaryLogo,
+                      key: ValueKey<bool>(_isPrimaryLogo),
+                      height: 25,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
               ),
               actions: [
                 ActionButtonIconWidget(
@@ -335,48 +358,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   false))
                             Stack(
                               children: [
-                                CarouselSlider(
-                                  options: CarouselOptions(
-                                    height: 440.0,
-                                    viewportFraction: 1,
-                                    onPageChanged: (index, i) {
-                                      controller.currentPageIndex = index;
-                                      controller.update();
-                                    },
+                                RepaintBoundary(
+                                  child: CarouselSlider(
+                                    options: CarouselOptions(
+                                      height: 440.0,
+                                      viewportFraction: 1,
+                                      onPageChanged: (index, i) {
+                                        controller.currentPageIndex = index;
+                                        controller.update();
+                                      },
+                                    ),
+                                    items: [
+                                      if (controller
+                                              .homeModel
+                                              .menuItems
+                                              ?.invoices ??
+                                          false)
+                                        HomeInvoicesCard(
+                                          invoices:
+                                              controller.homeModel.data?.invoices,
+                                        ),
+                                      if (controller
+                                              .homeModel
+                                              .menuItems
+                                              ?.estimates ??
+                                          false)
+                                        HomeEstimatesCard(
+                                          estimates: controller
+                                              .homeModel
+                                              .data
+                                              ?.estimates,
+                                        ),
+                                      if (controller
+                                              .homeModel
+                                              .menuItems
+                                              ?.proposals ??
+                                          false)
+                                        HomeProposalsCard(
+                                          proposals: controller
+                                              .homeModel
+                                              .data
+                                              ?.proposals,
+                                        ),
+                                    ],
                                   ),
-                                  items: [
-                                    if (controller
-                                            .homeModel
-                                            .menuItems
-                                            ?.invoices ??
-                                        false)
-                                      HomeInvoicesCard(
-                                        invoices:
-                                            controller.homeModel.data?.invoices,
-                                      ),
-                                    if (controller
-                                            .homeModel
-                                            .menuItems
-                                            ?.estimates ??
-                                        false)
-                                      HomeEstimatesCard(
-                                        estimates: controller
-                                            .homeModel
-                                            .data
-                                            ?.estimates,
-                                      ),
-                                    if (controller
-                                            .homeModel
-                                            .menuItems
-                                            ?.proposals ??
-                                        false)
-                                      HomeProposalsCard(
-                                        proposals: controller
-                                            .homeModel
-                                            .data
-                                            ?.proposals,
-                                      ),
-                                  ],
                                 ),
                               ],
                             ),
@@ -412,26 +437,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   space: Dimensions.space5,
                                   padding: Dimensions.space15,
                                 ),
-                                SfCircularChart(
-                                  tooltipBehavior: TooltipBehavior(
-                                    enable: true,
-                                  ),
-                                  legend: const Legend(
-                                    isVisible: true,
-                                    position: LegendPosition.bottom,
-                                    textStyle: lightDefault,
-                                  ),
-                                  series: <CircularSeries>[
-                                    DoughnutSeries<DataField, String>(
-                                      dataSource:
-                                          controller.homeModel.data?.projects,
-                                      xValueMapper: (DataField data, _) =>
-                                          data.status?.tr ?? '',
-                                      yValueMapper: (DataField data, _) =>
-                                          int.parse(data.total ?? '0'),
+                                RepaintBoundary(
+                                  child: SfCircularChart(
+                                    tooltipBehavior: TooltipBehavior(
+                                      enable: true,
                                     ),
-                                  ],
+                                    legend: const Legend(
+                                      isVisible: true,
+                                      position: LegendPosition.bottom,
+                                      textStyle: lightDefault,
+                                    ),
+                                    series: <CircularSeries>[
+                                      DoughnutSeries<DataField, String>(
+                                        dataSource:
+                                            controller.homeModel.data?.projects,
+                                        xValueMapper: (DataField data, _) =>
+                                            data.status?.tr ?? '',
+                                        yValueMapper: (DataField data, _) =>
+                                            int.parse(data.total ?? '0'),
+                                      ),
+                                    ],
+                                  ),
                                 ),
+                                const PerformanceChart(), // Added Performance Chart
+                                const SizedBox(height: Dimensions.space30),
                               ],
                             ),
                         ],

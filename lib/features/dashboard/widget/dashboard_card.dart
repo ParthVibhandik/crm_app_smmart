@@ -48,12 +48,12 @@ class DashboardCard extends StatelessWidget {
               children: [
                 CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Theme.of(context).textTheme.bodyMedium!.color,
+                  color: ColorResources.secondaryColor,
                   backgroundColor: ColorResources.colorLightGrey,
                   value: double.parse(percent) / 100,
                 ),
                 Icon(
-                  color: Theme.of(context).textTheme.bodyMedium!.color,
+                  color: ColorResources.secondaryColor,
                   icon,
                   size: 20,
                 ),
