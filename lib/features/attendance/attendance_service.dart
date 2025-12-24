@@ -33,6 +33,7 @@ class AttendanceService {
   /// ==============================
   Future<AttendanceStatus> getTodayStatus() async {
     final response = await _dio.get('/flutex_admin_api/attendance/today');
+    print(response.data);
 
     if (response.data['status'] != true) {
       throw Exception(response.data['message'] ?? 'Failed');
@@ -50,6 +51,10 @@ class AttendanceService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('attendance_id', attendanceId.toString());
       await prefs.setString('token', token);
+    } else {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('attendance_id');
+      await prefs.remove('token');
     }
 
     return AttendanceStatus.fromJson(response.data);
@@ -122,6 +127,8 @@ class AttendanceService {
       '/flutex_admin_api/attendance/punch-in',
       data: formData,
     );
+
+    print(response.data);
 
     if (response.data['status'] != true) {
       throw Exception(response.data['message'] ?? 'Punch-in failed');
@@ -200,13 +207,15 @@ class AttendanceService {
     final FormData formData = FormData.fromMap({
       'latitude': position.latitude.toString(),
       'longitude': position.longitude.toString(),
-      if (requiresReason) 'gps_off_reason': gpsOffReason,
+      'gps_off_reason': gpsOffReason ?? '',
     });
 
     final response = await _dio.post(
       '/flutex_admin_api/attendance/punch-out',
       data: formData,
     );
+
+    print(response.data);
 
     if (response.data['status'] != true) {
       throw Exception(response.data['message'] ?? 'Punch-out failed');
