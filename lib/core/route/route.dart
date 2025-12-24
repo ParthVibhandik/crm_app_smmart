@@ -45,7 +45,7 @@ import 'package:flutex_admin/features/proposal/view/add_proposal_screen.dart';
 import 'package:flutex_admin/features/proposal/view/proposal_details_screen.dart';
 import 'package:flutex_admin/features/proposal/view/proposal_screen.dart';
 import 'package:flutex_admin/features/proposal/view/update_proposal_screen.dart';
-import 'package:flutex_admin/features/sales_tracker/sales_tracker_screen.dart';
+import 'package:flutex_admin/features/sales_tracker/view/sales_tracker_screen.dart';
 import 'package:flutex_admin/features/splash/view/splash_screen.dart';
 import 'package:flutex_admin/features/staff/view/add_staff_screen.dart';
 import 'package:flutex_admin/features/staff/view/staff_details_screen.dart';

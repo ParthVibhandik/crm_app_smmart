@@ -192,8 +192,8 @@ class HomeDrawer extends StatelessWidget {
                         )
                       : const SizedBox.shrink(),
                   buildListTile(
-                    leadingIcon: Icons.assistant_direction_outlined,
-                    title: 'Sales Tracker',
+                    leadingIcon: Icons.map_outlined,
+                    title: "Sales Trip Tracker",
                     onTap: () {
                       Navigator.pop(context);
                       Get.toNamed(RouteHelper.salesTrackerScreen);

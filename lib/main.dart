@@ -13,11 +13,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/service/di_services.dart' as services;
 import 'features/attendance/attendance_tracking_service.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 AndroidNotificationChannel? channel;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await initTrackingService();
   try {
     await NotificationService.initialize(flutterLocalNotificationsPlugin);
