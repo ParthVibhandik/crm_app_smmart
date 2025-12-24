@@ -40,6 +40,10 @@ class UrlContainer {
   static const String miscellaneousUrl = 'miscellaneous';
   static const String privacyPolicyUrl = 'miscellaneous/privacy';
 
+  // Sales Tracker
+  static const String salesTrackerGetLeadsUrl = 'sales-tracker/get-leads';
+  static const String salesTrackerSearchLeadUrl = 'sales-tracker/search-lead';
+
   // Download URLs
   static const String leadAttachmentUrl = '$downloadUrl/lead_attachment';
   static const String salesAttachmentUrl = '$downloadUrl/sales_attachment';
