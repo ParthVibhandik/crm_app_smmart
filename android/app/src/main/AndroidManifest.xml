@@ -19,7 +19,7 @@
 
 
     <application
-        android:label="smmart"
+        android:label="Flutex Admin/Staff"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
 

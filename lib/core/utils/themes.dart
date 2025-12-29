@@ -1,170 +1,112 @@
 import 'package:flutex_admin/core/utils/color_resources.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+// Light Theme (Optional - kept clean)
 ThemeData light = ThemeData(
+  useMaterial3: true,
+  fontFamily: GoogleFonts.outfit().fontFamily,
   primaryColor: ColorResources.primaryColor,
   secondaryHeaderColor: ColorResources.secondaryColor,
+  scaffoldBackgroundColor: const Color(0xFFF8F9FA),
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: ColorResources.primaryColor,
+    surface: Colors.white,
+    brightness: Brightness.light,
+  ),
   appBarTheme: const AppBarTheme(
     backgroundColor: ColorResources.primaryColor,
     elevation: 0,
-    surfaceTintColor: Colors.transparent,
-    actionsIconTheme: IconThemeData(color: Colors.white),
-    foregroundColor: Colors.white,
     centerTitle: true,
-    titleTextStyle: TextStyle(
-      color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontSize: 20,
-      fontFamily: 'Montserrat-Arabic',
-    ),
+    titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
     iconTheme: IconThemeData(color: Colors.white),
-    systemOverlayStyle: SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.light,
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ),
+    systemOverlayStyle: SystemUiOverlayStyle.light,
   ),
-  fontFamily: 'Montserrat-Arabic',
-  scaffoldBackgroundColor: ColorResources.screenBgColor,
-  floatingActionButtonTheme: const FloatingActionButtonThemeData(
-    foregroundColor: Colors.white,
-    backgroundColor: ColorResources.secondaryColor,
-    elevation: 4,
-  ),
-  elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      backgroundColor: ColorResources.secondaryColor,
-      foregroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 2,
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-    ),
-  ),
-  inputDecorationTheme: InputDecorationTheme(
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: ColorResources.primaryColor, width: 1.5)),
-    contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-    hintStyle: const TextStyle(color: ColorResources.hintColor, fontSize: 14),
-    fillColor: ColorResources.inputColor,
-    filled: true,
-  ),
-  cardTheme: CardThemeData(
-    color: Colors.white,
-    elevation: 4,
-    shadowColor: Colors.black.withValues(alpha: 0.05),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  ),
-  cardColor: Colors.white,
-  textTheme: const TextTheme(
-    displaySmall: TextStyle(
-      color: ColorResources.primaryTextColor,
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
-    ),
-    bodyMedium: TextStyle(
-      color: ColorResources.primaryTextColor,
-      fontWeight: FontWeight.w400,
-      fontSize: 14,
-    ),
-    bodySmall: TextStyle(
-      color: ColorResources.contentTextColor,
-      fontWeight: FontWeight.w400,
-      fontSize: 12,
-    ),
-    bodyLarge: TextStyle(
-      color: ColorResources.primaryColor,
-      fontWeight: FontWeight.w600,
-      fontSize: 14,
-    ),
-  ),
-  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-    backgroundColor: Colors.white,
-    selectedItemColor: ColorResources.primaryColor,
-    unselectedItemColor: ColorResources.hintColor,
-    showUnselectedLabels: true,
-    elevation: 20,
-    type: BottomNavigationBarType.fixed,
-  ),
-  hintColor: ColorResources.hintColor,
+  textTheme: GoogleFonts.outfitTextTheme(),
 );
 
+// Dark "Future/Neon" Theme - The Main Star
 ThemeData dark = ThemeData(
-  primaryColor: ColorResources.primaryColor,
-  secondaryHeaderColor: ColorResources.secondaryColor,
+  useMaterial3: true,
+  fontFamily: GoogleFonts.outfit().fontFamily,
+  primaryColor: ColorResources.neonCyan,
+  secondaryHeaderColor: ColorResources.electricPurple,
+  scaffoldBackgroundColor: ColorResources.voidBackground,
   brightness: Brightness.dark,
+
+  colorScheme: const ColorScheme.dark(
+    primary: ColorResources.neonCyan,
+    secondary: ColorResources.electricPurple,
+    surface: ColorResources.cardSurface,
+    onPrimary: Colors.black,
+    onSurface: Colors.white,
+    error: Colors.redAccent,
+  ),
+
   appBarTheme: const AppBarTheme(
-    backgroundColor: ColorResources.primaryColor,
+    backgroundColor: Colors.transparent,
     elevation: 0,
-    surfaceTintColor: Colors.transparent,
-    actionsIconTheme: IconThemeData(color: Colors.white),
     centerTitle: true,
-    titleTextStyle: TextStyle(
-      color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontSize: 20,
-      fontFamily: 'Montserrat-Arabic',
-    ),
+    titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
     iconTheme: IconThemeData(color: Colors.white),
-    systemOverlayStyle: SystemUiOverlayStyle(
-      statusBarBrightness: Brightness.dark,
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-    ),
+    systemOverlayStyle: SystemUiOverlayStyle.light,
   ),
-  scaffoldBackgroundColor: ColorResources.screenBgColorDark,
+
   floatingActionButtonTheme: const FloatingActionButtonThemeData(
-    foregroundColor: Colors.white,
-    backgroundColor: ColorResources.secondaryColor,
+    backgroundColor: ColorResources.neonCyan,
+    foregroundColor: Colors.black,
   ),
-  elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      backgroundColor: ColorResources.secondaryColor,
-      foregroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 0,
+
+  inputDecorationTheme: InputDecorationTheme(
+    filled: true,
+    fillColor: ColorResources.glassBlack,
+    hintStyle: GoogleFonts.outfit(color: Colors.white38),
+    labelStyle: GoogleFonts.outfit(color: Colors.white70),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: ColorResources.neonCyan, width: 2),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: Colors.redAccent, width: 1),
     ),
   ),
-  inputDecorationTheme: InputDecorationTheme(
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: ColorResources.secondaryColor, width: 1.5)),
-    contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-    fillColor: ColorResources.inputColorDark,
-    filled: true,
-    hintStyle: const TextStyle(color: ColorResources.hintColorDark, fontSize: 14),
-  ),
+
   cardTheme: CardThemeData(
-    color: ColorResources.cardColorDark,
+    color: ColorResources.cardSurface,
     elevation: 0,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
   ),
-  cardColor: ColorResources.cardColorDark,
-  textTheme: const TextTheme(
-    displaySmall: TextStyle(
-      color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
-    ),
-    bodyMedium: TextStyle(
-      color: Colors.white,
-      fontWeight: FontWeight.w400,
-      fontSize: 14,
-    ),
-    bodySmall: TextStyle(
-      color: ColorResources.hintColorDark,
-      fontWeight: FontWeight.w400,
-      fontSize: 12,
-    ),
-    bodyLarge: TextStyle(
-      color: Colors.white,
-      fontWeight: FontWeight.w600,
-      fontSize: 14,
-    ),
+
+  drawerTheme: const DrawerThemeData(
+    backgroundColor: ColorResources.voidBackground,
+    surfaceTintColor: Colors.transparent,
   ),
-  iconTheme: const IconThemeData(color: Colors.white),
-  primaryIconTheme: const IconThemeData(color: Colors.white),
-  hintColor: ColorResources.hintColorDark,
-  expansionTileTheme: const ExpansionTileThemeData(iconColor: Colors.white, textColor: Colors.white),
+
+  // Typography System
+  textTheme: TextTheme(
+    // Headlines - Orbitron
+    displayLarge: GoogleFonts.orbitron(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+    displayMedium: GoogleFonts.orbitron(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+    displaySmall: GoogleFonts.orbitron(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
+    headlineMedium: GoogleFonts.orbitron(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+    
+    // Body - Outfit
+    bodyLarge: GoogleFonts.outfit(fontSize: 16, color: Colors.white),
+    bodyMedium: GoogleFonts.outfit(fontSize: 14, color: Colors.white70),
+    titleMedium: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
+    labelLarge: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+  ),
+
+  iconTheme: const IconThemeData(color: ColorResources.neonCyan),
 );

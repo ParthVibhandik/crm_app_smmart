@@ -47,8 +47,8 @@ dependencies:
   flutter_background_service_android: ^6.0.2
   wakelock_plus: ^1.1.6
   url_launcher: ^6.3.1
-  pdf: ^3.11.1
-  printing: ^5.11.2
+  flutter_animate: ^4.5.2
+  google_fonts: ^6.3.3
 
 dev_dependencies:
   flutter_test:
@@ -60,7 +60,13 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.2
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/app_logo_white.png"
+  min_sdk_android: 21
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -94,13 +100,3 @@ flutter:
           weight: 600
         - asset: assets/fonts/Montserrat-Arabic-Bold.ttf
           weight: 700
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/images/app_logo_white.png"
-  web:
-    generate: true
-    image_path: "assets/images/app_logo_white.png"
-    background_color: "#ffffff"
-    theme_color: "#ffffff"

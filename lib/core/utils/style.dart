@@ -1,256 +1,220 @@
 import 'package:flutter/material.dart';
 import 'package:flutex_admin/core/utils/dimensions.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-const TextStyle lightOverSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+// Using Google Fonts for all styles to ensure consistent futuristic look
+// 'Outfit' is clean, modern, and works well for UI text.
+
+final TextStyle _baseFont = GoogleFonts.outfit();
+
+TextStyle lightOverSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w300,
   fontSize: Dimensions.fontOverSmall,
 );
 
-const TextStyle lightExtraSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle lightExtraSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w300,
   fontSize: Dimensions.fontExtraSmall,
 );
 
-const TextStyle lightSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle lightSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w300,
   fontSize: Dimensions.fontSmall,
 );
 
-const TextStyle lightDefault = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle lightDefault = _baseFont.copyWith(
   fontWeight: FontWeight.w300,
   fontSize: Dimensions.fontDefault,
 );
 
-const TextStyle lightLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle lightLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w300,
   fontSize: Dimensions.fontLarge,
 );
 
-const TextStyle lightMediumLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle lightMediumLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w300,
   fontSize: Dimensions.fontMediumLarge,
 );
 
-const TextStyle lightExtraLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle lightExtraLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w300,
   fontSize: Dimensions.fontExtraLarge,
 );
 
-const TextStyle lightOverLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle lightOverLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w300,
   fontSize: Dimensions.fontOverLarge,
 );
 
-const TextStyle regularOverSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle regularOverSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontOverSmall,
 );
 
-const TextStyle regularExtraSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle regularExtraSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontExtraSmall,
 );
 
-const TextStyle regularSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle regularSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontSmall,
 );
 
-const TextStyle dateTextStyle = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle dateTextStyle = _baseFont.copyWith(
   fontWeight: FontWeight.w400,
   fontStyle: FontStyle.italic,
   fontSize: Dimensions.fontSmall,
 );
 
-const TextStyle regularDefault = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle regularDefault = _baseFont.copyWith(
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontDefault,
 );
 
-const TextStyle regularLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle regularLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontLarge,
 );
 
-const TextStyle regularMediumLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle regularMediumLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontMediumLarge,
 );
 
-const TextStyle regularExtraLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle regularExtraLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontExtraLarge,
 );
 
-const TextStyle regularOverLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle regularOverLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w400,
   fontSize: Dimensions.fontOverLarge,
 );
 
-const TextStyle mediumOverSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle mediumOverSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w500,
   fontSize: Dimensions.fontOverSmall,
 );
 
-const TextStyle mediumExtraSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle mediumExtraSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w500,
   fontSize: Dimensions.fontExtraSmall,
 );
 
-const TextStyle mediumSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle mediumSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w500,
   fontSize: Dimensions.fontSmall,
 );
 
-const TextStyle mediumDefault = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle mediumDefault = _baseFont.copyWith(
   fontWeight: FontWeight.w500,
   fontSize: Dimensions.fontDefault,
 );
 
-const TextStyle mediumLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle mediumLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w500,
   fontSize: Dimensions.fontLarge,
 );
 
-const TextStyle mediumMediumLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle mediumMediumLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w500,
   fontSize: Dimensions.fontMediumLarge,
 );
 
-const TextStyle mediumExtraLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle mediumExtraLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w500,
   fontSize: Dimensions.fontExtraLarge,
 );
 
-const TextStyle mediumOverLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle mediumOverLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w500,
   fontSize: Dimensions.fontOverLarge,
 );
 
-const TextStyle mediumMegaLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle mediumMegaLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w500,
   fontSize: Dimensions.fontMegaLarge,
 );
 
-const TextStyle semiBoldOverSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle semiBoldOverSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w600,
   fontSize: Dimensions.fontOverSmall,
 );
 
-const TextStyle semiBoldExtraSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle semiBoldExtraSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w600,
   fontSize: Dimensions.fontExtraSmall,
 );
 
-const TextStyle semiBoldSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle semiBoldSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w600,
   fontSize: Dimensions.fontSmall,
 );
 
-const TextStyle semiBoldDefault = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle semiBoldDefault = _baseFont.copyWith(
   fontWeight: FontWeight.w600,
   fontSize: Dimensions.fontDefault,
 );
 
-const TextStyle semiBoldLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle semiBoldLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w600,
   fontSize: Dimensions.fontLarge,
 );
 
-const TextStyle semiBoldMediumLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle semiBoldMediumLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w600,
   fontSize: Dimensions.fontMediumLarge,
 );
 
-const TextStyle semiBoldExtraLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle semiBoldExtraLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w600,
   fontSize: Dimensions.fontExtraLarge,
 );
 
-const TextStyle semiBoldOverLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle semiBoldOverLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w600,
   fontSize: Dimensions.fontOverLarge,
 );
 
 // semi-bold
-const TextStyle boldOverSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle boldOverSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w700,
   fontSize: Dimensions.fontOverSmall,
 );
 
-const TextStyle boldExtraSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle boldExtraSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w700,
   fontSize: Dimensions.fontExtraSmall,
 );
 
-const TextStyle boldSmall = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle boldSmall = _baseFont.copyWith(
   fontWeight: FontWeight.w700,
   fontSize: Dimensions.fontSmall,
 );
 
-const TextStyle boldDefault = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle boldDefault = _baseFont.copyWith(
   fontWeight: FontWeight.w700,
   fontSize: Dimensions.fontDefault,
 );
 
-const TextStyle boldLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle boldLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w700,
   fontSize: Dimensions.fontLarge,
 );
 
-const TextStyle boldMediumLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle boldMediumLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w700,
   fontSize: Dimensions.fontMediumLarge,
 );
 
-const TextStyle boldExtraLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle boldExtraLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w700,
   fontSize: Dimensions.fontExtraLarge,
 );
 
-const TextStyle boldOverLarge = TextStyle(
-  fontFamily: 'Montserrat-Arabic',
+TextStyle boldOverLarge = _baseFont.copyWith(
   fontWeight: FontWeight.w700,
   fontSize: Dimensions.fontOverLarge,
 );

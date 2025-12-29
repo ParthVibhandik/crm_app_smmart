@@ -46,14 +46,15 @@ class LeadCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
+                        SizedBox(
+                          width: MediaQuery.sizeOf(context).width / 1.5,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 '${lead.name}',
                                 overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
+                                maxLines: 2,
                                 style: regularLarge,
                               ),
                               Text(
@@ -66,12 +67,10 @@ class LeadCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(width: Dimensions.space10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Row(
-                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 if (lead.phoneNumber != null &&
                                     lead.phoneNumber!.isNotEmpty)
@@ -85,21 +84,15 @@ class LeadCard extends StatelessWidget {
                                     constraints: const BoxConstraints(),
                                   ),
                                 const SizedBox(width: Dimensions.space10),
-                                  Flexible(
-                                    child: Text(
-                                      lead.leadValue ?? '-',
-                                      style: regularDefault,
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                    ),
-                                  ),
+                                Text(
+                                  lead.leadValue ?? '-',
+                                  style: regularDefault,
+                                ),
                               ],
                             ),
                             Text(
                               lead.sourceName ?? '-',
                               style: lightSmall,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
                             ),
                           ],
                         ),

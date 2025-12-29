@@ -5,19 +5,19 @@ import 'package:flutex_admin/core/utils/style.dart';
 class HeaderText extends StatelessWidget {
   final String text;
   final TextAlign? textAlign;
-  final TextStyle textStyle;
-  const HeaderText(
+  final TextStyle? textStyle;
+  HeaderText(
       {super.key,
       required this.text,
       this.textAlign,
-      this.textStyle = semiBoldOverLarge});
+      this.textStyle});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text.tr,
       textAlign: textAlign,
-      style: textStyle,
+      style: textStyle ?? semiBoldOverLarge,
     );
   }
 }

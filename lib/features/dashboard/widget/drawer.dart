@@ -219,25 +219,33 @@ class HomeDrawer extends StatelessWidget {
                       Get.toNamed(RouteHelper.settingsScreen);
                     },
                   ),
-                  const Divider(height: 1, indent: 20, endIndent: 20),
-                  buildListTile(
-                    leadingIcon: Icons.logout,
-                    title: LocalStrings.logout.tr,
-                    onTap: () {
-                      const WarningAlertDialog().warningAlertDialog(
-                        context,
-                        () {
-                          Get.back();
-                          Get.find<DashboardController>().logout();
-                        },
-                        title: LocalStrings.logout.tr,
-                        subTitle: LocalStrings.logoutSureWarningMSg.tr,
-                      );
-                    },
-                  ),
                 ],
               ),
             ),
+          ),
+          ListTile(
+            leading: const Icon(
+              Icons.logout,
+              size: Dimensions.space20,
+              color: Colors.red,
+            ),
+            title: Text(
+              LocalStrings.logout.tr,
+              style: regularDefault.copyWith(
+                color: Theme.of(context).textTheme.bodyLarge!.color,
+              ),
+            ),
+            onTap: () {
+              const WarningAlertDialog().warningAlertDialog(
+                context,
+                () {
+                  Get.back();
+                  Get.find<DashboardController>().logout();
+                },
+                title: LocalStrings.logout.tr,
+                subTitle: LocalStrings.logoutSureWarningMSg.tr,
+              );
+            },
           ),
         ],
       ),

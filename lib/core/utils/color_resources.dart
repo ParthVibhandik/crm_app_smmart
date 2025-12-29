@@ -3,24 +3,42 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ColorResources {
-  static const Color primaryColor = Color(0xFF0047AB);
-  static const Color secondaryColor = Color(0xFFF97316);
-  static const Color screenBgColor = Color(0xFFF8FAFC);
-  static const Color screenBgColorDark = Color(0xFF0F172A);
-  static const Color cardColor = Color(0xFFFFFFFF);
-  static const Color cardColorDark = Color(0xFF1E293B);
-  static const Color hintColor = Color(0xFF94A3B8);
-  static const Color hintColorDark = Color(0xFF64748B);
+  static const Color primaryColor = Color(0xff1e293b);
+  static const Color secondaryColor = Color(0xff27B8DA);
+  static const Color screenBgColor = Color(0xFFF4F4F5);
+  static const Color screenBgColorDark = Color(0xFF171e29);
+  static const Color cardColor = Color(0xffF6F7FE);
+  static const Color cardColorDark = Color(0xff1c2739);
+  static const Color hintColor = Color(0xFF92A5C6);
+  static const Color hintColorDark = Color(0xFF92A5C6);
   static Color secondaryScreenBgColor = primaryColor.withValues(alpha: .4);
-  static const Color primaryTextColor = Color(0xFF1E293B);
-  static const Color contentTextColor = Color(0xFF475569);
+  static const Color primaryTextColor = Color(0xff262626);
+  static const Color contentTextColor = Color(0xff777777);
   static const Color primaryStatusBarColor = primaryColor;
-  static const Color underlineTextColor = secondaryColor;
-  static const Color lineColor = Color(0xFFE2E8F0);
-  static const Color borderColor = Color(0xFFCBD5E1);
-  static const Color inputColor = Color(0xFFF1F5F9);
-  static const Color inputColorDark = Color(0xFF1E293B);
+  static const Color underlineTextColor = primaryColor;
+  static const Color lineColor = Color(0xffECECEC);
+  static const Color borderColor = Color(0xffD9D9D9);
+  static const Color inputColor = Color(0xffECECEC);
+  static const Color inputColorDark = Color(0xff1F1F1F);
 
+  // Deep Midnight Theme (Global Overhaul v3)
+  static const Color voidBackground = Color(0xFF0F172A); // Rich Slate (Background)
+  static const Color cardSurface = Color(0xFF1E293B);    // Card Slate (Surface)
+  
+  static const Color primaryBlue = Color(0xFF38BDF8);    // Tech Blue (Primary)
+  static const Color secondaryIndigo = Color(0xFF6366F1); // Indigo (Secondary)
+
+  // Mapping old keys to new palette for compatibility
+  static const Color neonCyan = primaryBlue;       
+  static const Color electricPurple = secondaryIndigo;
+  
+  static const Color glassWhite = Color(0x1AFFFFFF); // 10% White
+  static const Color glassBlack = Color(0x66020617); // 40% Deep Black (Darker for contrast)
+
+  static const Color gradientStart = primaryBlue; 
+  static const Color gradientMid = Color(0xFF4F46E5);   
+  static const Color gradientEnd = secondaryIndigo;
+  
   // New
   static const Color lightBackgroundColor = Color(0xFFF5F6F9);
   static const Color darkColor = Color(0xFF202A44);

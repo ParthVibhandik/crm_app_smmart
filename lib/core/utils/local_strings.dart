@@ -3,8 +3,8 @@ import "package:flutex_admin/core/utils/images.dart";
 import "package:get/get.dart";
 
 class LocalStrings {
-  static const String appName = "smmart";
-  static const String topic = "smmart";
+  static const String appName = "Flutex";
+  static const String topic = "Flutex";
 
   static List<LanguageModel> appLanguages = [
     LanguageModel(
@@ -649,6 +649,15 @@ class LocalStrings {
   static const String transferDatadesc =
       "Some data for this staff member needs to be transferred to another user. Please select user where you want to transfer the data.";
   static const String staffMember = "Staff Member";
+
+  // ADDED KEYS
+  static const String checkIn = "Check In";
+  static const String checkOut = "Check Out";
+  static const String calendar = "Calendar";
+  static const String attendanceHistory = "Attendance History";
+  static const String noEventsFound = "No events found";
+  static const String attendance = "Attendance";
+  static const String notCheckedIn = "Not Checked In";
 }
 
 class Messages extends Translations {

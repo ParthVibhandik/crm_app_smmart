@@ -25,26 +25,20 @@ class LoginController extends GetxController {
   LoginController({required this.loginRepo});
 
   Future<void> checkAndGotoNextStep(LoginModel responseModel) async {
-    if (remember) {
-      await loginRepo.apiClient.sharedPreferences.setBool(
+    await Future.wait([
+      loginRepo.apiClient.sharedPreferences.setBool(
         SharedPreferenceHelper.rememberMeKey,
-        true,
-      );
-    } else {
-      await loginRepo.apiClient.sharedPreferences.setBool(
-        SharedPreferenceHelper.rememberMeKey,
-        false,
-      );
-    }
-
-    await loginRepo.apiClient.sharedPreferences.setString(
-      SharedPreferenceHelper.userIdKey,
-      responseModel.data?.staffId.toString() ?? '-1',
-    );
-    await loginRepo.apiClient.sharedPreferences.setString(
-      SharedPreferenceHelper.accessTokenKey,
-      responseModel.data?.accessToken.toString() ?? '',
-    );
+        remember,
+      ),
+      loginRepo.apiClient.sharedPreferences.setString(
+        SharedPreferenceHelper.userIdKey,
+        responseModel.data?.staffId.toString() ?? '-1',
+      ),
+      loginRepo.apiClient.sharedPreferences.setString(
+        SharedPreferenceHelper.accessTokenKey,
+        responseModel.data?.accessToken.toString() ?? '',
+      ),
+    ]);
     String? token = responseModel.data?.accessToken.toString() ?? '';
     print('Access Token: $token');
     Get.offAndToNamed(RouteHelper.dashboardScreen);
