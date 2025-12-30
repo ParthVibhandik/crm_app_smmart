@@ -15,7 +15,9 @@ import 'package:geocoding/geocoding.dart' as geo;
 
 class ContinueTripScreen extends StatefulWidget {
   final Lead lead;
-  const ContinueTripScreen({super.key, required this.lead});
+  final bool isCustomer;
+  const ContinueTripScreen(
+      {super.key, required this.lead, this.isCustomer = false});
 
   @override
   State<ContinueTripScreen> createState() => _ContinueTripScreenState();
@@ -71,14 +73,16 @@ class _ContinueTripScreenState extends State<ContinueTripScreen> {
                     padding: const EdgeInsets.all(12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const <Widget>[
+                      children: <Widget>[
                         Row(
                           children: <Widget>[
                             Icon(Icons.assignment_outlined,
                                 size: 24, color: Colors.blue),
                             SizedBox(width: 8),
                             Text(
-                              "Lead Details",
+                              widget.isCustomer
+                                  ? "Customer Details"
+                                  : "Lead Details",
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w600),
                             ),
@@ -285,13 +289,15 @@ class _ContinueTripScreenState extends State<ContinueTripScreen> {
       Position position = await Geolocator.getCurrentPosition();
 
       // Determine if it's a lead or customer
-      // lead.id is String, convert to int if needed
-      int? leadId =
-          widget.lead.id != null ? int.tryParse(widget.lead.id!) : null;
-      int? customerId = null;
-      // Note: If you need to distinguish between lead and customer,
-      // you may need to pass an additional parameter through the Lead model
-      // For now, assuming lead.id is used, customerId remains null
+      int? leadId;
+      int? customerId;
+
+      if (widget.isCustomer) {
+        customerId =
+            widget.lead.id != null ? int.tryParse(widget.lead.id!) : null;
+      } else {
+        leadId = widget.lead.id != null ? int.tryParse(widget.lead.id!) : null;
+      }
 
       // Get destination coordinates (from the lead/customer address)
       // For now, using placeholder values - these should be geocoded from the address

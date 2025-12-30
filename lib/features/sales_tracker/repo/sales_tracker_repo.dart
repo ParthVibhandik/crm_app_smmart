@@ -197,7 +197,7 @@ class SalesTrackerRepo {
     return responseModel;
   }
 
-  Future<ResponseModel> endTrip({String? callRemark}) async {
+  Future<ResponseModel> endTrip({String? callRemark, String? invoiceId}) async {
     String url =
         "${UrlContainer.baseUrl}${UrlContainer.salesTrackerEndTripUrl}";
     print('--- [SalesTrackerRepo] Request: endTrip ---');
@@ -206,6 +206,9 @@ class SalesTrackerRepo {
     Map<String, String> params = {};
     if (callRemark != null && callRemark.isNotEmpty) {
       params['call_remark'] = callRemark;
+    }
+    if (invoiceId != null && invoiceId.isNotEmpty) {
+      params['invoice_id'] = invoiceId;
     }
 
     ResponseModel responseModel = await apiClient.request(
