@@ -379,7 +379,10 @@ class SalesTrackerController extends GetxController {
                 label: const Text('Continue'),
                 onPressed: () {
                   Get.back();
-                  Get.to(() => ContinueTripScreen(lead: lead));
+                  Get.to(() => ContinueTripScreen(
+                        lead: lead,
+                        isCustomer: type == 'customer',
+                      ));
                 },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.green),
