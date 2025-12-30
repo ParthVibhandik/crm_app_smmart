@@ -4,11 +4,11 @@ import 'package:flutex_admin/common/components/snack_bar/show_custom_snackbar.da
 import 'package:flutex_admin/common/models/response_model.dart';
 import 'package:flutex_admin/core/helper/shared_preference_helper.dart';
 import 'package:flutex_admin/core/service/api_service.dart';
-import 'package:flutex_admin/core/utils/local_strings.dart';
 import 'package:flutex_admin/core/route/route.dart';
 import 'package:flutex_admin/features/attendance/attendance_service.dart';
 import 'package:flutex_admin/features/attendance/attendance_status.dart';
 import 'package:flutex_admin/features/lead/model/lead_model.dart';
+import 'package:flutex_admin/features/sales_tracker/model/trip_session.dart';
 import 'package:flutex_admin/features/sales_tracker/repo/sales_tracker_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -18,6 +18,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:dio/dio.dart';
 
 import 'package:flutex_admin/features/sales_tracker/view/continue_trip_screen.dart';
+import 'package:flutex_admin/features/sales_tracker/view/trip_flow_screen.dart';
 
 class SalesTrackerController extends GetxController {
   final SalesTrackerRepo salesTrackerRepo;
@@ -43,14 +44,16 @@ class SalesTrackerController extends GetxController {
 
     try {
       final apiClient = Get.find<ApiClient>();
-      String token = apiClient.sharedPreferences.getString(SharedPreferenceHelper.accessTokenKey) ?? '';
-      
+      String token = apiClient.sharedPreferences
+              .getString(SharedPreferenceHelper.accessTokenKey) ??
+          '';
+
       if (token.isEmpty) {
         isPunchedIn = false;
       } else {
         AttendanceService attendanceService = AttendanceService(token);
         AttendanceStatus status = await attendanceService.getTodayStatus();
-        
+
         // Check if there is an active session
         isPunchedIn = status.punchedIn && !status.punchedOut;
       }
@@ -62,10 +65,65 @@ class SalesTrackerController extends GetxController {
     if (isPunchedIn) {
       await _getCurrentLocation();
       loadLeads();
+      // Check current trip status and navigate accordingly
+      await checkTripStatusAndNavigate();
     }
-    
+
     isLoading = false;
     update();
+  }
+
+  Future<void> checkTripStatusAndNavigate() async {
+    try {
+      final response = await salesTrackerRepo.getTripStatus();
+      if (!response.status) return;
+
+      String status = _extractStatus(response.responseJson);
+      print('Trip Status: $status');
+
+      // If there's an active trip (not in not_started state), navigate to TripFlowScreen
+      if (status != 'not_started') {
+        Get.to(() => const TripFlowScreen());
+      }
+    } catch (e) {
+      print('Error checking trip status: $e');
+    }
+  }
+
+  String _extractStatus(String raw) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) {
+        if (decoded['data'] is Map && decoded['data']['status'] is String) {
+          return _normalizeStatus(decoded['data']['status']);
+        }
+        if (decoded['status'] is String) {
+          return _normalizeStatus(decoded['status']);
+        }
+      } else if (decoded is String) {
+        return _normalizeStatus(decoded);
+      }
+    } catch (_) {
+      // Not JSON; fall back to substring checks
+    }
+    final lowered = raw.toLowerCase();
+    if (lowered.contains('not_started')) return 'not_started';
+    if (lowered.contains('started') && !lowered.contains('call'))
+      return 'started';
+    if (lowered.contains('reached')) return 'reached';
+    if (lowered.contains('call') && lowered.contains('started'))
+      return 'call_started';
+    return 'unknown';
+  }
+
+  String _normalizeStatus(String s) {
+    final lowered = s.toLowerCase().replaceAll(' ', '_').replaceAll('-', '_');
+    if (lowered.contains('call') && lowered.contains('started'))
+      return 'call_started';
+    if (lowered == 'not_started') return 'not_started';
+    if (lowered == 'started') return 'started';
+    if (lowered == 'reached') return 'reached';
+    return 'unknown';
   }
 
   Future<void> _getCurrentLocation() async {
@@ -83,7 +141,7 @@ class SalesTrackerController extends GetxController {
   Future<void> loadLeads({String? query}) async {
     isLoading = true;
     update();
-    
+
     leads.clear();
     markers.clear();
     itemTypes.clear(); // Clear types
@@ -101,52 +159,54 @@ class SalesTrackerController extends GetxController {
 
       if (responseModel.status) {
         try {
-            var decoded = jsonDecode(responseModel.responseJson);
-            
-            List<dynamic> leadsList = [];
-            List<dynamic> customersList = [];
-            
-            if (decoded is Map<String, dynamic> && decoded.containsKey('data')) {
-                 var dataObj = decoded['data'];
-                 if (dataObj is Map<String, dynamic>) {
-                   if (dataObj.containsKey('leads') && dataObj['leads'] is List) {
-                     leadsList = dataObj['leads'];
-                   }
-                   if (dataObj.containsKey('customers') && dataObj['customers'] is List) {
-                     customersList = dataObj['customers'];
-                   }
-                 } else if (dataObj is List) {
-                   // Fallback if structure is just a list (assume leads)
-                   leadsList = dataObj;
-                 }
-            } else if (decoded is List) {
-                 leadsList = decoded;
-            }
+          var decoded = jsonDecode(responseModel.responseJson);
 
-            // Process Leads
-            for (var item in leadsList) {
-                Lead lead = Lead.fromJson(item);
-                leads.add(lead);
-                if (lead.id != null) itemTypes[lead.id.toString()] = 'lead';
-            }
+          List<dynamic> leadsList = [];
+          List<dynamic> customersList = [];
 
-            // Process Customers
-            for (var item in customersList) {
-                Lead lead = Lead.fromJson(item); // reusing Lead model for simplicity if compatible
-                leads.add(lead);
-                if (lead.id != null) itemTypes[lead.id.toString()] = 'customer';
+          if (decoded is Map<String, dynamic> && decoded.containsKey('data')) {
+            var dataObj = decoded['data'];
+            if (dataObj is Map<String, dynamic>) {
+              if (dataObj.containsKey('leads') && dataObj['leads'] is List) {
+                leadsList = dataObj['leads'];
+              }
+              if (dataObj.containsKey('customers') &&
+                  dataObj['customers'] is List) {
+                customersList = dataObj['customers'];
+              }
+            } else if (dataObj is List) {
+              // Fallback if structure is just a list (assume leads)
+              leadsList = dataObj;
             }
+          } else if (decoded is List) {
+            leadsList = decoded;
+          }
 
-            if (leads.isNotEmpty) {
-              print("Parsed ${leads.length} items (${leadsList.length} leads, ${customersList.length} customers).");
-              await _geocodeAndCreateMarkers();
-            } else {
-               print("No lead/customer data found in response.");
-            }
+          // Process Leads
+          for (var item in leadsList) {
+            Lead lead = Lead.fromJson(item);
+            leads.add(lead);
+            if (lead.id != null) itemTypes[lead.id.toString()] = 'lead';
+          }
 
-        } catch(e) {
-            print("Parsing error in loadLeads: $e");
-            CustomSnackBar.error(errorList: ["Failed to parse data"]);
+          // Process Customers
+          for (var item in customersList) {
+            Lead lead = Lead.fromJson(
+                item); // reusing Lead model for simplicity if compatible
+            leads.add(lead);
+            if (lead.id != null) itemTypes[lead.id.toString()] = 'customer';
+          }
+
+          if (leads.isNotEmpty) {
+            print(
+                "Parsed ${leads.length} items (${leadsList.length} leads, ${customersList.length} customers).");
+            await _geocodeAndCreateMarkers();
+          } else {
+            print("No lead/customer data found in response.");
+          }
+        } catch (e) {
+          print("Parsing error in loadLeads: $e");
+          CustomSnackBar.error(errorList: ["Failed to parse data"]);
         }
       } else {
         CustomSnackBar.error(errorList: [responseModel.message.tr]);
@@ -160,8 +220,8 @@ class SalesTrackerController extends GetxController {
   }
 
   // ... (existing _geocodeAndCreateMarkers and _getCoordinates methods remain same, but I need to include them to keep file integrity if I'm replacing a block, or just replace the specific methods. I will replace the methods to be safe and clean)
-  
-  // skipping _geocodeAndCreateMarkers and _getCoordinates in this Replace block for brevity if possible, 
+
+  // skipping _geocodeAndCreateMarkers and _getCoordinates in this Replace block for brevity if possible,
   // BUT the user asked to change `_showLeadDetailsBottom`.
   // So I'll just replace `loadLeads` and `_showLeadDetailsBottom` logic.
   // Warning: I need to be careful with line numbers.
@@ -171,28 +231,23 @@ class SalesTrackerController extends GetxController {
 
   // 1. First edit: Update loadLeads to populate itemTypes.
   // 2. Second edit: Update _showLeadDetailsBottom to use itemTypes and add button.
-  
+
   // This first tool call is for `loadLeads`.
-
-
 
   Future<void> _geocodeAndCreateMarkers() async {
     // Limit to first 20 to avoid rate limits for demo
     int count = 0;
     print("Starting geocoding for ${leads.length} items...");
-    
+
     for (var lead in leads) {
       if (count >= 20) {
         print("Reached geocoding limit of 20.");
         break;
       }
-      
-      String address = [
-        lead.address, 
-        lead.city, 
-        lead.state, 
-        lead.country
-      ].where((s) => s != null && s.trim().isNotEmpty).join(', ');
+
+      String address = [lead.address, lead.city, lead.state, lead.country]
+          .where((s) => s != null && s.trim().isNotEmpty)
+          .join(', ');
 
       print("Processing Item: ${lead.name}, Address: '$address'");
 
@@ -207,7 +262,7 @@ class SalesTrackerController extends GetxController {
               height: 40,
               child: GestureDetector(
                 onTap: () {
-                   _showLeadDetailsBottom(lead);
+                  _showLeadDetailsBottom(lead);
                 },
                 child: const Icon(
                   Icons.location_on,
@@ -218,7 +273,7 @@ class SalesTrackerController extends GetxController {
             ),
           );
         } else {
-           print("Could not geocode address: $address");
+          print("Could not geocode address: $address");
         }
         // Small delay to respect Nominatim usage policy (1 sec per request recommended)
         await Future.delayed(const Duration(milliseconds: 1000));
@@ -232,23 +287,20 @@ class SalesTrackerController extends GetxController {
 
   Future<LatLng?> _getCoordinates(String address) async {
     String? googleApiKey = dotenv.env['GOOGLE_API_KEY'];
-    
+
     // 1. Try Google Geocoding API first
     if (googleApiKey != null && googleApiKey.isNotEmpty) {
       try {
         final response = await Dio().get(
-          'https://maps.googleapis.com/maps/api/geocode/json', 
-          queryParameters: {
-            'address': address,
-            'key': googleApiKey
-          }
-        );
+            'https://maps.googleapis.com/maps/api/geocode/json',
+            queryParameters: {'address': address, 'key': googleApiKey});
 
-        if (response.data['status'] == 'OK' && response.data['results'].isNotEmpty) {
-           var location = response.data['results'][0]['geometry']['location'];
-           return LatLng(location['lat'], location['lng']);
+        if (response.data['status'] == 'OK' &&
+            response.data['results'].isNotEmpty) {
+          var location = response.data['results'][0]['geometry']['location'];
+          return LatLng(location['lat'], location['lng']);
         } else {
-           print("Google Geocoding failed: ${response.data['status']}");
+          print("Google Geocoding failed: ${response.data['status']}");
         }
       } catch (e) {
         print('Google Geocoding error: $e');
@@ -258,33 +310,26 @@ class SalesTrackerController extends GetxController {
     // 2. Fallback to Nominatim (OpenStreetMap)
     print("Falling back to Nominatim for address: $address");
     try {
-       final response = await Dio().get(
-         'https://nominatim.openstreetmap.org/search', 
-         queryParameters: {
-           'q': address,
-           'format': 'json',
-           'limit': 1
-         },
-         options: Options(
-           headers: {
-             'User-Agent': 'SmmartCRMApp/1.0', // Required by Nominatim
-           }
-         )
-       );
-       
-       if (response.data is List && response.data.isNotEmpty) {
-         var data = response.data[0];
-         return LatLng(double.parse(data['lat']), double.parse(data['lon']));
-       }
+      final response =
+          await Dio().get('https://nominatim.openstreetmap.org/search',
+              queryParameters: {'q': address, 'format': 'json', 'limit': 1},
+              options: Options(headers: {
+                'User-Agent': 'SmmartCRMApp/1.0', // Required by Nominatim
+              }));
+
+      if (response.data is List && response.data.isNotEmpty) {
+        var data = response.data[0];
+        return LatLng(double.parse(data['lat']), double.parse(data['lon']));
+      }
     } catch (e) {
       print('Nominatim Geocoding error: $e');
     }
     return null;
   }
-  
+
   void _showLeadDetailsBottom(Lead lead) {
     String type = itemTypes[lead.id.toString()] ?? 'lead'; // Default to lead
-    
+
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(16),
@@ -316,9 +361,11 @@ class SalesTrackerController extends GetxController {
                 onPressed: () {
                   Get.back(); // Close bottom sheet
                   if (type == 'customer') {
-                     Get.toNamed(RouteHelper.customerDetailsScreen, arguments: lead.id);
+                    Get.toNamed(RouteHelper.customerDetailsScreen,
+                        arguments: lead.id);
                   } else {
-                     Get.toNamed(RouteHelper.leadDetailsScreen, arguments: lead.id);
+                    Get.toNamed(RouteHelper.leadDetailsScreen,
+                        arguments: lead.id);
                   }
                 },
                 child: const Text('View Details'),
@@ -327,12 +374,12 @@ class SalesTrackerController extends GetxController {
             const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
-                child: OutlinedButton.icon(
+              child: OutlinedButton.icon(
                 icon: const Icon(Icons.arrow_forward),
                 label: const Text('Continue'),
                 onPressed: () {
-                   Get.back();
-                   Get.to(() => ContinueTripScreen(lead: lead));
+                  Get.back();
+                  Get.to(() => ContinueTripScreen(lead: lead));
                 },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.green),

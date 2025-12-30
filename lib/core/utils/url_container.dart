@@ -43,6 +43,15 @@ class UrlContainer {
   // Sales Tracker
   static const String salesTrackerGetLeadsUrl = 'sales-tracker/get-leads';
   static const String salesTrackerSearchLeadUrl = 'sales-tracker/search-lead';
+  static const String salesTrackerStartTripUrl = 'sales-tracker/start-trip';
+  static const String salesTrackerGetActiveTripUrl =
+      'sales-tracker/get-active-trip';
+  static const String salesTrackerReachedUrl = 'sales-tracker/reached';
+  static const String salesTrackerUpdateAddressUrl =
+      'sales-tracker/update-address';
+  static const String salesTrackerCallStartUrl = 'sales-tracker/call-start';
+  static const String salesTrackerEndTripUrl = 'sales-tracker/end-trip';
+  static const String salesTrackerGetStatusUrl = 'sales-tracker/get-status';
 
   // Download URLs
   static const String leadAttachmentUrl = '$downloadUrl/lead_attachment';

@@ -27,16 +27,16 @@ class _SalesTrackerScreenState extends State<SalesTrackerScreen> {
         print("Error finding SharedPreferences: $e");
       }
     }
-    
+
     // Using SalesTrackerRepo now
     if (!Get.isRegistered<SalesTrackerRepo>()) {
-       try {
-         Get.put(SalesTrackerRepo(apiClient: Get.find()));
-       } catch(e) {
-         print("Error finding ApiClient for SalesTrackerRepo: $e");
-       }
+      try {
+        Get.put(SalesTrackerRepo(apiClient: Get.find()));
+      } catch (e) {
+        print("Error finding ApiClient for SalesTrackerRepo: $e");
+      }
     }
-    
+
     Get.put(SalesTrackerController(salesTrackerRepo: Get.find()));
   }
 
@@ -55,7 +55,8 @@ class _SalesTrackerScreenState extends State<SalesTrackerScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.timer_off_outlined, size: 80, color: Colors.orange),
+                  const Icon(Icons.timer_off_outlined,
+                      size: 80, color: Colors.orange),
                   const SizedBox(height: 20),
                   const Text(
                     "You are not punched in!",
@@ -85,7 +86,8 @@ class _SalesTrackerScreenState extends State<SalesTrackerScreen> {
                 ),
                 children: [
                   TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                     userAgentPackageName: 'com.smmart.crm',
                   ),
                   MarkerLayer(
@@ -112,12 +114,13 @@ class _SalesTrackerScreenState extends State<SalesTrackerScreen> {
                         suffixIcon: IconButton(
                           icon: const Icon(Icons.search),
                           onPressed: () {
-                            controller.searchLeads(controller.searchController.text);
+                            controller
+                                .searchLeads(controller.searchController.text);
                           },
                         ),
                       ),
                       onSubmitted: (value) {
-                         controller.searchLeads(value);
+                        controller.searchLeads(value);
                       },
                     ),
                   ),

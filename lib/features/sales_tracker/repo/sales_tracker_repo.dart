@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutex_admin/core/service/api_service.dart';
 import 'package:flutex_admin/core/utils/method.dart';
 import 'package:flutex_admin/core/utils/url_container.dart';
 import 'package:flutex_admin/common/models/response_model.dart';
+import 'package:geolocator/geolocator.dart';
 
 class SalesTrackerRepo {
   final ApiClient apiClient;
@@ -9,83 +11,32 @@ class SalesTrackerRepo {
   SalesTrackerRepo({required this.apiClient});
 
   Future<ResponseModel> getAssignedLeads() async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.salesTrackerGetLeadsUrl}";
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.salesTrackerGetLeadsUrl}";
     print('--- [SalesTrackerRepo] Request: getAssignedLeads ---');
     print('URL: $url');
     // Body should be empty map {}
     Map<String, dynamic> params = {};
-    
+
     ResponseModel responseModel = await apiClient.request(
       url,
       Method.postMethod,
       params,
       passHeader: true,
     );
-     print('--- [SalesTrackerRepo] Response: getAssignedLeads ---');
-     print('Response Body: ${responseModel.responseJson}');
+    print('--- [SalesTrackerRepo] Response: getAssignedLeads ---');
+    print('Response Body: ${responseModel.responseJson}');
     return responseModel;
   }
 
   Future<ResponseModel> searchAssignedLeads(String keyword) async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.salesTrackerSearchLeadUrl}";
-    // Use x-www-form-urlencoded params as per requirement
-    Map<String, String> params = {
-      "keyword": keyword,
-    };
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.salesTrackerSearchLeadUrl}";
+    Map<String, String> params = {"keyword": keyword};
     print('--- [SalesTrackerRepo] Request: searchAssignedLeads ---');
     print('URL: $url');
     print('Params: $params');
-    
-    // Using Method.putMethod internally if it supports form-urlencoded or ensure apiClient handles it.
-    // However, apiClient 'postMethod' usually sends JSON unless specific headers are set.
-    // The requirement says: Content-Type: application/x-www-form-urlencoded
-    // Let's check api_service.dart again. 
-    // It seems apiClient handles JSON body by default for POST.
-    // BUT we can perform a trick or modify apiClient. 
-    // Or we can use `post` but apiClient might enforce json header.
-    // Let's check if we can force it.
-    // ApiClient code:
-    // ...
-    // headers: {'Accept': 'application/json', 'Authorization': token} ...
-    //
-    // The requirement explicitly asks for application/x-www-form-urlencoded for search. 
-    // "Method.putMethod" in ApiClient uses: 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-    // But this is a POST request.
-    //
-    // Since we can't easily change ApiClient without affecting others, we will rely on 
-    // ApiClient sending standard request.
-    // **WAIT**: The user provided `curl -d "keyword=test"`. 
-    // If ApiClient sends JSON `{"keyword": "test"}`, backend might not like it if it expects form-data.
-    // However, the `getAssignedLeads` working curl sends `-d '{}'` which is JSON.
-    // The search one strictly says `Content-Type: application/x-www-form-urlencoded`.
-    //
-    // If ApiClient doesn't support custom headers for POST easily (it hardcodes them), 
-    // we might have an issue. 
-    // ApiClient: `headers: {'Accept': 'application/json', 'Authorization': token}`
-    // It does NOT set Content-Type to application/json explicitly for POST? 
-    // Usually http.post defaults to text/plain or similar if body is map?? No, encoding...
-    //
-    // Actually, `http.post(url, body: map)` sends `x-www-form-urlencoded` by default in Dart http package!
-    // UNLESS we encode it to JSON string.
-    // ApiClient passes `params` (Map) directly to `http.post`.
-    // So `http.post(..., body: params)` => x-www-form-urlencoded.
-    // 
-    // Wait, for `getAssignedLeads`, the curl uses `Content-Type: application/json` and `-d '{}'`.
-    // Passings `params` (Map) to http.post makes it form-urlencoded.
-    // Passing `jsonEncode(params)` makes it body, but we need header.
-    //
-    // Let's look at ApiClient again.
-    // `response = await http.post(url, body: params, headers: {...})`
-    // If `params` is Map, it sends form-urlencoded. 
-    // So Search API (form-urlencoded) should work fine with `params`.
-    //
-    // The Get Leads API (JSON) might fail if it receives form-urlencoded `{}`. 
-    // But the user said: "Use empty {} body for list API".
-    // 
-    // We will follow the pattern. If `params` is null/empty map, http might send content-length 0.
-    //
-    // Let's stick to standard `params` map for now.
-    
+
     ResponseModel responseModel = await apiClient.request(
       url,
       Method.postMethod,
@@ -93,6 +44,200 @@ class SalesTrackerRepo {
       passHeader: true,
     );
     print('--- [SalesTrackerRepo] Response: searchAssignedLeads ---');
+    print('Response Body: ${responseModel.responseJson}');
+    return responseModel;
+  }
+
+  Future<ResponseModel> startTrip({
+    required int? leadId,
+    required int? customerId,
+    required double destinationLat,
+    required double destinationLng,
+    required double startLat,
+    required double startLng,
+    required String startAddress,
+    String? altAddress,
+    String? altAddressReason,
+    String? modeOfTransport,
+  }) async {
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.salesTrackerStartTripUrl}";
+
+    // Convert all values to strings for form data
+    Map<String, String> params = {
+      "lead_id": leadId?.toString() ?? "",
+      "customer_id": customerId?.toString() ?? "",
+      "destination_lat": destinationLat.toString(),
+      "destination_lng": destinationLng.toString(),
+      "start_lat": startLat.toString(),
+      "start_lng": startLng.toString(),
+      "start_address": startAddress,
+      "alt_address": altAddress ?? "",
+      "alt_address_reason": altAddressReason ?? "",
+      "mode_of_transport": modeOfTransport ?? "",
+    };
+
+    print('--- [SalesTrackerRepo] Request: startTrip ---');
+    print('URL: $url');
+    print('Params: ${jsonEncode(params)}');
+
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.postMethod,
+      params,
+      passHeader: true,
+    );
+
+    print('--- [SalesTrackerRepo] Response: startTrip ---');
+    print('Response Status: ${responseModel.status}');
+    print('Response Message: ${responseModel.message}');
+    print('Response Body: ${responseModel.responseJson}');
+    return responseModel;
+  }
+
+  Future<ResponseModel> getActiveTrip() async {
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.salesTrackerGetActiveTripUrl}";
+    print('--- [SalesTrackerRepo] Request: getActiveTrip ---');
+    print('URL: $url');
+
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.getMethod,
+      {},
+      passHeader: true,
+    );
+
+    print('--- [SalesTrackerRepo] Response: getActiveTrip ---');
+    print('Response Status: ${responseModel.status}');
+    print('Response Message: ${responseModel.message}');
+    print('Response Body: ${responseModel.responseJson}');
+    return responseModel;
+  }
+
+  Future<ResponseModel> markReachedDestination() async {
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.salesTrackerReachedUrl}";
+    print('--- [SalesTrackerRepo] Request: markReachedDestination ---');
+    print('URL: $url');
+
+    // getting lat and lng from device should be handled in controller
+    final position = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+    );
+    final lat = position.latitude;
+    final lng = position.longitude;
+
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.postMethod,
+      {
+        "latitude": lat.toString(),
+        "longitude": lng.toString(),
+      },
+      passHeader: true,
+    );
+
+    print('--- [SalesTrackerRepo] Response: markReachedDestination ---');
+    print(
+      'Response Status: ${responseModel.status}',
+    );
+    print('Response Message: ${responseModel.message}');
+    print('Response Body: ${responseModel.responseJson}');
+    return responseModel;
+  }
+
+  Future<ResponseModel> updateAddress({
+    required String altAddress,
+    required String altReason,
+  }) async {
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.salesTrackerUpdateAddressUrl}";
+
+    Map<String, String> params = {
+      "alt_address": altAddress,
+      "alt_address_reason": altReason,
+    };
+
+    print('--- [SalesTrackerRepo] Request: updateAddress ---');
+    print('URL: $url');
+    print('Params: $params');
+
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.postMethod,
+      params,
+      passHeader: true,
+    );
+
+    print('--- [SalesTrackerRepo] Response: updateAddress ---');
+    print('Response Status: ${responseModel.status}');
+    print('Response Message: ${responseModel.message}');
+    print('Response Body: ${responseModel.responseJson}');
+    return responseModel;
+  }
+
+  Future<ResponseModel> callStart() async {
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.salesTrackerCallStartUrl}";
+    print('--- [SalesTrackerRepo] Request: callStart ---');
+    print('URL: $url');
+
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.postMethod,
+      {},
+      passHeader: true,
+    );
+
+    print('--- [SalesTrackerRepo] Response: callStart ---');
+    print('Response Status: ${responseModel.status}');
+    print('Response Message: ${responseModel.message}');
+    print('Response Body: ${responseModel.responseJson}');
+    return responseModel;
+  }
+
+  Future<ResponseModel> endTrip({String? callRemark}) async {
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.salesTrackerEndTripUrl}";
+    print('--- [SalesTrackerRepo] Request: endTrip ---');
+    print('URL: $url');
+
+    Map<String, String> params = {};
+    if (callRemark != null && callRemark.isNotEmpty) {
+      params['call_remark'] = callRemark;
+    }
+
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.postMethod,
+      params,
+      passHeader: true,
+    );
+
+    print('--- [SalesTrackerRepo] Response: endTrip ---');
+    print('Response Status: ${responseModel.status}');
+    print('Response Message: ${responseModel.message}');
+    print('Response Body: ${responseModel.responseJson}');
+    return responseModel;
+  }
+
+  Future<ResponseModel> getTripStatus() async {
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.salesTrackerGetStatusUrl}";
+    print('--- [SalesTrackerRepo] Request: getTripStatus ---');
+    print('URL: $url');
+
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.getMethod,
+      {},
+      passHeader: true,
+    );
+
+    print('--- [SalesTrackerRepo] Response: getTripStatus ---');
+    print('Response Status: ${responseModel.status}');
+    print('Response Message: ${responseModel.message}');
     print('Response Body: ${responseModel.responseJson}');
     return responseModel;
   }
