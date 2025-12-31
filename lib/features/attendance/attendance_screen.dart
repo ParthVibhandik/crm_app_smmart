@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'attendance_service.dart';
 import 'attendance_status.dart';
+import 'package:get/get.dart';
+import 'package:flutex_admin/core/route/route.dart';
 
 class AttendanceScreen extends StatefulWidget {
   final String authToken;
@@ -69,7 +71,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       }
 
       await service.punchOut(gpsOffReason: reason);
-      await loadStatus();
+      Get.offAllNamed(RouteHelper.dcrScreen);
     } catch (e) {
       setState(() => loading = false);
       if (mounted) {
