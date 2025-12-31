@@ -45,7 +45,18 @@ class _SplashScreenState extends State<SplashScreen> {
       builder: (controller) => Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
-          child: Image.asset(MyImages.appLogo, height: 60),
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Image.asset(
+              MyImages.appLogo,
+              height: 70,
+              width: 250,
+            ),
+          ),
         ),
       ),
     );
