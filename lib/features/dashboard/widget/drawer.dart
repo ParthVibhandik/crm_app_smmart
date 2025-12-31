@@ -199,6 +199,14 @@ class HomeDrawer extends StatelessWidget {
                       Get.toNamed(RouteHelper.salesTrackerScreen);
                     },
                   ),
+                  buildListTile(
+                    leadingIcon: Icons.call_outlined,
+                    title: "Telecalling",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Get.toNamed(RouteHelper.telecallingScreen);
+                    },
+                  ),
                   homeModel.menuItems?.expenses ?? false
                       ? buildListTile(
                           leadingIcon: Icons.monetization_on_outlined,

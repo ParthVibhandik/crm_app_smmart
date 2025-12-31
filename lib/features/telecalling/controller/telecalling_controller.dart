@@ -1,0 +1,133 @@
+import 'dart:convert';
+import 'package:flutex_admin/common/components/snack_bar/show_custom_snackbar.dart';
+import 'package:flutex_admin/common/models/response_model.dart';
+import 'package:flutex_admin/features/lead/model/lead_model.dart';
+import 'package:flutex_admin/features/telecalling/repo/telecalling_repo.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'package:flutex_admin/features/telecalling/widget/success_dialog.dart';
+
+class TelecallingController extends GetxController {
+  final TelecallingRepo telecallingRepo;
+  TelecallingController({required this.telecallingRepo});
+
+  bool isLoading = false;
+  bool isSubmitLoading = false;
+  
+  List<Lead> searchResultLeads = [];
+  Lead? selectedLead;
+  
+  TextEditingController searchController = TextEditingController();
+  TextEditingController durationController = TextEditingController();
+  TextEditingController remarksController = TextEditingController();
+  
+  String selectedStatus = 'hot';
+  List<String> statusOptions = ['hot', 'warm', 'cold', 'converted', 'lost'];
+
+  Future<void> searchLeads(String keyword) async {
+    if (keyword.isEmpty) {
+      searchResultLeads = [];
+      update();
+      return;
+    }
+
+    isLoading = true;
+    update();
+
+    try {
+      ResponseModel responseModel = await telecallingRepo.searchLeads(keyword);
+      if (responseModel.status) {
+        var decoded = jsonDecode(responseModel.responseJson);
+        List<dynamic> leadsList = [];
+        if (decoded is Map<String, dynamic> && decoded.containsKey('data')) {
+          var dataObj = decoded['data'];
+          if (dataObj is Map<String, dynamic> && dataObj.containsKey('leads')) {
+            leadsList = dataObj['leads'];
+          } else if (dataObj is List) {
+            leadsList = dataObj;
+          }
+        }
+        
+        searchResultLeads = leadsList.map((item) => Lead.fromJson(item)).toList();
+      } else {
+        CustomSnackBar.error(errorList: [responseModel.message.tr]);
+      }
+    } catch (e) {
+      print('Error searching leads: $e');
+    }
+
+    isLoading = false;
+    update();
+  }
+
+  void selectLead(Lead lead) {
+    selectedLead = lead;
+    searchController.text = lead.name ?? '';
+    searchResultLeads = [];
+    update();
+  }
+
+  void setStatus(String status) {
+    selectedStatus = status;
+    update();
+  }
+
+  Future<void> submitTelecall() async {
+    if (selectedLead == null) {
+      CustomSnackBar.error(errorList: ['Please select a lead']);
+      return;
+    }
+    if (durationController.text.isEmpty) {
+      CustomSnackBar.error(errorList: ['Please enter duration']);
+      return;
+    }
+    if (remarksController.text.isEmpty) {
+      CustomSnackBar.error(errorList: ['Please enter remarks']);
+      return;
+    }
+
+    isSubmitLoading = true;
+    update();
+
+    try {
+      ResponseModel responseModel = await telecallingRepo.recordTelecall(
+        leadId: selectedLead!.id.toString(),
+        duration: durationController.text,
+        status: selectedStatus,
+        remarks: remarksController.text,
+      );
+
+      if (responseModel.status) {
+        Get.dialog(
+          SuccessDialog(
+            message: "Telecall record has been saved successfully.",
+            onOkPress: () {
+              clearData();
+              Get.back(); // Close dialog
+              Get.back(); // Go back from telecalling screen
+            },
+          ),
+          barrierDismissible: false,
+        );
+      } else {
+        CustomSnackBar.error(errorList: [responseModel.message.tr]);
+      }
+    } catch (e) {
+      CustomSnackBar.error(errorList: ['Error recording telecall: $e']);
+    }
+
+    isSubmitLoading = false;
+    update();
+  }
+
+  void clearData() {
+    selectedLead = null;
+    searchController.clear();
+    durationController.clear();
+    remarksController.clear();
+    selectedStatus = 'hot';
+    searchResultLeads = [];
+    update();
+  }
+}
