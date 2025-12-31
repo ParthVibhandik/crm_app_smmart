@@ -60,7 +60,7 @@ PODS:
   - geocoding_ios (1.0.5):
     - Flutter
   - geolocator_apple (1.2.0):
-    - Flutter
+    - Flutter-=
     - FlutterMacOS
   - GoogleUtilities/Environment (8.1.0):
     - GoogleUtilities/Privacy
