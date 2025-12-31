@@ -39,6 +39,7 @@ class UrlContainer {
   static const String expensesUrl = 'expenses';
   static const String miscellaneousUrl = 'miscellaneous';
   static const String privacyPolicyUrl = 'miscellaneous/privacy';
+  static const String telecallUrl = 'telecall';
 
   // Sales Tracker
   static const String salesTrackerGetLeadsUrl = 'sales-tracker/get-leads';
