@@ -24,6 +24,11 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>mailto</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
@@ -42,11 +47,6 @@
 	<string>This app needs photo library access to save or select images for attendance</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>tel</string>
-		<string>mailto</string>
-	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
