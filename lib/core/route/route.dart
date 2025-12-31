@@ -45,6 +45,9 @@ import 'package:flutex_admin/features/proposal/view/add_proposal_screen.dart';
 import 'package:flutex_admin/features/proposal/view/proposal_details_screen.dart';
 import 'package:flutex_admin/features/proposal/view/proposal_screen.dart';
 import 'package:flutex_admin/features/proposal/view/update_proposal_screen.dart';
+import 'package:flutex_admin/features/sales_tracker/view/sales_tracker_screen.dart';
+import 'package:flutex_admin/features/telecalling/view/telecalling_screen.dart';
+import 'package:flutex_admin/features/dcr/view/dcr_screen.dart';
 import 'package:flutex_admin/features/splash/view/splash_screen.dart';
 import 'package:flutex_admin/features/staff/view/add_staff_screen.dart';
 import 'package:flutex_admin/features/staff/view/staff_details_screen.dart';
@@ -120,6 +123,9 @@ class RouteHelper {
   static const String profileScreen = "/profile_screen";
   static const String editProfileScreen = "/edit_profile_screen";
   static const String privacyScreen = "/privacy_screen";
+  static const String salesTrackerScreen = "/sales_tracker_screen";
+  static const String telecallingScreen = "/telecalling_screen";
+  static const String dcrScreen = "/dcr_screen";
 
   List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => const SplashScreen()),
@@ -256,5 +262,8 @@ class RouteHelper {
     GetPage(name: editProfileScreen, page: () => const EditProfileScreen()),
     GetPage(name: settingsScreen, page: () => const MenuScreen()),
     GetPage(name: privacyScreen, page: () => const PrivacyPolicyScreen()),
+    GetPage(name: salesTrackerScreen, page: () => const SalesTrackerScreen()),
+    GetPage(name: telecallingScreen, page: () => const TelecallingScreen()),
+    GetPage(name: dcrScreen, page: () => const DCRScreen()),
   ];
 }

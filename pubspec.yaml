@@ -4,12 +4,14 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 2.1.1+1
 
 environment:
-  sdk: ^3.8.1
+  sdk: '>=3.0.0 <4.0.0'
   
 dependencies:
   flutter:
     sdk: flutter
 
+  flutter_map: ^6.1.0
+  latlong2: ^0.9.1
   get: ^4.7.2
   http: ^1.4.0
   dio: ^5.8.0+1
@@ -41,10 +43,14 @@ dependencies:
   firebase_core: ^4.2.1
   local_auth: 2.2.0
   geolocator: ^13.0.2
+  geocoding: ^3.0.0
   battery_plus: ^6.2.1
   workmanager: ^0.9.0+3
   flutter_background_service: ^5.0.5
   flutter_background_service_android: ^6.0.2
+  wakelock_plus: ^1.1.6
+  url_launcher: ^6.3.1
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +87,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - .env
     - assets/images/
     - assets/animation/
     - assets/lang/

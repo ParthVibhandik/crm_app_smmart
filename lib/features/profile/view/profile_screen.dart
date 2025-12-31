@@ -14,6 +14,8 @@ import 'package:flutex_admin/features/profile/repo/profile_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutex_admin/core/utils/dimensions.dart';
+import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
+import 'package:flutex_admin/core/utils/color_resources.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -137,10 +139,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   image: MyImages.email,
                                 ),
                                 const SizedBox(width: Dimensions.space15),
-                                CardColumn(
-                                  header: LocalStrings.email.tr,
-                                  body:
-                                      controller.profileModel.data?.email ?? '',
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: () => UrlLauncherHelper.mail(
+                                        controller.profileModel.data?.email),
+                                    child: CardColumn(
+                                      header: LocalStrings.email.tr,
+                                      body: controller
+                                              .profileModel.data?.email ??
+                                          '',
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -154,14 +163,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   image: MyImages.phone,
                                 ),
                                 const SizedBox(width: Dimensions.space15),
-                                CardColumn(
-                                  header: LocalStrings.phone.tr,
-                                  body:
-                                      controller
-                                          .profileModel
-                                          .data
-                                          ?.phoneNumber ??
-                                      '',
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: () => UrlLauncherHelper.call(
+                                        controller.profileModel.data?.phoneNumber),
+                                    child: CardColumn(
+                                      header: LocalStrings.phone.tr,
+                                      body: controller
+                                              .profileModel.data?.phoneNumber ??
+                                          '',
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),

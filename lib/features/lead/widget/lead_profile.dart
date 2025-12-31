@@ -7,6 +7,7 @@ import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
 import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/lead/model/lead_details_model.dart';
+import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -145,8 +146,27 @@ class LeadProfile extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(leadModel.phoneNumber ?? ''),
-                    Text(leadModel.website ?? '-'),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () =>
+                            UrlLauncherHelper.call(leadModel.phoneNumber),
+                        child: Text(
+                          leadModel.phoneNumber ?? '',
+                          overflow: TextOverflow.ellipsis,
+                          style: regularDefault.copyWith(
+                              color: ColorResources.primaryColor,
+                              decoration: TextDecoration.underline),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: Dimensions.space10),
+                    Expanded(
+                      child: Text(
+                        leadModel.website ?? '-',
+                        textAlign: TextAlign.end,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
               ],

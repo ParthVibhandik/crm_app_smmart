@@ -7,6 +7,7 @@ import 'package:flutex_admin/core/utils/color_resources.dart';
 import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/lead/model/lead_model.dart';
+import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -69,9 +70,25 @@ class LeadCard extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              lead.leadValue ?? '-',
-                              style: regularDefault,
+                            Row(
+                              children: [
+                                if (lead.phoneNumber != null &&
+                                    lead.phoneNumber!.isNotEmpty)
+                                  IconButton(
+                                    onPressed: () =>
+                                        UrlLauncherHelper.call(lead.phoneNumber),
+                                    icon: const Icon(Icons.call,
+                                        size: 20,
+                                        color: ColorResources.primaryColor),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
+                                const SizedBox(width: Dimensions.space10),
+                                Text(
+                                  lead.leadValue ?? '-',
+                                  style: regularDefault,
+                                ),
+                              ],
                             ),
                             Text(
                               lead.sourceName ?? '-',

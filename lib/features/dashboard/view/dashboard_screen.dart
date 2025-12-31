@@ -21,6 +21,7 @@ import 'package:flutex_admin/features/dashboard/widget/home_estimates_card.dart'
 import 'package:flutex_admin/features/dashboard/widget/home_invoices_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/home_proposals_card.dart';
 import 'package:flutex_admin/features/attendance/attendance_screen.dart';
+import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -165,10 +166,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           ],
                                         ),
                                       ),
-                                      Text(
-                                        controller.homeModel.staff?.email ?? '',
-                                        style: regularSmall.copyWith(
-                                          color: ColorResources.blueGreyColor,
+                                      InkWell(
+                                        onTap: () => UrlLauncherHelper.mail(
+                                            controller.homeModel.staff?.email),
+                                        child: Text(
+                                          controller.homeModel.staff?.email ??
+                                              '',
+                                          style: regularSmall.copyWith(
+                                            color: ColorResources.blueGreyColor,
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
                                         ),
                                       ),
                                     ],

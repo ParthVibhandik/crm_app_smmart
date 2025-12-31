@@ -5,6 +5,7 @@ import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
 import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/customer/model/customer_model.dart';
+import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -43,9 +44,15 @@ class CustomersCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: regularDefault.copyWith(
                         color: Theme.of(context).textTheme.bodyMedium!.color)),
-                subtitle: Text(
-                  customerModel.data![index].phoneNumber ?? '',
-                  style: regularSmall.copyWith(color: ColorResources.blueColor),
+                subtitle: InkWell(
+                  onTap: () => UrlLauncherHelper.call(
+                      customerModel.data![index].phoneNumber),
+                  child: Text(
+                    customerModel.data![index].phoneNumber ?? '',
+                    overflow: TextOverflow.ellipsis,
+                    style:
+                        regularSmall.copyWith(color: ColorResources.blueColor),
+                  ),
                 ),
                 trailing: Container(
                     padding: const EdgeInsets.all(Dimensions.space5),

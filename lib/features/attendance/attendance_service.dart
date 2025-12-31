@@ -2,14 +2,20 @@ import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 
 import 'attendance_status.dart';
 import 'biometric_service.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
+import 'camera_service.dart';
 
 class AttendanceService {
   final Dio _dio;
   final BiometricService _biometric = BiometricService();
+  final CameraService _camera = CameraService();
+
+  // Backend verify endpoint (expects attendance_id query param)
+  static const String _verifyGpsEndpoint =
+      '/flutex_admin_api/attendance/verify';
 
   AttendanceService(String token)
     : _dio = Dio(
@@ -22,17 +28,21 @@ class AttendanceService {
         ),
       );
 
-  /// Get today's attendance status
+  /// ==============================
+  /// TODAY STATUS
+  /// ==============================
   Future<AttendanceStatus> getTodayStatus() async {
     final response = await _dio.get('/flutex_admin_api/attendance/today');
+    print(response.data);
 
     if (response.data['status'] != true) {
       throw Exception(response.data['message'] ?? 'Failed');
     }
 
-    // Persist active attendance_id only when provided so we do not wipe prefs with null/empty
     final attendanceId = response.data['attendance_id'];
     final tokenHeader = _dio.options.headers['Authorization']?.toString();
+
+    // Persist only if active attendance exists
     if (attendanceId != null &&
         attendanceId.toString().isNotEmpty &&
         tokenHeader != null &&
@@ -41,25 +51,34 @@ class AttendanceService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('attendance_id', attendanceId.toString());
       await prefs.setString('token', token);
+    } else {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('attendance_id');
+      await prefs.remove('token');
     }
 
     return AttendanceStatus.fromJson(response.data);
   }
 
-  /// Get high-accuracy GPS location
+  /// ==============================
+  /// LOCATION (SINGLE SHOT ONLY)
+  /// ==============================
   Future<Position> _getCurrentLocation() async {
     LocationPermission permission = await Geolocator.checkPermission();
 
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        throw Exception('Location permission denied');
-      }
     }
 
-    if (permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      throw Exception('Location permission required to mark attendance.');
+    }
+
+    // 🔒 IMPORTANT: For background tracking, enforce ALWAYS
+    if (permission == LocationPermission.whileInUse) {
       throw Exception(
-        'Location permissions are permanently denied. Enable them from settings.',
+        'Please allow location access "Always" to enable attendance tracking.',
       );
     }
 
@@ -68,9 +87,11 @@ class AttendanceService {
     );
   }
 
-  /// Punch In (Biometric + Selfie + GPS required)
+  /// ==============================
+  /// PUNCH IN
+  /// ==============================
   Future<void> punchIn() async {
-    // 1. Biometric Authentication
+    // 1️⃣ Biometric
     final biometricAvailable = await _biometric.isBiometricAvailable();
     if (biometricAvailable) {
       final authenticated = await _biometric.authenticate(
@@ -81,26 +102,22 @@ class AttendanceService {
       }
     }
 
-    // 2. Selfie Capture
-    final ImagePicker picker = ImagePicker();
-    final XFile? photo = await picker.pickImage(
-      source: ImageSource.camera,
-      preferredCameraDevice: CameraDevice.front,
-      maxWidth: 600,
-    );
+    // 2️⃣ Selfie
+    final XFile? photo = await _camera.takeSelfie(maxWidth: 600);
 
     if (photo == null) {
       throw Exception('Selfie is required to punch in');
     }
 
-    // 3. Location Capture
+    // 3️⃣ Location (single fetch)
     final Position position = await _getCurrentLocation();
 
-    // 4. Send to Backend
-    final String fileName = photo.path.split('/').last;
-
+    // 4️⃣ API
     final FormData formData = FormData.fromMap({
-      'image': await MultipartFile.fromFile(photo.path, filename: fileName),
+      'image': await MultipartFile.fromFile(
+        photo.path,
+        filename: photo.path.split('/').last,
+      ),
       'punch_time': DateTime.now().toIso8601String(),
       'latitude': position.latitude,
       'longitude': position.longitude,
@@ -111,30 +128,62 @@ class AttendanceService {
       data: formData,
     );
 
+    print(response.data);
+
     if (response.data['status'] != true) {
       throw Exception(response.data['message'] ?? 'Punch-in failed');
     }
 
-    // ✅ START TRACKING
+    // ==============================
+    // START BACKGROUND TRACKING
+    // ==============================
     final int attendanceId = response.data['attendance_id'];
     final String token = _dio.options.headers['Authorization']!
         .toString()
         .replaceAll('Bearer ', '');
 
-    // Store in SharedPreferences for background service (reset any stale values first)
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('attendance_id');
-    await prefs.remove('token');
     await prefs.setString('attendance_id', attendanceId.toString());
     await prefs.setString('token', token);
-    print(prefs.getKeys());
+
     final service = FlutterBackgroundService();
+
+    // Restart service cleanly
+    final isRunning = await service.isRunning();
+    if (isRunning) {
+      service.invoke('stop');
+      await Future.delayed(const Duration(seconds: 1));
+    }
+
     await service.startService();
   }
 
-  /// Punch Out (Biometric + GPS required)
-  Future<void> punchOut() async {
-    // 1. Biometric Authentication
+  /// ==============================
+  /// PUNCH OUT
+  /// ==============================
+  Future<bool> _verifyGpsOffEvents() async {
+    final prefs = await SharedPreferences.getInstance();
+    final attendanceId = prefs.getString('attendance_id');
+    if (attendanceId == null || attendanceId.isEmpty) return false;
+
+    try {
+      final response = await _dio.get(
+        _verifyGpsEndpoint,
+        queryParameters: {'attendance_id': attendanceId},
+      );
+      print('GPS Off Verification Response: ${response.data}');
+      if (response.data is Map && response.data['status'] == true) {
+        return response.data['gps_closed_exists'] == true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  /// Exposed helper so UI can decide whether to collect a GPS-off reason.
+  Future<bool> requiresGpsOffReason() => _verifyGpsOffEvents();
+
+  Future<void> punchOut({String? gpsOffReason}) async {
+    // 1️⃣ Biometric
     final biometricAvailable = await _biometric.isBiometricAvailable();
     if (biometricAvailable) {
       final authenticated = await _biometric.authenticate(
@@ -145,13 +194,20 @@ class AttendanceService {
       }
     }
 
-    // 2. Location Capture
+    // 2️⃣ Check if backend saw GPS-off events today; enforce reason if needed
+    final requiresReason = await _verifyGpsOffEvents();
+    if (requiresReason && (gpsOffReason == null || gpsOffReason.isEmpty)) {
+      throw Exception('Please provide reason for GPS off before punch-out.');
+    }
+
+    // 3️⃣ Location (single fetch)
     final Position position = await _getCurrentLocation();
 
-    // 3. Send to Backend
+    // 4️⃣ API
     final FormData formData = FormData.fromMap({
       'latitude': position.latitude.toString(),
       'longitude': position.longitude.toString(),
+      'gps_off_reason': gpsOffReason ?? '',
     });
 
     final response = await _dio.post(
@@ -159,11 +215,15 @@ class AttendanceService {
       data: formData,
     );
 
+    print(response.data);
+
     if (response.data['status'] != true) {
       throw Exception(response.data['message'] ?? 'Punch-out failed');
     }
 
-    // Stop tracking and clear stored data
+    // ==============================
+    // STOP BACKGROUND TRACKING
+    // ==============================
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('attendance_id');
     await prefs.remove('token');
