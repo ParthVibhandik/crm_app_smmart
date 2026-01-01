@@ -171,8 +171,12 @@ class _ProposalScreenState extends State<ProposalScreen> {
                       ),
                       controller.proposalsModel.data!.isNotEmpty
                           ? ListView.separated(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: Dimensions.space15),
+                              padding: const EdgeInsets.fromLTRB(
+                                Dimensions.space15,
+                                0,
+                                Dimensions.space15,
+                                90,
+                              ),
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (context, index) {

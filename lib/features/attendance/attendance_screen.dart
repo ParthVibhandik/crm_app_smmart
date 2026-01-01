@@ -33,9 +33,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     });
 
     try {
-      status = await service.getTodayStatus();
-    } catch (e) {
-      error = e.toString();
+      final result = await service.getTodayStatus();
+      status = result;
+    } catch (e, s) {
+      debugPrint('Attendance load failed: $e');
+      debugPrintStack(stackTrace: s);
+      error = 'Unable to load attendance. Please try again.';
     }
 
     setState(() => loading = false);
@@ -119,60 +122,59 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : error != null
-          ? Center(child: Text(error!))
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: Center(
-                child: Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _StatusHeader(status!),
-                        const SizedBox(height: 24),
-
-                        if (!status!.punchedIn)
-                          _PrimaryButton(
-                            text: 'Punch In',
-                            icon: Icons.login,
-                            onPressed: punchIn,
-                          ),
-
-                        if (status!.punchedIn && !status!.punchedOut) ...[
-                          Text(
-                            'Punched in at',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            status!.punchInTime ?? '--',
-                            style: Theme.of(context).textTheme.headlineSmall
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 24),
-                          _PrimaryButton(
-                            text: 'Punch Out',
-                            icon: Icons.logout,
-                            onPressed: punchOut,
-                          ),
-                        ],
-
-                        if (status!.punchedIn && status!.punchedOut)
-                          const Text(
-                            'You have completed attendance for today',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                      ],
+              ? Center(child: Text(error!))
+              : Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Center(
+                    child: Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _StatusHeader(status!),
+                            const SizedBox(height: 24),
+                            if (!status!.punchedIn)
+                              _PrimaryButton(
+                                text: 'Punch In',
+                                icon: Icons.login,
+                                onPressed: punchIn,
+                              ),
+                            if (status!.punchedIn && !status!.punchedOut) ...[
+                              Text(
+                                'Punched in at',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                status!.punchInTime ?? '--',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 24),
+                              _PrimaryButton(
+                                text: 'Punch Out',
+                                icon: Icons.logout,
+                                onPressed: punchOut,
+                              ),
+                            ],
+                            if (status!.punchedIn && status!.punchedOut)
+                              const Text(
+                                'You have completed attendance for today',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
     );
   }
 }
@@ -206,8 +208,8 @@ class _StatusHeader extends StatelessWidget {
             status.punchedOut
                 ? 'Completed'
                 : status.punchedIn
-                ? 'In Progress'
-                : 'Not Started',
+                    ? 'In Progress'
+                    : 'Not Started',
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               color: Colors.blue,

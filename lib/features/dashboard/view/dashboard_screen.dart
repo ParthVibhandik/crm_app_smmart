@@ -77,7 +77,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               centerTitle: true,
               title: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
@@ -120,11 +121,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   backgroundColor: ColorResources.blueGreyColor,
                                   radius: 32,
                                   child: CircleImageWidget(
-                                    imagePath:
-                                        controller
-                                            .homeModel
-                                            .staff
-                                            ?.profileImage ??
+                                    imagePath: controller
+                                            .homeModel.staff?.profileImage ??
                                         '',
                                     isAsset: false,
                                     isProfile: true,
@@ -234,41 +232,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               DashboardCard(
-                                currentValue:
-                                    controller
-                                        .homeModel
-                                        .overview
+                                currentValue: controller.homeModel.overview
                                         ?.invoicesAwaitingPaymentTotal ??
                                     '0',
-                                totalValue:
-                                    controller
-                                        .homeModel
-                                        .overview
-                                        ?.totalInvoices ??
+                                totalValue: controller
+                                        .homeModel.overview?.totalInvoices ??
                                     '0',
-                                percent:
-                                    controller
-                                        .homeModel
-                                        .overview
+                                percent: controller.homeModel.overview
                                         ?.invoicesAwaitingPaymentPercent ??
                                     '0',
                                 icon: Icons.attach_money_rounded,
                                 title: LocalStrings.invoicesAwaitingPayment.tr,
                               ),
                               DashboardCard(
-                                currentValue:
-                                    controller
-                                        .homeModel
-                                        .overview
+                                currentValue: controller.homeModel.overview
                                         ?.leadsConvertedTotal ??
                                     '0',
                                 totalValue:
                                     controller.homeModel.overview?.totalLeads ??
-                                    '0',
-                                percent:
-                                    controller
-                                        .homeModel
-                                        .overview
+                                        '0',
+                                percent: controller.homeModel.overview
                                         ?.leadsConvertedPercent ??
                                     '0',
                                 icon: Icons.move_up_rounded,
@@ -280,41 +263,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Row(
                             children: [
                               DashboardCard(
-                                currentValue:
-                                    controller
-                                        .homeModel
-                                        .overview
+                                currentValue: controller.homeModel.overview
                                         ?.notFinishedTasksTotal ??
                                     '0',
                                 totalValue:
                                     controller.homeModel.overview?.totalTasks ??
-                                    '0',
-                                percent:
-                                    controller
-                                        .homeModel
-                                        .overview
+                                        '0',
+                                percent: controller.homeModel.overview
                                         ?.notFinishedTasksPercent ??
                                     '0',
                                 icon: Icons.task_outlined,
                                 title: LocalStrings.notCompleted.tr,
                               ),
                               DashboardCard(
-                                currentValue:
-                                    controller
-                                        .homeModel
-                                        .overview
+                                currentValue: controller.homeModel.overview
                                         ?.projectsInProgressTotal ??
                                     '0',
-                                totalValue:
-                                    controller
-                                        .homeModel
-                                        .overview
-                                        ?.totalProjects ??
+                                totalValue: controller
+                                        .homeModel.overview?.totalProjects ??
                                     '0',
-                                percent:
-                                    controller
-                                        .homeModel
-                                        .overview
+                                percent: controller.homeModel.overview
                                         ?.inProgressProjectsPercent ??
                                     '0',
                                 icon: Icons.dashboard_customize_rounded,
@@ -343,90 +311,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                   items: [
                                     if (controller
-                                            .homeModel
-                                            .menuItems
-                                            ?.invoices ??
+                                            .homeModel.menuItems?.invoices ??
                                         false)
                                       HomeInvoicesCard(
                                         invoices:
                                             controller.homeModel.data?.invoices,
                                       ),
                                     if (controller
-                                            .homeModel
-                                            .menuItems
-                                            ?.estimates ??
+                                            .homeModel.menuItems?.estimates ??
                                         false)
                                       HomeEstimatesCard(
                                         estimates: controller
-                                            .homeModel
-                                            .data
-                                            ?.estimates,
+                                            .homeModel.data?.estimates,
                                       ),
                                     if (controller
-                                            .homeModel
-                                            .menuItems
-                                            ?.proposals ??
+                                            .homeModel.menuItems?.proposals ??
                                         false)
                                       HomeProposalsCard(
                                         proposals: controller
-                                            .homeModel
-                                            .data
-                                            ?.proposals,
+                                            .homeModel.data?.proposals,
                                       ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
-                          const SizedBox(height: Dimensions.space15),
-
-                          /// PROJECT STATS
-                          if (controller.homeModel.menuItems?.projects ?? false)
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: Dimensions.space15,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.menu_open_rounded,
-                                        size: 20,
-                                        color: Theme.of(context).primaryColor,
-                                      ),
-                                      const SizedBox(width: Dimensions.space10),
-                                      Text(
-                                        LocalStrings.projectStatistics.tr,
-                                        style: regularLarge.copyWith(
-                                          color: Theme.of(context).primaryColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const CustomDivider(
-                                  space: Dimensions.space5,
-                                  padding: Dimensions.space15,
-                                ),
-                                SfCircularChart(
-                                  tooltipBehavior: TooltipBehavior(
-                                    enable: true,
-                                  ),
-                                  legend: const Legend(
-                                    isVisible: true,
-                                    position: LegendPosition.bottom,
-                                    textStyle: lightDefault,
-                                  ),
-                                  series: <CircularSeries>[
-                                    DoughnutSeries<DataField, String>(
-                                      dataSource:
-                                          controller.homeModel.data?.projects,
-                                      xValueMapper: (DataField data, _) =>
-                                          data.status?.tr ?? '',
-                                      yValueMapper: (DataField data, _) =>
-                                          int.parse(data.total ?? '0'),
-                                    ),
                                   ],
                                 ),
                               ],
@@ -441,4 +345,3 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
-

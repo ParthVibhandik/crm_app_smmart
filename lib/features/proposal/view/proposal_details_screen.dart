@@ -34,7 +34,7 @@ class _ProposalDetailsScreenState extends State<ProposalDetailsScreen> {
     controller.isLoading = true;
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.loadProposalDetails(widget.id);
     });
   }
@@ -48,7 +48,10 @@ class _ProposalDetailsScreenState extends State<ProposalDetailsScreen> {
         isShowActionBtnTwo: true,
         actionWidget: IconButton(
           onPressed: () {
-            Get.toNamed(RouteHelper.updateProposalScreen, arguments: widget.id);
+            Get.toNamed(
+              RouteHelper.updateProposalScreen,
+              arguments: widget.id,
+            );
           },
           icon: const Icon(Icons.edit, size: 20),
         ),
@@ -71,259 +74,198 @@ class _ProposalDetailsScreenState extends State<ProposalDetailsScreen> {
       ),
       body: GetBuilder<ProposalController>(
         builder: (controller) {
-          return controller.isLoading
-              ? const CustomLoader()
-              : RefreshIndicator(
-                  color: Theme.of(context).primaryColor,
-                  backgroundColor: Theme.of(context).cardColor,
-                  onRefresh: () async {
-                    await controller.loadProposalDetails(widget.id);
-                  },
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    child: Padding(
-                      padding: const EdgeInsets.all(Dimensions.space15),
+          if (controller.isLoading) {
+            return const CustomLoader();
+          }
+
+          final data = controller.proposalDetailsModel.data!;
+
+          return RefreshIndicator(
+            color: Theme.of(context).primaryColor,
+            backgroundColor: Theme.of(context).cardColor,
+            onRefresh: () async {
+              await controller.loadProposalDetails(widget.id);
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.all(Dimensions.space15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /// ---------------- HEADER ----------------
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            data.subject ?? '',
+                            style: mediumLarge,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          Converter.proposalStatusString(data.status ?? ''),
+                          style: lightDefault.copyWith(
+                            color: ColorResources.proposalStatusColor(
+                              data.status ?? '',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: Dimensions.space10),
+
+                    /// ---------------- COMPANY CARD ----------------
+                    CustomCard(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.6,
-                                child: Text(
-                                  controller
-                                          .proposalDetailsModel
-                                          .data!
-                                          .subject ??
-                                      '',
-                                  style: mediumLarge,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Text(
-                                Converter.proposalStatusString(
-                                  controller
-                                          .proposalDetailsModel
-                                          .data!
-                                          .status ??
-                                      '',
-                                ),
-                                style: lightDefault.copyWith(
-                                  color: ColorResources.proposalStatusColor(
-                                    controller
-                                            .proposalDetailsModel
-                                            .data!
-                                            .status ??
-                                        '',
-                                  ),
-                                ),
-                              ),
-                            ],
+                          _labelRow(
+                            LocalStrings.company.tr,
+                            LocalStrings.email.tr,
                           ),
-                          const SizedBox(height: Dimensions.space10),
-                          CustomCard(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      LocalStrings.company.tr,
-                                      style: lightSmall,
-                                    ),
-                                    Text(
-                                      LocalStrings.email.tr,
-                                      style: lightSmall,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      controller
-                                              .proposalDetailsModel
-                                              .data!
-                                              .proposalTo ??
-                                          '',
-                                      style: regularDefault,
-                                    ),
-                                    Text(
-                                      controller
-                                              .proposalDetailsModel
-                                              .data!
-                                              .email ??
-                                          '-',
-                                      style: regularDefault,
-                                    ),
-                                  ],
-                                ),
-                                const CustomDivider(space: Dimensions.space10),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      LocalStrings.date.tr,
-                                      style: lightSmall,
-                                    ),
-                                    Text(
-                                      LocalStrings.openTill.tr,
-                                      style: lightSmall,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      controller
-                                              .proposalDetailsModel
-                                              .data!
-                                              .date ??
-                                          '',
-                                      style: regularDefault,
-                                    ),
-                                    Text(
-                                      controller
-                                              .proposalDetailsModel
-                                              .data!
-                                              .openTill ??
-                                          '-',
-                                      style: regularDefault,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                          _valueRow(
+                            data.proposalTo ?? '',
+                            data.email ?? '-',
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: Dimensions.space10,
-                            ),
-                            child: Text(
-                              LocalStrings.items.tr,
-                              style: mediumLarge.copyWith(
-                                color: Theme.of(context).secondaryHeaderColor,
-                              ),
-                            ),
+                          const CustomDivider(space: Dimensions.space10),
+                          _labelRow(
+                            LocalStrings.date.tr,
+                            LocalStrings.openTill.tr,
                           ),
-                          CustomCard(
-                            child: ListView.separated(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              padding: EdgeInsets.symmetric(
-                                vertical: Dimensions.space5,
-                              ),
-                              itemBuilder: (context, index) {
-                                return TableItem(
-                                  item: controller
-                                      .proposalDetailsModel
-                                      .data!
-                                      .items![index],
-                                  currency: controller
-                                      .proposalDetailsModel
-                                      .data!
-                                      .symbol,
-                                );
-                              },
-                              separatorBuilder: (context, index) =>
-                                  const CustomDivider(
-                                    space: Dimensions.space10,
-                                  ),
-                              itemCount: controller
-                                  .proposalDetailsModel
-                                  .data!
-                                  .items!
-                                  .length,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(Dimensions.space10),
-                            child: Column(
-                              spacing: Dimensions.space10,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      LocalStrings.subtotal.tr,
-                                      style: lightDefault,
-                                    ),
-                                    Text(
-                                      '${controller.proposalDetailsModel.data!.symbol ?? ''}${controller.proposalDetailsModel.data!.subtotal ?? ''}',
-                                      style: regularDefault,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      LocalStrings.discount.tr,
-                                      style: lightDefault,
-                                    ),
-                                    Text(
-                                      controller
-                                              .proposalDetailsModel
-                                              .data!
-                                              .discountTotal ??
-                                          '',
-                                      style: regularDefault,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      LocalStrings.tax.tr,
-                                      style: lightDefault,
-                                    ),
-                                    Text(
-                                      controller
-                                              .proposalDetailsModel
-                                              .data!
-                                              .totalTax ??
-                                          '',
-                                      style: regularDefault,
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      LocalStrings.total.tr,
-                                      style: regularLarge,
-                                    ),
-                                    Text(
-                                      '${controller.proposalDetailsModel.data!.symbol ?? ''}${controller.proposalDetailsModel.data!.total ?? ''}',
-                                      style: mediumLarge,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                          _valueRow(
+                            data.date ?? '',
+                            data.openTill ?? '-',
                           ),
                         ],
                       ),
                     ),
-                  ),
-                );
+
+                    const SizedBox(height: Dimensions.space10),
+
+                    /// ---------------- ITEMS ----------------
+                    Text(
+                      LocalStrings.items.tr,
+                      style: mediumLarge.copyWith(
+                        color: Theme.of(context).secondaryHeaderColor,
+                      ),
+                    ),
+
+                    const SizedBox(height: Dimensions.space10),
+
+                    CustomCard(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: Dimensions.space5,
+                        ),
+                        itemBuilder: (context, index) {
+                          return TableItem(
+                            item: data.items![index],
+                            currency: data.symbol,
+                          );
+                        },
+                        separatorBuilder: (_, __) =>
+                            const CustomDivider(space: Dimensions.space10),
+                        itemCount: data.items!.length,
+                      ),
+                    ),
+
+                    const SizedBox(height: Dimensions.space10),
+
+                    /// ---------------- TOTALS ----------------
+                    CustomCard(
+                      child: Column(
+                        spacing: Dimensions.space10,
+                        children: [
+                          _amountRow(
+                            LocalStrings.subtotal.tr,
+                            '${data.symbol ?? ''}${data.subtotal ?? ''}',
+                          ),
+                          _amountRow(
+                            LocalStrings.discount.tr,
+                            data.discountTotal ?? '',
+                          ),
+                          _amountRow(
+                            LocalStrings.tax.tr,
+                            data.totalTax ?? '',
+                          ),
+                          _amountRow(
+                            LocalStrings.total.tr,
+                            '${data.symbol ?? ''}${data.total ?? ''}',
+                            isBold: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
         },
       ),
+    );
+  }
+
+  /// ---------------- HELPERS ----------------
+
+  Widget _labelRow(String left, String right) {
+    return Row(
+      children: [
+        Expanded(child: Text(left, style: lightSmall)),
+        Expanded(
+          child: Text(
+            right,
+            style: lightSmall,
+            textAlign: TextAlign.end,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _valueRow(String left, String right) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            left,
+            style: regularDefault,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            right,
+            style: regularDefault,
+            textAlign: TextAlign.end,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _amountRow(String label, String value, {bool isBold = false}) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: isBold ? regularLarge : lightDefault,
+          ),
+        ),
+        Text(
+          value,
+          style: isBold ? mediumLarge : regularDefault,
+        ),
+      ],
     );
   }
 }

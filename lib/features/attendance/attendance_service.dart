@@ -18,15 +18,15 @@ class AttendanceService {
       '/flutex_admin_api/attendance/verify';
 
   AttendanceService(String token)
-    : _dio = Dio(
-        BaseOptions(
-          baseUrl: 'https://smmartcrm.in',
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Accept': 'application/json',
-          },
-        ),
-      );
+      : _dio = Dio(
+          BaseOptions(
+            baseUrl: 'https://smmartcrm.in',
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Accept': 'application/json',
+            },
+          ),
+        );
 
   /// ==============================
   /// TODAY STATUS
