@@ -187,6 +187,45 @@ class _EndTripScreenState extends State<EndTripScreen> {
                           style: TextStyle(fontSize: 14, color: Colors.grey),
                         ),
                         const SizedBox(height: 20),
+                        
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.orange,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.description),
+                                label: const Text('Proposals'),
+                                onPressed: () {
+                                  Get.toNamed(RouteHelper.proposalScreen);
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.receipt),
+                                label: const Text('Invoices'),
+                                onPressed: () {
+                                  Get.toNamed(RouteHelper.invoiceScreen);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
 
                         if (_isLoadingInvoices)
                            const Center(child: LinearProgressIndicator())
@@ -204,16 +243,22 @@ class _EndTripScreenState extends State<EndTripScreen> {
                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                                 ),
                                 hint: const Text("Select Invoice"),
-                                items: _invoices.take(50).map((inv) {
-                                   return DropdownMenuItem<String>(
-                                     value: inv.id,
-                                     child: Text(
-                                       "${inv.prefix ?? ''}${inv.number ?? ''} - ${inv.total ?? ''} (${inv.date ?? ''})",
-                                       overflow: TextOverflow.ellipsis,
-                                       style: const TextStyle(fontSize: 13),
-                                     ),
-                                   );
-                                }).toList(),
+                                items: [
+                                  const DropdownMenuItem<String>(
+                                    value: null,
+                                    child: Text("None (Do not send any invoice)"),
+                                  ),
+                                  ..._invoices.take(50).map((inv) {
+                                     return DropdownMenuItem<String>(
+                                       value: inv.id,
+                                       child: Text(
+                                         "${inv.prefix ?? ''}${inv.number ?? ''} - ${inv.clientName ?? 'Unknown'} - ${inv.total ?? ''} (${inv.date ?? ''})",
+                                         overflow: TextOverflow.ellipsis,
+                                         style: const TextStyle(fontSize: 13),
+                                       ),
+                                     );
+                                  }),
+                                ].toList(),
                                 onChanged: (val) {
                                   setState(() {
                                     _selectedInvoiceId = val;

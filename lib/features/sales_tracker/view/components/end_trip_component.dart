@@ -174,6 +174,45 @@ class _EndTripComponentState extends State<EndTripComponent> {
                     ),
                     const SizedBox(height: 20),
                     
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            icon: const Icon(Icons.description),
+                            label: const Text('Proposals'),
+                            onPressed: () {
+                              Get.toNamed(RouteHelper.proposalScreen);
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            icon: const Icon(Icons.receipt),
+                            label: const Text('Invoices'),
+                            onPressed: () {
+                              Get.toNamed(RouteHelper.invoiceScreen);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    
                     if (_isLoadingInvoices)
                        const Center(child: LinearProgressIndicator())
                     else if (_invoices.isNotEmpty)
@@ -190,16 +229,22 @@ class _EndTripComponentState extends State<EndTripComponent> {
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                             ),
                             hint: const Text("Select Invoice"),
-                            items: _invoices.take(50).map((inv) {
+                            items: [
+                              const DropdownMenuItem<String>(
+                                value: null,
+                                child: Text("None (Do not send any invoice)"),
+                              ),
+                              ..._invoices.take(50).map((inv) {
                                return DropdownMenuItem<String>(
                                  value: inv.id,
                                  child: Text(
-                                   "${inv.prefix ?? ''}${inv.number ?? ''} - ${inv.total ?? ''} (${inv.date ?? ''})",
+                                   "${inv.prefix ?? ''}${inv.number ?? ''} - ${inv.clientName ?? 'Unknown'} - ${inv.total ?? ''} (${inv.date ?? ''})",
                                    overflow: TextOverflow.ellipsis,
                                    style: const TextStyle(fontSize: 13),
                                  ),
                                );
-                            }).toList(),
+                            }),
+                            ].toList(),
                             onChanged: (val) {
                               setState(() {
                                 _selectedInvoiceId = val;

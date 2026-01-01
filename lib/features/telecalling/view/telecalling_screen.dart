@@ -4,6 +4,7 @@ import 'package:flutex_admin/common/components/buttons/rounded_loading_button.da
 import 'package:flutex_admin/common/components/text-form-field/custom_text_field.dart';
 import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/style.dart';
+import 'package:flutex_admin/core/route/route.dart';
 import 'package:flutex_admin/features/telecalling/controller/telecalling_controller.dart';
 import 'package:flutex_admin/features/telecalling/repo/telecalling_repo.dart';
 import 'package:flutter/material.dart';
@@ -130,6 +131,90 @@ class _TelecallingScreenState extends State<TelecallingScreen> {
                   ),
                 ),
                 const SizedBox(height: Dimensions.space20),
+                
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        icon: const Icon(Icons.description),
+                        label: const Text('Proposals'),
+                        onPressed: () {
+                          Get.toNamed(RouteHelper.proposalScreen);
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        icon: const Icon(Icons.receipt),
+                        label: const Text('Invoices'),
+                        onPressed: () {
+                          Get.toNamed(RouteHelper.invoiceScreen);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: Dimensions.space20),
+
+                if (controller.isLoadingInvoices)
+                   const Center(child: LinearProgressIndicator())
+                else if (controller.invoices.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Link Created Invoice (Optional)", style: regularDefault.copyWith(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: Dimensions.space10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            isExpanded: true,
+                            value: controller.selectedInvoiceId,
+                            hint: const Text("Select Invoice"),
+                            items: [
+                              const DropdownMenuItem<String>(
+                                value: null,
+                                child: Text("None (Do not send any invoice)"),
+                              ),
+                              ...controller.invoices.take(50).map((inv) {
+                                return DropdownMenuItem<String>(
+                                  value: inv.id,
+                                  child: Text(
+                                    "${inv.prefix ?? ''}${inv.number ?? ''} - ${inv.clientName ?? 'Unknown'} - ${inv.total ?? ''} (${inv.date ?? ''})",
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontSize: 13),
+                                  ),
+                                );
+                              }),
+                            ].toList(),
+                            onChanged: (val) {
+                               controller.setInvoiceId(val);
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: Dimensions.space20),
+                    ],
+                  ),
                 Text(
                   "Remarks",
                   style: regularDefault.copyWith(fontWeight: FontWeight.w600),

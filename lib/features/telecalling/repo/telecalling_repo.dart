@@ -26,6 +26,7 @@ class TelecallingRepo {
     required String duration,
     required String status,
     required String remarks,
+    String? invoiceId,
   }) async {
     String url = "${UrlContainer.baseUrl}${UrlContainer.telecallUrl}/record";
     Map<String, String> params = {
@@ -33,6 +34,7 @@ class TelecallingRepo {
       "duration": duration,
       "current_status": status,
       "remarks": remarks,
+      if (invoiceId != null) "invoice_id": invoiceId,
     };
 
     ResponseModel responseModel = await apiClient.request(
