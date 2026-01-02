@@ -25,8 +25,7 @@ class DiscussionCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    width: MediaQuery.sizeOf(context).width / 2,
+                  Expanded(
                     child: Text(
                       discussion.subject ?? '',
                       style: regularDefault,
@@ -34,6 +33,7 @@ class DiscussionCard extends StatelessWidget {
                       maxLines: 2,
                     ),
                   ),
+                  const SizedBox(width: Dimensions.space10),
                   TextIcon(
                     text: discussion.showToCustomer == '1'
                         ? LocalStrings.visible

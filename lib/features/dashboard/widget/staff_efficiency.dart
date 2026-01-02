@@ -36,7 +36,7 @@ class StaffEfficiencyWidget extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: regularDefault.copyWith(color: Colors.white70)),
+            Expanded(child: Text(label, style: regularDefault.copyWith(color: Colors.white70), overflow: TextOverflow.ellipsis)),
             Text('${(percent * 100).toInt()}%', style: semiBoldDefault.copyWith(color: color)),
           ],
         ),

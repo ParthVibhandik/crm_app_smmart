@@ -48,8 +48,7 @@ class ProposalCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          width: MediaQuery.sizeOf(context).width / 2,
+                        Expanded(
                           child: Text(
                             proposalModel.data![index].subject ?? '',
                             overflow: TextOverflow.ellipsis,
@@ -57,20 +56,29 @@ class ProposalCard extends StatelessWidget {
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ),
+                        const SizedBox(width: Dimensions.space10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              '${proposalModel.data![index].total} ${proposalModel.data![index].currencyName}',
-                              style: Theme.of(context).textTheme.bodyLarge,
+                            ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 120),
+                              child: Text(
+                                '${proposalModel.data![index].total} ${proposalModel.data![index].currencyName}',
+                                style: Theme.of(context).textTheme.bodyLarge,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             const SizedBox(height: Dimensions.space5),
-                            Text(
-                              Converter.proposalStatusString(
-                                  proposalModel.data![index].status ?? ''),
-                              style: lightDefault.copyWith(
-                                  color: ColorResources.proposalStatusColor(
-                                      proposalModel.data![index].status!)),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 100),
+                              child: Text(
+                                Converter.proposalStatusString(
+                                    proposalModel.data![index].status ?? ''),
+                                style: lightDefault.copyWith(
+                                    color: ColorResources.proposalStatusColor(
+                                        proposalModel.data![index].status!)),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ],
                         ),

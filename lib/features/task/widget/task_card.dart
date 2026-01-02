@@ -42,8 +42,7 @@ class TaskCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SizedBox(
-                        width: MediaQuery.sizeOf(context).width / 1.5,
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -65,6 +64,7 @@ class TaskCard extends StatelessWidget {
                           ],
                         ),
                       ),
+                      const SizedBox(width: Dimensions.space10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -77,9 +77,13 @@ class TaskCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: Dimensions.space3),
-                          Text(
-                            task.relType?.capitalizeFirst ?? '-',
-                            style: lightSmall,
+                          ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 100),
+                            child: Text(
+                              task.relType?.capitalizeFirst ?? '-',
+                              style: lightSmall,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),

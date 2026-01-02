@@ -34,11 +34,13 @@ class TextIcon extends StatelessWidget {
           size: iconSize,
           color: iconColor,
         ),
-        Text(
-          text.tr,
-          overflow: TextOverflow.ellipsis,
-          style: textStyle ??
-              lightDefault.copyWith(color: ColorResources.blueGreyColor),
+        Flexible(
+          child: Text(
+            text.tr,
+            overflow: TextOverflow.ellipsis,
+            style: textStyle ??
+                lightDefault.copyWith(color: ColorResources.blueGreyColor),
+          ),
         ),
       ],
     );

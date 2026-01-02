@@ -50,14 +50,14 @@ class ProjectCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          width: MediaQuery.sizeOf(context).width * 0.65,
+                        Expanded(
                           child: Text(
                             projectModel.data![index].name ?? '',
                             overflow: TextOverflow.ellipsis,
                             style: regularDefault,
                           ),
                         ),
+                        const SizedBox(width: Dimensions.space10),
                         Container(
                           padding: const EdgeInsets.all(Dimensions.space5),
                           decoration: ShapeDecoration(
@@ -72,12 +72,16 @@ class ProjectCard extends StatelessWidget {
                                       projectModel.data![index].status!)),
                             ),
                           ),
-                          child: Text(
-                            Converter.projectStatusString(
-                                projectModel.data![index].status ?? ''),
-                            style: lightSmall.copyWith(
-                                color: ColorResources.projectStatusColor(
-                                    projectModel.data![index].status ?? '')),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: 100),
+                            child: Text(
+                              Converter.projectStatusString(
+                                  projectModel.data![index].status ?? ''),
+                              style: lightSmall.copyWith(
+                                  color: ColorResources.projectStatusColor(
+                                      projectModel.data![index].status ?? '')),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                       ],

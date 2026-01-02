@@ -46,8 +46,7 @@ class LeadCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          width: MediaQuery.sizeOf(context).width / 1.5,
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -67,6 +66,7 @@ class LeadCard extends StatelessWidget {
                             ],
                           ),
                         ),
+                        const SizedBox(width: Dimensions.space10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -84,15 +84,23 @@ class LeadCard extends StatelessWidget {
                                     constraints: const BoxConstraints(),
                                   ),
                                 const SizedBox(width: Dimensions.space10),
-                                Text(
-                                  lead.leadValue ?? '-',
-                                  style: regularDefault,
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(maxWidth: 100),
+                                  child: Text(
+                                    lead.leadValue ?? '-',
+                                    style: regularDefault,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ],
                             ),
-                            Text(
-                              lead.sourceName ?? '-',
-                              style: lightSmall,
+                            ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 120),
+                              child: Text(
+                                lead.sourceName ?? '-',
+                                style: lightSmall,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ],
                         ),

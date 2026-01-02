@@ -51,31 +51,35 @@ class _AppLockScreenState extends State<AppLockScreen> {
             colors: [ColorResources.gradientStart, ColorResources.gradientEnd],
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.lock_person_rounded, size: 80, color: Colors.white),
-            const SizedBox(height: 20),
-            Text('App Locked', style: semiBoldOverLarge.copyWith(color: Colors.white)),
-            const SizedBox(height: 40),
-            Row(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(4, (index) {
-                return Container(
-                  margin: const EdgeInsets.all(10),
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: index < _pin.length ? Colors.white : Colors.white24,
-                    border: Border.all(color: Colors.white),
-                  ),
-                );
-              }),
+              children: [
+                const Icon(Icons.lock_person_rounded, size: 80, color: Colors.white),
+                const SizedBox(height: 20),
+                Text('App Locked', style: semiBoldOverLarge.copyWith(color: Colors.white)),
+                const SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(4, (index) {
+                    return Container(
+                      margin: const EdgeInsets.all(10),
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: index < _pin.length ? Colors.white : Colors.white24,
+                        border: Border.all(color: Colors.white),
+                      ),
+                    );
+                  }),
+                ),
+                const SizedBox(height: 40),
+                _buildKeypad(),
+              ],
             ),
-            const SizedBox(height: 40),
-            _buildKeypad(),
-          ],
+          ),
         ),
       ),
     );

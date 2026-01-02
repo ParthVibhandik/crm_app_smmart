@@ -48,19 +48,23 @@ class TicketCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          width: MediaQuery.sizeOf(context).width * 0.65,
+                        Expanded(
                           child: Text(
                             '${ticketModel.data![index].subject}',
                             overflow: TextOverflow.ellipsis,
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ),
-                        Text(
-                          ticketModel.data![index].statusName?.tr ?? '',
-                          style: TextStyle(
-                              color: ColorResources.ticketStatusColor(
-                                  ticketModel.data![index].status!)),
+                        const SizedBox(width: Dimensions.space10),
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: 100),
+                          child: Text(
+                            ticketModel.data![index].statusName?.tr ?? '',
+                            style: TextStyle(
+                                color: ColorResources.ticketStatusColor(
+                                    ticketModel.data![index].status!)),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),

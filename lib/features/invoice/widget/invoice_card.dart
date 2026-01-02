@@ -47,10 +47,14 @@ class InvoiceCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          '${invoiceModel.data![index].prefix!}${invoiceModel.data![index].number}',
-                          style: regularLarge,
+                        Expanded(
+                          child: Text(
+                            '${invoiceModel.data![index].prefix!}${invoiceModel.data![index].number}',
+                            style: regularLarge,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
+                        const SizedBox(width: Dimensions.space10),
                         Text(
                           '${invoiceModel.data![index].currencySymbol}${invoiceModel.data![index].total}',
                           style: regularLarge,
@@ -74,10 +78,13 @@ class InvoiceCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        TextIcon(
-                          text: invoiceModel.data![index].clientName ?? '',
-                          icon: Icons.business_center_outlined,
+                        Expanded(
+                          child: TextIcon(
+                            text: invoiceModel.data![index].clientName ?? '',
+                            icon: Icons.business_center_outlined,
+                          ),
                         ),
+                        const SizedBox(width: Dimensions.space10),
                         TextIcon(
                           text: invoiceModel.data![index].date ?? '',
                           icon: Icons.calendar_month,
