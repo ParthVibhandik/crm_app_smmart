@@ -3,457 +3,267 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ColorResources {
-  static const Color primaryColor = Color(0xff1e293b);
-  static const Color secondaryColor = Color(0xff27B8DA);
-  static const Color screenBgColor = Color(0xFFF4F4F5);
-  static const Color screenBgColorDark = Color(0xFF171e29);
-  static const Color cardColor = Color(0xffF6F7FE);
-  static const Color cardColorDark = Color(0xff1c2739);
-  static const Color hintColor = Color(0xFF92A5C6);
-  static const Color hintColorDark = Color(0xFF92A5C6);
-  static Color secondaryScreenBgColor = primaryColor.withValues(alpha: .4);
-  static const Color primaryTextColor = Color(0xff262626);
-  static const Color contentTextColor = Color(0xff777777);
-  static const Color primaryStatusBarColor = primaryColor;
+  // Premium Core Colors
+  static const Color primaryColor = Color(0xFF4F46E5); // Indigo 600 - Validated for impact
+  static const Color secondaryColor = Color(0xFF0EA5E9); // Sky 500
+  static const Color tertiaryColor = Color(0xFF8B5CF6); // Violet 500
+
+  // Backgrounds & Surfaces
+  static const Color screenBgColor = Color(0xFFF8FAFC); // Slate 50
+  static const Color screenBgColorDark = Color(0xFF0F172A); // Slate 900
+  
+  static const Color cardColor = Color(0xFFFFFFFF);
+  static const Color cardColorDark = Color(0xFF1E293B); // Slate 800
+  
+  static const Color secondaryScreenBgColor = Color(0xFFEEF2FF); // Indigo 50
+  
+  // Text Colors
+  static const Color primaryTextColor = Color(0xFF1E293B); // Slate 800
+  static const Color contentTextColor = Color(0xFF64748B); // Slate 500
+  static const Color primaryStatusBarColor = screenBgColorDark;
+  
   static const Color underlineTextColor = primaryColor;
-  static const Color lineColor = Color(0xffECECEC);
-  static const Color borderColor = Color(0xffD9D9D9);
-  static const Color inputColor = Color(0xffECECEC);
-  static const Color inputColorDark = Color(0xff1F1F1F);
+  static const Color lineColor = Color(0xFFE2E8F0); // Slate 200
+  static const Color borderColor = Color(0xFFCBD5E1); // Slate 300
+  
+  static const Color inputColor = Color(0xFFFFFFFF); 
+  static const Color inputColorDark = Color(0xFF334155); // Slate 700
 
-  // New
-  static const Color lightBackgroundColor = Color(0xFFF5F6F9);
-  static const Color darkColor = Color(0xFF202A44);
-  static const Color textDarkColor = Color(0xFF444952);
-  static const Color blueGreyColor = Color(0xFF92A5C6);
-  static const Color lightBlueGreyColor = Color(0xFFDEE4ED);
-  static const Color blueColor = Colors.blue;
-  static const Color redColor = Colors.redAccent;
-  static const Color greenColor = Colors.green;
-  static const Color yellowColor = Colors.orange;
-  static const Color purpleColor = Colors.purple;
+  // Hints
+  static const Color hintColor = Color(0xFF94A3B8); // Slate 400
+  static const Color hintColorDark = Color(0xFF64748B);
 
-  // app bar
+  // Expanded Palette for UI freshness
+  static const Color lightBackgroundColor = Color(0xFFF1F5F9);
+  static const Color darkColor = Color(0xFF1E293B);
+  static const Color textDarkColor = Color(0xFF334155);
+  static const Color blueGreyColor = Color(0xFF64748B);
+  static const Color lightBlueGreyColor = Color(0xFFCBD5E1);
+  
+  // Functional Colors
+  static const Color blueColor = Color(0xFF3B82F6);
+  static const Color redColor = Color(0xFFEF4444);
+  static const Color greenColor = Color(0xFF10B981); // Emerald 500
+  static const Color yellowColor = Color(0xFFF59E0B); // Amber 500
+  static const Color purpleColor = Color(0xFF8B5CF6);
+
+  // AppBar
   static const Color appBarColor = primaryColor;
   static const Color appBarContentColor = colorWhite;
 
-  // text field
-  static Color labelTextColor = colorBlack.withValues(alpha: 0.6);
-  static const Color textFieldDisableBorderColor = Color(0xffCFCEDB);
+  // TextField
+  static Color labelTextColor = Color(0xFF475569);
+  static const Color textFieldDisableBorderColor = Color(0xFFE2E8F0);
   static const Color textFieldEnableBorderColor = primaryColor;
-  static const Color hintTextColor = Color(0xff98a1ab);
+  static const Color hintTextColor = Color(0xFF94A3B8);
 
-  // button
+  // Buttons
   static const Color primaryButtonColor = primaryColor;
   static const Color primaryButtonTextColor = colorWhite;
   static const Color secondaryButtonColor = colorWhite;
-  static const Color secondaryButtonTextColor = colorBlack;
+  static const Color secondaryButtonTextColor = Color(0xFF1E293B);
 
-  // icon
-  static const Color iconColor = Color(0xff555555);
+  // Icons
+  static const Color iconColor = Color(0xFF64748B);
   static const Color filterEnableIconColor = primaryColor;
   static const Color filterIconColor = iconColor;
-  static const Color searchEnableIconColor = colorRed;
+  static const Color searchEnableIconColor = redColor;
   static const Color searchIconColor = iconColor;
-  static const Color bottomSheetCloseIconColor = colorBlack;
+  static const Color bottomSheetCloseIconColor = Color(0xFF0F172A);
 
-  static const Color colorWhite = Color(0xffFFFFFF);
-  static const Color colorBlack = Color(0xff262626);
-  static const Color colorGreen = Color(0xff28C76F);
-  static const Color colorGreen100 = Color(0xffD4F4E2);
-  static const Color colorOrange = Color(0xffFF9F43);
-  static const Color colorOrange100 = Color(0xffFFECD9);
-  static const Color colorRed = Color(0xffEA5455);
-  static const Color colorRed100 = Color(0xffFCE9E9);
-  static const Color colorGrey = Color(0xff555555);
-  static const Color lightGray = Color(0xFFFAFAFA);
-  static const Color colorlighterGrey = Color(0xFF7c8099);
-  static const Color colorLightGrey = Color(0xFFCECECE);
+  // Base
+  static const Color colorWhite = Color(0xFFFFFFFF);
+  static const Color colorBlack = Color(0xFF000000);
+  static const Color colorGreen = Color(0xFF10B981);
+  static const Color colorGreen100 = Color(0xFFD1FAE5);
+  static const Color colorOrange = Color(0xFFF59E0B);
+  static const Color colorOrange100 = Color(0xFFFEF3C7);
+  static const Color colorRed = Color(0xFFEF4444);
+  static const Color colorRed100 = Color(0xFFFEE2E2);
+  static const Color colorGrey = Color(0xFF64748B);
+  static const Color lightGray = Color(0xFFF8FAFC);
+  static const Color colorlighterGrey = Color(0xFF94A3B8);
+  static const Color colorLightGrey = Color(0xFFE2E8F0);
   static const Color transparentColor = Colors.transparent;
 
-  // screen-bg & primary color
-  static Color getPrimaryColor() {
-    return primaryColor;
-  }
-
-  static Color getScreenBgColor() {
-    return Get.find<ThemeController>().darkTheme ? cardColorDark : cardColor;
-  }
-
+  // Getters & Helpers
+  static Color getPrimaryColor() => primaryColor;
+  static Color getScreenBgColor() => Get.find<ThemeController>().darkTheme ? screenBgColorDark : screenBgColor;
+  
   static Color projectStatusColor(String state) {
-    Color color = ColorResources.blueColor;
     switch (state) {
-      case '1': // Not Started
-        color = ColorResources.darkColor;
-        break;
-      case '2': // In Progress
-        color = ColorResources.blueColor;
-        break;
-      case '3': // On Hold
-        color = ColorResources.yellowColor;
-        break;
-      case '4': // Finished
-        color = ColorResources.greenColor;
-        break;
-      case '5': // Cancelled
-        color = ColorResources.redColor;
-        break;
+      case '1':
+      case 'Not Started':
+        return lightBlueGreyColor;
+      case '2':
+      case 'In Progress':
+        return blueColor;
+      case '3':
+      case 'On Hold':
+        return yellowColor;
+      case '4':
+      case 'Finished':
+        return greenColor;
+      case '5':
+      case 'Cancelled':
+        return redColor;
+      default:
+        return blueColor;
     }
-    return color;
   }
 
   static Color taskStatusColor(String state) {
-    Color color = ColorResources.blueColor;
     switch (state) {
-      case '1':
-        color = ColorResources.darkColor;
-        break;
-      case '2':
-        color = ColorResources.blueColor;
-        break;
-      case '3':
-        color = ColorResources.yellowColor;
-        break;
-      case '4':
-        color = ColorResources.blueColor;
-        break;
-      case '5':
-        color = ColorResources.greenColor;
-        break;
+      case '1': return lightBlueGreyColor;
+      case '2': return blueColor;
+      case '3': return yellowColor;
+      case '4': return blueColor;
+      case '5': return greenColor;
+      default: return blueColor;
     }
-    return color;
   }
 
   static Color taskPriorityColor(String state) {
-    Color color = ColorResources.blueColor;
     switch (state) {
-      case '1': // Low
-        color = ColorResources.darkColor;
-        break;
-      case '2': // Medium
-        color = ColorResources.blueColor;
-        break;
-      case '3': // High
-        color = ColorResources.yellowColor;
-        break;
-      case '4': // Urgent
-        color = ColorResources.redColor;
-        break;
+      case '1': return lightBlueGreyColor;
+      case '2': return blueColor;
+      case '3': return yellowColor;
+      case '4': return redColor;
+      default: return blueColor;
     }
-    return color;
   }
 
   static Color invoiceStatusColor(String state) {
-    Color color = ColorResources.blueColor;
     switch (state) {
-      case '1': // Unpaid
-        color = ColorResources.redColor;
-        break;
-      case '2': // Paid
-        color = ColorResources.greenColor;
-        break;
-      case '3': // Partialy Paid
-        color = ColorResources.colorOrange;
-        break;
-      case '4': // Overdue
-        color = ColorResources.yellowColor;
-        break;
-      case '5': // Cancelled
-        color = ColorResources.colorGrey;
-        break;
-      case '6': // Draft
-        color = ColorResources.darkColor;
-        break;
+      case '1': return redColor;
+      case '2': return greenColor;
+      case '3': return colorOrange;
+      case '4': return yellowColor;
+      case '5': return colorGrey;
+      case '6': return lightBlueGreyColor;
+      default: return blueColor;
     }
-    return color;
   }
 
   static Color invoiceTextStatusColor(String state) {
-    Color color = ColorResources.blueColor;
     switch (state) {
-      case 'Unpaid':
-        color = ColorResources.redColor;
-        break;
-      case 'Paid':
-        color = ColorResources.greenColor;
-        break;
-      case 'Partialy Paid':
-        color = ColorResources.colorOrange;
-        break;
-      case 'Overdue':
-        color = ColorResources.redColor;
-        break;
-      case 'Cancelled':
-        color = ColorResources.redColor;
-        break;
-      case 'Draft':
-        color = ColorResources.darkColor;
-        break;
+      case 'Unpaid': return redColor;
+      case 'Paid': return greenColor;
+      case 'Partialy Paid': return colorOrange;
+      case 'Overdue': return redColor;
+      case 'Cancelled': return redColor;
+      case 'Draft': return lightBlueGreyColor;
+      default: return blueColor;
     }
-    return color;
   }
 
   static Color contractStatusColor(String state) {
-    Color color = ColorResources.blueColor;
     switch (state) {
-      case '0':
-        color = ColorResources.blueColor;
-        break;
-      case '1':
-        color = ColorResources.greenColor;
-        break;
-      case '2':
-        color = ColorResources.redColor;
-        break;
-      case '3':
-        color = ColorResources.yellowColor;
-        break;
-      case '4':
-        color = ColorResources.darkColor;
-        break;
+      case '0': return blueColor;
+      case '1': return greenColor;
+      case '2': return redColor;
+      case '3': return yellowColor;
+      case '4': return lightBlueGreyColor;
+      default: return blueColor;
     }
-    return color;
   }
 
   static Color estimateStatusColor(String state) {
-    Color color = ColorResources.blueColor;
     switch (state) {
-      case '1': //
-        color = ColorResources.darkColor;
-        break;
-      case '2': //
-        color = ColorResources.blueColor;
-        break;
-      case '3': //
-        color = ColorResources.redColor;
-        break;
-      case '4': //
-        color = ColorResources.greenColor;
-        break;
-      case '5': // Expired
-        color = ColorResources.redColor;
-        break;
+      case '1': return lightBlueGreyColor;
+      case '2': return blueColor;
+      case '3': return redColor;
+      case '4': return greenColor;
+      case '5': return redColor;
+      default: return blueColor;
     }
-    return color;
   }
 
   static Color estimateTextStatusColor(String state) {
-    Color color = ColorResources.blueColor;
     switch (state) {
-      case 'Draft':
-        color = ColorResources.darkColor;
-        break;
-      case 'Not Sent':
-        color = ColorResources.blueColor;
-        break;
-      case 'Sent':
-        color = ColorResources.redColor;
-        break;
-      case 'Expired':
-        color = ColorResources.greenColor;
-        break;
-      case 'Declined':
-        color = ColorResources.redColor;
-        break;
-      case 'Accepted':
-        color = ColorResources.redColor;
-        break;
+      case 'Draft': return lightBlueGreyColor;
+      case 'Not Sent': return blueColor;
+      case 'Sent': return redColor;
+      case 'Expired': return greenColor; // Logic seems weird in original, but keeping mapping
+      case 'Declined': return redColor;
+      case 'Accepted': return redColor;
+      default: return blueColor;
     }
-    return color;
   }
-
+  
   static Color proposalTextStatusColor(String state) {
-    Color color = ColorResources.blueColor;
     switch (state) {
-      case 'Draft':
-        color = ColorResources.darkColor;
-        break;
-      case 'Sent':
-        color = ColorResources.blueColor;
-        break;
-      case 'Open':
-        color = ColorResources.redColor;
-        break;
-      case 'Revised':
-        color = ColorResources.greenColor;
-        break;
-      case 'Declined':
-        color = ColorResources.redColor;
-        break;
-      case 'Accepted':
-        color = ColorResources.greenColor;
-        break;
+      case 'Draft': return lightBlueGreyColor;
+      case 'Sent': return blueColor;
+      case 'Open': return redColor;
+      case 'Revised': return greenColor;
+      case 'Declined': return redColor;
+      case 'Accepted': return greenColor;
+      default: return blueColor;
     }
-    return color;
   }
 
   static Color proposalStatusColor(String state) {
-    Color color = ColorResources.blueColor;
     switch (state) {
-      case '1': // Open
-        color = ColorResources.blueColor;
-        break;
-      case '2': // Declined
-        color = ColorResources.redColor;
-        break;
-      case '3': // Accepted
-        color = ColorResources.greenColor;
-        break;
-      case '4': // Sent
-        color = ColorResources.colorOrange;
-        break;
-      case '5': // Revised
-        color = ColorResources.blueColor;
-        break;
-      case '6': // Draft
-        color = ColorResources.colorGrey;
-        break;
+      case '1': return blueColor;
+      case '2': return redColor;
+      case '3': return greenColor;
+      case '4': return colorOrange;
+      case '5': return blueColor;
+      case '6': return colorGrey;
+      default: return blueColor;
     }
-    return color;
   }
 
   static Color ticketStatusColor(String state) {
-    Color color = ColorResources.blueColor;
     switch (state) {
-      case '1': // Open
-        color = ColorResources.redColor;
-        break;
-      case '2': // In Progress
-        color = ColorResources.greenColor;
-        break;
-      case '3': // Answered
-        color = ColorResources.blueColor;
-        break;
-      case '4': // On Hold
-        color = ColorResources.yellowColor;
-        break;
-      case '5': // Closed
-        color = ColorResources.darkColor;
-        break;
+      case '1': return redColor;
+      case '2': return greenColor;
+      case '3': return blueColor;
+      case '4': return yellowColor;
+      case '5': return lightBlueGreyColor; // Closed
+      default: return blueColor;
     }
-    return color;
   }
 
   static Color ticketPriorityColor(String state) {
-    Color color = ColorResources.blueColor;
     switch (state) {
-      case '1': // Low
-        color = ColorResources.greenColor;
-        break;
-      case '2': // Medium
-        color = ColorResources.yellowColor;
-        break;
-      case '3': // High
-        color = ColorResources.redColor;
-        break;
+      case '1': return greenColor;
+      case '2': return yellowColor;
+      case '3': return redColor;
+      default: return blueColor;
     }
-    return color;
   }
 
-  static Color getGreyText() {
-    return ColorResources.colorBlack.withValues(alpha: 0.5);
-  }
-
-  static Color getSecondaryScreenBgColor() {
-    return secondaryScreenBgColor;
-  }
-
-  // appbar color
-  static Color getAppBarColor() {
-    return appBarColor;
-  }
-
-  static Color getAppBarContentColor() {
-    return appBarContentColor;
-  }
-
-  // text color
-  static Color getHeadingTextColor() {
-    return primaryTextColor;
-  }
-
-  static Color getContentTextColor() {
-    return contentTextColor;
-  }
-
-  // text-field color
-  static Color getLabelTextColor() {
-    return labelTextColor;
-  }
-
-  static Color getHintTextColor() {
-    return hintTextColor;
-  }
-
-  static Color getTextFieldDisableBorder() {
-    return textFieldDisableBorderColor;
-  }
-
-  static Color getTextFieldEnableBorder() {
-    return textFieldEnableBorderColor;
-  }
-
-  // button color
-  static Color getPrimaryButtonColor() {
-    return primaryButtonColor;
-  }
-
-  static Color getPrimaryButtonTextColor() {
-    return primaryButtonTextColor;
-  }
-
-  static Color getSecondaryButtonColor() {
-    return secondaryButtonColor;
-  }
-
-  static Color getSecondaryButtonTextColor() {
-    return secondaryButtonTextColor;
-  }
-
-  // icon color
-  static Color getIconColor() {
-    return iconColor;
-  }
-
-  static Color getFilterDisableIconColor() {
-    return filterIconColor;
-  }
-
-  static Color getFilterEnableIconColor() {
-    return filterEnableIconColor;
-  }
-
-  static Color getSearchIconColor() {
-    return searchIconColor;
-  }
-
-  static Color getSearchEnableIconColor() {
-    return colorRed;
-  }
-
+  static Color getGreyText() => colorBlack.withValues(alpha: 0.5);
+  static Color getSecondaryScreenBgColor() => secondaryScreenBgColor;
+  static Color getAppBarColor() => appBarColor;
+  static Color getAppBarContentColor() => appBarContentColor;
+  static Color getHeadingTextColor() => primaryTextColor;
+  static Color getContentTextColor() => contentTextColor;
+  static Color getLabelTextColor() => labelTextColor;
+  static Color getHintTextColor() => hintTextColor;
+  static Color getTextFieldDisableBorder() => textFieldDisableBorderColor;
+  static Color getTextFieldEnableBorder() => textFieldEnableBorderColor;
+  static Color getPrimaryButtonColor() => primaryButtonColor;
+  static Color getPrimaryButtonTextColor() => primaryButtonTextColor;
+  static Color getSecondaryButtonColor() => secondaryButtonColor;
+  static Color getSecondaryButtonTextColor() => secondaryButtonTextColor;
+  static Color getIconColor() => iconColor;
+  static Color getFilterDisableIconColor() => filterIconColor;
+  static Color getFilterEnableIconColor() => filterEnableIconColor;
+  static Color getSearchIconColor() => searchIconColor;
+  static Color getSearchEnableIconColor() => redColor;
+  
   static Color getUnselectedIconColor() {
-    return Get.find<ThemeController>().darkTheme
-        ? Color(0xFF121212)
-        : textFieldDisableBorderColor;
+    return Get.find<ThemeController>().darkTheme ? const Color(0xFF94A3B8) : textFieldDisableBorderColor;
   }
 
   static Color getSelectedIconColor() {
-    return Get.find<ThemeController>().darkTheme
-        ? getTextColor()
-        : getTextColor();
+    return Get.find<ThemeController>().darkTheme ? colorWhite : colorBlack;
   }
 
-  // transparent color
-  static Color getTransparentColor() {
-    return transparentColor;
-  }
-
-  // text color
-  static Color getTextColor() {
-    return colorBlack;
-  }
-
-  static Color getCardBgColor() {
-    return colorWhite;
-  }
+  static Color getTransparentColor() => transparentColor;
+  static Color getTextColor() => Get.find<ThemeController>().darkTheme ? colorWhite : colorBlack;
+  static Color getCardBgColor() => colorWhite;
 }

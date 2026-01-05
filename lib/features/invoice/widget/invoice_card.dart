@@ -18,81 +18,138 @@ class InvoiceCard extends StatelessWidget {
   final int index;
   final InvoicesModel invoiceModel;
 
+
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: () {
         Get.toNamed(RouteHelper.invoiceDetailsScreen,
             arguments: invoiceModel.data![index].id!);
       },
-      child: Card(
-        margin: EdgeInsets.zero,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(5),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              border: Border(
-                left: BorderSide(
-                  width: 5.0,
-                  color: ColorResources.invoiceStatusColor(
-                      invoiceModel.data![index].status ?? ''),
-                ),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 5),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(Dimensions.cardRadius),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 4,
+              blurStyle: BlurStyle.outer,
+            ),
+          ],
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(Dimensions.cardRadius),
+            border: Border(
+              left: BorderSide(
+                width: 5.0,
+                color: ColorResources.invoiceStatusColor(
+                    invoiceModel.data![index].status ?? ''),
               ),
             ),
-            child: Padding(
-                padding: const EdgeInsets.all(Dimensions.space15),
-                child: Column(
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${invoiceModel.data![index].prefix!}${invoiceModel.data![index].number}',
-                            style: regularLarge,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                    Expanded(
+                      child: Text(
+                        '${invoiceModel.data![index].prefix!}${invoiceModel.data![index].number}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(width: Dimensions.space10),
-                        Text(
-                          '${invoiceModel.data![index].currencySymbol}${invoiceModel.data![index].total}',
-                          style: regularLarge,
-                        ),
-                      ],
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    const SizedBox(height: Dimensions.space5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          Converter.invoiceStatusString(
-                              invoiceModel.data![index].status ?? ''),
-                          style: lightDefault.copyWith(
-                              color: ColorResources.invoiceStatusColor(
-                                  invoiceModel.data![index].status ?? '')),
-                        ),
-                      ],
+                    const SizedBox(width: 10),
+                    Text(
+                      '${invoiceModel.data![index].currencySymbol}${invoiceModel.data![index].total}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor,
+                      ),
                     ),
-                    const CustomDivider(space: Dimensions.space10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: TextIcon(
-                            text: invoiceModel.data![index].clientName ?? '',
-                            icon: Icons.business_center_outlined,
-                          ),
-                        ),
-                        const SizedBox(width: Dimensions.space10),
-                        TextIcon(
-                          text: invoiceModel.data![index].date ?? '',
-                          icon: Icons.calendar_month,
-                        ),
-                      ],
-                    )
                   ],
-                )),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: ColorResources.invoiceStatusColor(
+                                invoiceModel.data![index].status ?? '')
+                            .withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        Converter.invoiceStatusString(
+                            invoiceModel.data![index].status ?? ''),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: ColorResources.invoiceStatusColor(
+                              invoiceModel.data![index].status ?? ''),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Divider(height: 1),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Icon(Icons.business,
+                              size: 16, color: Theme.of(context).hintColor),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              invoiceModel.data![index].clientName ?? '',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Theme.of(context).hintColor,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Row(
+                      children: [
+                        Icon(Icons.calendar_today,
+                            size: 14, color: Theme.of(context).hintColor),
+                        const SizedBox(width: 6),
+                        Text(
+                          invoiceModel.data![index].date ?? '',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).hintColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

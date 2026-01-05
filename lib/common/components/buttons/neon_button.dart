@@ -24,13 +24,13 @@ class NeonButton extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           gradient: const LinearGradient(
-            colors: [ColorResources.primaryBlue, ColorResources.secondaryIndigo],
+            colors: [ColorResources.primaryColor, ColorResources.secondaryColor],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           boxShadow: [
             BoxShadow(
-              color: ColorResources.primaryBlue.withValues(alpha: 0.4),
+              color: ColorResources.primaryColor.withValues(alpha: 0.4),
               blurRadius: 15,
               spreadRadius: 1,
               offset: const Offset(0, 4),

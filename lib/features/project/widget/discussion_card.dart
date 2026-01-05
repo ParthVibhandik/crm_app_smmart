@@ -1,9 +1,6 @@
-import 'package:flutex_admin/common/components/divider/custom_divider.dart';
-import 'package:flutex_admin/common/components/text/text_icon.dart';
 import 'package:flutex_admin/core/helper/date_converter.dart';
 import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
-import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/project/model/project_discussions_model.dart';
 import 'package:flutter/material.dart';
 
@@ -13,61 +10,107 @@ class DiscussionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(5),
-        child: Padding(
-          padding: const EdgeInsets.all(Dimensions.space15),
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      discussion.subject ?? '',
-                      style: regularDefault,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 5),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(Dimensions.cardRadius),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            blurStyle: BlurStyle.outer,
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    discussion.subject ?? '',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
-                  const SizedBox(width: Dimensions.space10),
-                  TextIcon(
-                    text: discussion.showToCustomer == '1'
-                        ? LocalStrings.visible
-                        : LocalStrings.notVisible,
-                    textStyle: lightSmall.copyWith(
-                      color: discussion.showToCustomer == '1'
-                          ? Colors.green
-                          : Colors.red,
-                    ),
-                    icon: discussion.showToCustomer == '1'
+                ),
+                const SizedBox(width: Dimensions.space10),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                     Icon(
+                      discussion.showToCustomer == '1'
                         ? Icons.visibility
                         : Icons.visibility_off,
-                  ),
-                ],
-              ),
-              const CustomDivider(space: Dimensions.space8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextIcon(
-                    text:
-                        '${LocalStrings.totalComments}: ${discussion.totalComments}',
-                    icon: Icons.account_box_rounded,
-                  ),
-                  TextIcon(
-                    text: DateConverter.formatValidityDate(
-                      discussion.lastActivity ?? '',
+                      size: 14,
+                      color: discussion.showToCustomer == '1'
+                        ? Colors.green
+                        : Colors.red,
+                     ),
+                    const SizedBox(width: 6),
+                    Text(
+                      discussion.showToCustomer == '1'
+                          ? LocalStrings.visible
+                          : LocalStrings.notVisible,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: discussion.showToCustomer == '1'
+                            ? Colors.green
+                            : Colors.red,
+                      ),
                     ),
-                    icon: Icons.calendar_month,
-                  ),
-                ],
-              ),
-            ],
-          ),
+                  ],
+                ),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Divider(height: 1),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                 Row(
+                  children: [
+                    Icon(Icons.comment,
+                        size: 16, color: Theme.of(context).hintColor),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${LocalStrings.totalComments}: ${discussion.totalComments}',
+                       style: TextStyle(
+                        fontSize: 13,
+                        color: Theme.of(context).hintColor,
+                      ),
+                    ),
+                  ],
+                ),
+                 Row(
+                   children: [
+                     Icon(Icons.calendar_today,
+                        size: 14, color: Theme.of(context).hintColor),
+                     const SizedBox(width: 6),
+                     Text(
+                      DateConverter.formatValidityDate(
+                        discussion.lastActivity ?? '',
+                      ),
+                       style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).hintColor,
+                        ),
+                     ),
+                   ],
+                 ),
+              ],
+            ),
+          ],
         ),
       ),
     );

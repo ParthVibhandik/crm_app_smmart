@@ -18,51 +18,85 @@ class HomeDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(topRight: Radius.circular(24), bottomRight: Radius.circular(24)),
+      ),
       child: Column(
         children: [
-          UserAccountsDrawerHeader(
-            accountName: Text(
-              '${homeModel.staff?.firstName ?? ''} ${homeModel.staff?.lastName ?? ''}',
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-              style: mediumLarge.copyWith(color: Colors.white),
-            ),
-            accountEmail: Text(
-              homeModel.staff?.email ?? '',
-              style: lightDefault.copyWith(color: Colors.white),
-            ),
-            onDetailsPressed: () {
-              Get.back();
-              Get.toNamed(RouteHelper.profileScreen);
-            },
-            currentAccountPicture: CircleAvatar(
-              child: CircleImageWidget(
-                imagePath: homeModel.staff?.formattedProfileImage ?? '',
-                isAsset: false,
-                isProfile: true,
-                width: 80,
-                height: 80,
-              ),
-            ),
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 50, 20, 30),
             decoration: BoxDecoration(
-              image: DecorationImage(
-                colorFilter: ColorFilter.mode(
-                  ColorResources.primaryColor.withValues(alpha: 0.6),
-                  BlendMode.multiply,
-                ),
-                image: AssetImage(MyImages.login),
-                fit: BoxFit.fill,
+              gradient: LinearGradient(
+                colors: [ColorResources.primaryColor, ColorResources.secondaryColor],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    shape: BoxShape.circle,
+                  ),
+                  child: CircleAvatar(
+                    radius: 36,
+                    backgroundColor: Colors.white,
+                    child: CircleImageWidget(
+                      imagePath: homeModel.staff?.formattedProfileImage ?? '',
+                      isAsset: false,
+                      isProfile: true,
+                      width: 72,
+                      height: 72,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  '${homeModel.staff?.firstName ?? ''} ${homeModel.staff?.lastName ?? ''}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                GestureDetector(
+                   onTap: () {
+                    Get.back();
+                    Get.toNamed(RouteHelper.profileScreen);
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        homeModel.staff?.email ?? '',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Colors.white.withValues(alpha: 0.8))
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
             child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
                   homeModel.menuItems?.customers ?? false
                       ? buildListTile(
-                          leadingIcon: Icons.person_outline,
+                          leadingIcon: Icons.people_alt_outlined,
                           title: LocalStrings.customers.tr,
                           onTap: () {
                             Navigator.pop(context);
@@ -70,80 +104,86 @@ class HomeDrawer extends StatelessWidget {
                           },
                         )
                       : const SizedBox.shrink(),
-                  ExpansionTile(
-                    title: Text(
-                      LocalStrings.sales.tr,
-                      style: regularDefault.copyWith(
-                        color: Theme.of(context).textTheme.bodyLarge!.color,
+                  Theme(
+                    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                    child: ExpansionTile(
+                      title: Text(
+                        LocalStrings.sales.tr,
+                        style: mediumDefault.copyWith(
+                          color: Theme.of(context).textTheme.bodyLarge!.color,
+                          fontSize: 15,
+                        ),
                       ),
+                      leading: Icon(
+                        Icons.monetization_on_outlined,
+                        color: Theme.of(context).iconTheme.color,
+                        size: 22,
+                      ),
+                      iconColor: ColorResources.primaryColor,
+                      childrenPadding: const EdgeInsets.only(left: 16),
+                      children: [
+                        homeModel.menuItems?.proposals ?? false
+                            ? buildListTile(
+                                leadingIcon: Icons.description_outlined,
+                                title: LocalStrings.proposals.tr,
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Get.toNamed(RouteHelper.proposalScreen);
+                                },
+                                isSubItem: true,
+                              )
+                            : const SizedBox.shrink(),
+                        homeModel.menuItems?.estimates ?? false
+                            ? buildListTile(
+                                leadingIcon: Icons.pie_chart_outline_rounded,
+                                title: LocalStrings.estimates.tr,
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Get.toNamed(RouteHelper.estimateScreen);
+                                },
+                                isSubItem: true,
+                              )
+                            : const SizedBox.shrink(),
+                        homeModel.menuItems?.invoices ?? false
+                            ? buildListTile(
+                                leadingIcon: Icons.receipt_long_rounded,
+                                title: LocalStrings.invoices.tr,
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Get.toNamed(RouteHelper.invoiceScreen);
+                                },
+                                isSubItem: true,
+                              )
+                            : const SizedBox.shrink(),
+                        homeModel.menuItems?.payments ?? false
+                            ? buildListTile(
+                                leadingIcon:
+                                    Icons.account_balance_wallet_outlined,
+                                title: LocalStrings.payments.tr,
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Get.toNamed(RouteHelper.paymentScreen);
+                                },
+                                isSubItem: true,
+                              )
+                            : const SizedBox.shrink(),
+                        homeModel.menuItems?.items ?? false
+                            ? buildListTile(
+                                leadingIcon: Icons.inventory_2_outlined,
+                                title: LocalStrings.items.tr,
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Get.toNamed(RouteHelper.itemScreen);
+                                },
+                                isSubItem: true,
+                              )
+                            : const SizedBox.shrink(),
+                      ],
                     ),
-                    leading: Icon(
-                      Icons.electric_bolt_rounded,
-                      color: Theme.of(context).textTheme.bodyLarge!.color,
-                    ),
-                    iconColor: Theme.of(
-                      Get.context!,
-                    ).textTheme.bodyLarge!.color,
-                    collapsedIconColor: Theme.of(
-                      Get.context!,
-                    ).textTheme.bodyLarge!.color,
-                    children: [
-                      homeModel.menuItems?.proposals ?? false
-                          ? buildListTile(
-                              leadingIcon: Icons.document_scanner_outlined,
-                              title: LocalStrings.proposals.tr,
-                              onTap: () {
-                                Navigator.pop(context);
-                                Get.toNamed(RouteHelper.proposalScreen);
-                              },
-                            )
-                          : const SizedBox.shrink(),
-                      homeModel.menuItems?.estimates ?? false
-                          ? buildListTile(
-                              leadingIcon: Icons.add_chart_outlined,
-                              title: LocalStrings.estimates.tr,
-                              onTap: () {
-                                Navigator.pop(context);
-                                Get.toNamed(RouteHelper.estimateScreen);
-                              },
-                            )
-                          : const SizedBox.shrink(),
-                      homeModel.menuItems?.invoices ?? false
-                          ? buildListTile(
-                              leadingIcon: Icons.assignment_outlined,
-                              title: LocalStrings.invoices.tr,
-                              onTap: () {
-                                Navigator.pop(context);
-                                Get.toNamed(RouteHelper.invoiceScreen);
-                              },
-                            )
-                          : const SizedBox.shrink(),
-                      homeModel.menuItems?.payments ?? false
-                          ? buildListTile(
-                              leadingIcon:
-                                  Icons.account_balance_wallet_outlined,
-                              title: LocalStrings.payments.tr,
-                              onTap: () {
-                                Navigator.pop(context);
-                                Get.toNamed(RouteHelper.paymentScreen);
-                              },
-                            )
-                          : const SizedBox.shrink(),
-                      homeModel.menuItems?.items ?? false
-                          ? buildListTile(
-                              leadingIcon: Icons.add_box_outlined,
-                              title: LocalStrings.items.tr,
-                              onTap: () {
-                                Navigator.pop(context);
-                                Get.toNamed(RouteHelper.itemScreen);
-                              },
-                            )
-                          : const SizedBox.shrink(),
-                    ],
                   ),
                   homeModel.menuItems?.projects ?? false
                       ? buildListTile(
-                          leadingIcon: Icons.folder_open_outlined,
+                          leadingIcon: Icons.folder_open_rounded,
                           title: LocalStrings.projects.tr,
                           onTap: () {
                             Navigator.pop(context);
@@ -153,7 +193,7 @@ class HomeDrawer extends StatelessWidget {
                       : const SizedBox.shrink(),
                   homeModel.menuItems?.tasks ?? false
                       ? buildListTile(
-                          leadingIcon: Icons.task_alt_rounded,
+                          leadingIcon: Icons.check_circle_outline_rounded,
                           title: LocalStrings.tasks.tr,
                           onTap: () {
                             Navigator.pop(context);
@@ -163,7 +203,7 @@ class HomeDrawer extends StatelessWidget {
                       : const SizedBox.shrink(),
                   homeModel.menuItems?.contracts ?? false
                       ? buildListTile(
-                          leadingIcon: Icons.article_outlined,
+                          leadingIcon: Icons.gavel_rounded,
                           title: LocalStrings.contracts.tr,
                           onTap: () {
                             Navigator.pop(context);
@@ -183,7 +223,7 @@ class HomeDrawer extends StatelessWidget {
                       : const SizedBox.shrink(),
                   homeModel.menuItems?.leads ?? false
                       ? buildListTile(
-                          leadingIcon: Icons.markunread_mailbox_outlined,
+                          leadingIcon: Icons.filter_alt_outlined,
                           title: LocalStrings.leads.tr,
                           onTap: () {
                             Navigator.pop(context);
@@ -209,7 +249,7 @@ class HomeDrawer extends StatelessWidget {
                   ),
                   homeModel.menuItems?.expenses ?? false
                       ? buildListTile(
-                          leadingIcon: Icons.monetization_on_outlined,
+                          leadingIcon: Icons.money_off_rounded,
                           title: LocalStrings.expenses.tr,
                           onTap: () {
                             Navigator.pop(context);
@@ -219,7 +259,7 @@ class HomeDrawer extends StatelessWidget {
                       : const SizedBox.shrink(),
                   homeModel.menuItems?.staff ?? false
                       ? buildListTile(
-                          leadingIcon: Icons.person_4_outlined,
+                          leadingIcon: Icons.group_outlined,
                           title: LocalStrings.staffs.tr,
                           onTap: () {
                             Navigator.pop(context);
@@ -227,6 +267,9 @@ class HomeDrawer extends StatelessWidget {
                           },
                         )
                       : const SizedBox.shrink(),
+                  
+                  const Divider(indent: 20, endIndent: 20, height: 30),
+                  
                   buildListTile(
                     leadingIcon: Icons.settings_outlined,
                     title: LocalStrings.settings.tr,
@@ -235,33 +278,44 @@ class HomeDrawer extends StatelessWidget {
                       Get.toNamed(RouteHelper.settingsScreen);
                     },
                   ),
+                  
+                   ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFEBEE), // Light red
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.logout_rounded,
+                        size: 20,
+                        color: Colors.red,
+                      ),
+                    ),
+                    title: Text(
+                      LocalStrings.logout.tr,
+                      style: mediumDefault.copyWith(
+                        color: Colors.red,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onTap: () {
+                      const WarningAlertDialog().warningAlertDialog(
+                        context,
+                        () {
+                          Get.back();
+                          Get.find<DashboardController>().logout();
+                        },
+                        title: LocalStrings.logout.tr,
+                        subTitle: LocalStrings.logoutSureWarningMSg.tr,
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
-          ),
-          ListTile(
-            leading: const Icon(
-              Icons.logout,
-              size: Dimensions.space20,
-              color: Colors.red,
-            ),
-            title: Text(
-              LocalStrings.logout.tr,
-              style: regularDefault.copyWith(
-                color: Theme.of(context).textTheme.bodyLarge!.color,
-              ),
-            ),
-            onTap: () {
-              const WarningAlertDialog().warningAlertDialog(
-                context,
-                () {
-                  Get.back();
-                  Get.find<DashboardController>().logout();
-                },
-                title: LocalStrings.logout.tr,
-                subTitle: LocalStrings.logoutSureWarningMSg.tr,
-              );
-            },
           ),
         ],
       ),
@@ -272,19 +326,27 @@ class HomeDrawer extends StatelessWidget {
     required IconData leadingIcon,
     required String title,
     required VoidCallback onTap,
+    bool isSubItem = false,
   }) {
     return ListTile(
-      leading: Icon(
-        leadingIcon,
-        color: Theme.of(Get.context!).textTheme.bodyLarge!.color,
-      ),
+      contentPadding: EdgeInsets.only(left: isSubItem ? 16 : 24, right: 24, top: 2, bottom: 2),
+      leading: isSubItem 
+      ? Icon(leadingIcon, size: 20, color: ColorResources.hintColor)
+      : Icon(leadingIcon, color: Theme.of(Get.context!).iconTheme.color, size: 22),
       title: Text(
         title,
-        style: regularDefault.copyWith(
-          color: Theme.of(Get.context!).textTheme.bodyLarge!.color,
-        ),
+        style: isSubItem
+           ? regularDefault.copyWith(color: ColorResources.contentTextColor, fontSize: 14)
+           : mediumDefault.copyWith(
+               color: Theme.of(Get.context!).textTheme.bodyLarge!.color,
+               fontSize: 15,
+             ),
       ),
+      trailing: isSubItem ? null : const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: ColorResources.hintColor),
       onTap: onTap,
+      dense: true,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      visualDensity: const VisualDensity(horizontal: 0, vertical: -1),
     );
   }
 }

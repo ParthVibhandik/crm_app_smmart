@@ -140,14 +140,6 @@ class MenuScreen extends StatelessWidget {
                           },
                         ),
                         const CustomDivider(space: Dimensions.space10),
-                        MenuItems(
-                          imageSrc: MyImages.policy,
-                          label: LocalStrings.privacyPolicy.tr,
-                          onPressed: () {
-                            Get.toNamed(RouteHelper.privacyScreen);
-                          },
-                        ),
-                        const CustomDivider(space: Dimensions.space10),
                         Get.find<DashboardController>().logoutLoading
                             ? const Align(
                                 alignment: Alignment.center,

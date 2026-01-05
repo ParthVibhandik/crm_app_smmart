@@ -64,27 +64,20 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return GetBuilder<InvoiceController>(builder: (controller) {
       return Scaffold(
-        appBar: CustomAppBar(
-          title: LocalStrings.invoices.tr,
-          isShowActionBtn: true,
-          actionWidget: IconButton(
-              onPressed: () => controller.changeSearchIcon(),
-              icon: Icon(controller.isSearch ? Icons.clear : Icons.search)),
-        ),
         floatingActionButton: AnimatedSlide(
           offset: showFab ? Offset.zero : const Offset(0, 2),
           duration: const Duration(milliseconds: 300),
           child: AnimatedOpacity(
             opacity: showFab ? 1 : 0,
             duration: const Duration(milliseconds: 300),
-            child: CustomFAB(
-                isShowIcon: true,
-                isShowText: false,
-                press: () {
-                  Get.toNamed(RouteHelper.addInvoiceScreen);
-                }),
+            child: FloatingActionButton(
+              onPressed: () => Get.toNamed(RouteHelper.addInvoiceScreen),
+               backgroundColor: ColorResources.secondaryColor,
+              child: const Icon(Icons.add, color: Colors.white),
+            ),
           ),
         ),
         body: controller.isLoading
@@ -95,107 +88,133 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                 onRefresh: () async {
                   await controller.initialData(shouldLoad: false);
                 },
-                child: SingleChildScrollView(
+                child: CustomScrollView(
                   controller: scrollController,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    children: [
-                      Visibility(
-                        visible: controller.isSearch,
-                        child: SearchField(
-                          title: LocalStrings.invoiceDetails.tr,
-                          searchController: controller.searchController,
-                          onTap: () => controller.searchInvoice(),
-                        ),
+                  physics: const BouncingScrollPhysics(),
+                  slivers: [
+                     SliverAppBar(
+                      pinned: true,
+                      floating: true,
+                      snap: true,
+                      backgroundColor: ColorResources.primaryColor,
+                      expandedHeight: 120.0,
+                      leading: IconButton(
+                        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                        onPressed: () => Get.back(),
                       ),
-                      if (controller.invoicesModel.overview != null)
-                        ExpansionTile(
-                          title: Row(
-                            children: [
-                              Container(
-                                width: Dimensions.space3,
-                                height: Dimensions.space15,
-                                color: Colors.blue,
-                              ),
-                              const SizedBox(width: Dimensions.space5),
-                              Text(
-                                LocalStrings.invoiceSummery.tr,
-                                style: regularLarge.copyWith(
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium!
-                                        .color),
-                              ),
-                            ],
+                      flexibleSpace: FlexibleSpaceBar(
+                        title: Text(
+                          LocalStrings.invoices.tr,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        background: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                ColorResources.primaryColor,
+                                ColorResources.secondaryColor.withValues(alpha: 0.8),
+                              ],
+                            ),
                           ),
-                          shape: const Border(),
-                          initiallyExpanded: true,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: Dimensions.space15),
-                              child: SizedBox(
-                                height: 80,
-                                child: ListView.separated(
-                                    scrollDirection: Axis.horizontal,
-                                    itemBuilder: (context, index) {
-                                      return OverviewCard(
-                                          name: controller.invoicesModel
-                                              .overview![index].status!.tr,
-                                          number: controller.invoicesModel
-                                              .overview![index].total
-                                              .toString(),
-                                          color: ColorResources.blueColor);
-                                    },
-                                    separatorBuilder: (context, index) =>
-                                        const SizedBox(
-                                            width: Dimensions.space5),
-                                    itemCount: controller
-                                        .invoicesModel.overview!.length),
-                              ),
-                            ),
-                          ],
-                        ),
-                      Padding(
-                        padding: const EdgeInsets.all(Dimensions.space15),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              LocalStrings.invoices.tr,
-                              style: regularLarge.copyWith(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium!
-                                      .color),
-                            ),
-                            InkWell(
-                              onTap: () {},
-                              child: TextIcon(
-                                  text: LocalStrings.filter.tr,
-                                  icon: Icons.sort_outlined),
-                            ),
-                          ],
                         ),
                       ),
-                      controller.invoicesModel.data?.isNotEmpty ?? false
-                          ? ListView.separated(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: Dimensions.space15),
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
+                       actions: [
+                        IconButton(
+                            onPressed: () => controller.changeSearchIcon(),
+                            icon: Icon(controller.isSearch ? Icons.clear : Icons.search, color: Colors.white)),
+                      ],
+                      bottom: controller.isSearch
+                          ? PreferredSize(
+                              preferredSize: const Size.fromHeight(60),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                color: Colors.white,
+                                child: SearchField(
+                                  title: LocalStrings.invoiceDetails.tr,
+                                  searchController: controller.searchController,
+                                  onTap: () => controller.searchInvoice(),
+                                ),
+                              ),
+                            )
+                          : null,
+                    ),
+
+                    if (controller.invoicesModel.overview != null)
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: SizedBox(
+                            height: 100,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              physics: const BouncingScrollPhysics(),
                               itemBuilder: (context, index) {
-                                return InvoiceCard(
-                                  index: index,
-                                  invoiceModel: controller.invoicesModel,
+                                return Container(
+                                  width: 160,
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.05),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        controller.invoicesModel.overview![index].total.toString(),
+                                         style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: ColorResources.invoiceStatusColor(controller.invoicesModel.overview![index].status!.tr),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        controller.invoicesModel.overview![index].status!.tr,
+                                        style: const TextStyle(fontSize: 14, color: ColorResources.hintColor),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
                                 );
                               },
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(height: Dimensions.space10),
-                              itemCount: controller.invoicesModel.data!.length)
-                          : const NoDataWidget(),
-                    ],
-                  ),
+                              separatorBuilder: (context, index) => const SizedBox(width: 12),
+                              itemCount: controller.invoicesModel.overview!.length,
+                            ),
+                          ),
+                        ),
+                      ),
+                    
+                    controller.invoicesModel.data?.isNotEmpty ?? false
+                        ? SliverPadding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            sliver: SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: InvoiceCard(
+                                      index: index,
+                                      invoiceModel: controller.invoicesModel,
+                                    ),
+                                  );
+                                },
+                                childCount: controller.invoicesModel.data!.length,
+                              ),
+                            ),
+                          )
+                        : const SliverToBoxAdapter(child: NoDataWidget()),
+                  ],
                 ),
               ),
       );

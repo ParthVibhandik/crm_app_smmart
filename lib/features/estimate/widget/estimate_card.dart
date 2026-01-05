@@ -24,56 +24,130 @@ class EstimateCard extends StatelessWidget {
         Get.toNamed(RouteHelper.estimateDetailsScreen,
             arguments: estimateModel.data![index].id!);
       },
-      child: Card(
-        margin: EdgeInsets.zero,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(5),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              border: Border(
-                left: BorderSide(
-                  width: 5.0,
-                  color: ColorResources.estimateStatusColor(
-                      estimateModel.data![index].status ?? ''),
-                ),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 5),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(Dimensions.cardRadius),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 4,
+              blurStyle: BlurStyle.outer,
+            ),
+          ],
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(Dimensions.cardRadius),
+            border: Border(
+              left: BorderSide(
+                width: 5.0,
+                color: ColorResources.estimateStatusColor(
+                    estimateModel.data![index].status ?? ''),
               ),
             ),
-            child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          estimateModel.data![index].formattedNumber ??
-                              '${estimateModel.data![index].prefix ?? ''}${estimateModel.data![index].number ?? ''}',
-                          style: Theme.of(context).textTheme.bodyLarge,
+                    Expanded(
+                      child: Text(
+                        estimateModel.data![index].formattedNumber ??
+                            '${estimateModel.data![index].prefix ?? ''}${estimateModel.data![index].number ?? ''}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${estimateModel.data![index].currencySymbol}${estimateModel.data![index].total}',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                    ),
+                  ],
+                ),
+                 const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                     Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: ColorResources.estimateStatusColor(
+                                estimateModel.data![index].status ?? '')
+                            .withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        Converter.estimateStatusString(
+                            estimateModel.data![index].status ?? '1'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: ColorResources.estimateStatusColor(
+                              estimateModel.data![index].status ?? ''),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Divider(height: 1),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                     Expanded(
+                       child: Row(
+                        children: [
+                           Icon(Icons.business,
+                              size: 16, color: Theme.of(context).hintColor),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              estimateModel.data![index].clientName ?? '',
+                               style: TextStyle(
+                                fontSize: 13,
+                                color: Theme.of(context).hintColor,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                                           ),
+                     ),
+                     const SizedBox(width: 8), // Add some spacing between name and date
+                     Row(
+                      children: [
+                         Icon(Icons.calendar_today,
+                            size: 14, color: Theme.of(context).hintColor),
+                        const SizedBox(width: 6),
                         Text(
-                          '${estimateModel.data![index].currencySymbol}${estimateModel.data![index].total}',
-                          style: Theme.of(context).textTheme.bodyLarge,
+                          estimateModel.data![index].expiryDate ?? '',
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).hintColor,
+                            ),
                         ),
                       ],
                     ),
-                    const CustomDivider(space: Dimensions.space10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextIcon(
-                          text: Converter.estimateStatusString(
-                              estimateModel.data![index].status ?? '1'),
-                          icon: Icons.check_circle_outline_rounded,
-                        ),
-                        TextIcon(
-                          text: estimateModel.data![index].expiryDate ?? '',
-                          icon: Icons.calendar_month,
-                        ),
-                      ],
-                    )
                   ],
-                )),
+                )
+              ],
+            ),
           ),
         ),
       ),

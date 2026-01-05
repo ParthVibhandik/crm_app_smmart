@@ -1,9 +1,6 @@
-import 'package:flutex_admin/common/components/divider/custom_divider.dart';
-import 'package:flutex_admin/common/components/text/text_icon.dart';
 import 'package:flutex_admin/core/route/route.dart';
 import 'package:flutex_admin/core/utils/color_resources.dart';
 import 'package:flutex_admin/core/utils/dimensions.dart';
-import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/item/model/item_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,76 +21,111 @@ class ItemCard extends StatelessWidget {
         Get.toNamed(RouteHelper.itemDetailsScreen,
             arguments: itemModel.data![index].itemId!);
       },
-      child: Card(
-        margin: EdgeInsets.zero,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(5),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              border: const Border(
-                left: BorderSide(
-                  width: 5.0,
-                  color: ColorResources.blueColor,
-                ),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 5),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(Dimensions.cardRadius),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 4,
+              blurStyle: BlurStyle.outer,
+            ),
+          ],
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(Dimensions.cardRadius),
+            border: const Border(
+              left: BorderSide(
+                width: 5.0,
+                color: ColorResources.blueColor,
               ),
             ),
-            child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${itemModel.data![index].description ?? itemModel.data![index].name}',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${itemModel.data![index].longDescription ?? itemModel.data![index].subText}',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Theme.of(context).hintColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: Dimensions.space10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        SizedBox(
-                          width: MediaQuery.sizeOf(context).width / 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${itemModel.data![index].description ?? itemModel.data![index].name}',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                              Text(
-                                '${itemModel.data![index].longDescription ?? itemModel.data![index].subText}',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style: lightSmall.copyWith(
-                                    color: ColorResources.blueGreyColor),
-                              ),
-                            ],
+                        Text(
+                          '${itemModel.data![index].rate}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
                           ),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '${itemModel.data![index].rate}',
-                              style: regularDefault,
-                            ),
-                            Text(
-                              itemModel.data![index].unit ?? '',
-                              style: lightSmall,
-                            ),
-                          ],
+                        const SizedBox(height: 4),
+                        Text(
+                          itemModel.data![index].unit ?? '',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).hintColor,
+                          ),
                         ),
                       ],
                     ),
-                    const CustomDivider(space: Dimensions.space10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextIcon(
-                          text: itemModel.data![index].groupName ?? '',
-                          icon: Icons.layers_rounded,
-                        ),
-                      ],
-                    )
                   ],
-                )),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Divider(height: 1),
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.layers_rounded,
+                        size: 16, color: Theme.of(context).hintColor),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        itemModel.data![index].groupName ?? '',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Theme.of(context).hintColor,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

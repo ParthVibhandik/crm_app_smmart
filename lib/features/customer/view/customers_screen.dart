@@ -67,26 +67,16 @@ class _CustomersScreenState extends State<CustomersScreen> {
     return GetBuilder<CustomerController>(
       builder: (controller) {
         return Scaffold(
-          appBar: CustomAppBar(
-            title: LocalStrings.customers.tr,
-            isShowActionBtn: true,
-            actionWidget: IconButton(
-              onPressed: () => controller.changeSearchIcon(),
-              icon: Icon(controller.isSearch ? Icons.clear : Icons.search),
-            ),
-          ),
           floatingActionButton: AnimatedSlide(
             offset: showFab ? Offset.zero : const Offset(0, 2),
             duration: const Duration(milliseconds: 300),
             child: AnimatedOpacity(
               opacity: showFab ? 1 : 0,
               duration: const Duration(milliseconds: 300),
-              child: CustomFAB(
-                isShowIcon: true,
-                isShowText: false,
-                press: () {
-                  Get.toNamed(RouteHelper.addCustomerScreen);
-                },
+              child: FloatingActionButton(
+                onPressed: () => Get.toNamed(RouteHelper.addCustomerScreen),
+                backgroundColor: ColorResources.secondaryColor,
+                child: const Icon(Icons.add, color: Colors.white),
               ),
             ),
           ),
@@ -98,184 +88,172 @@ class _CustomersScreenState extends State<CustomersScreen> {
                   onRefresh: () async {
                     await controller.initialData(shouldLoad: false);
                   },
-                  child: SingleChildScrollView(
+                  child: CustomScrollView(
                     controller: scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Visibility(
-                          visible: controller.isSearch,
-                          child: SearchField(
-                            title: LocalStrings.customerDetails.tr,
-                            searchController: controller.searchController,
-                            onTap: () => controller.searchCustomer(),
-                          ),
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                       SliverAppBar(
+                        pinned: true,
+                        floating: true,
+                        snap: true,
+                        backgroundColor: ColorResources.primaryColor,
+                        expandedHeight: 120.0,
+                        leading: IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                          onPressed: () => Get.back(),
                         ),
-                        if (controller.customersModel.overview != null)
-                          ExpansionTile(
-                            title: Text(
-                              LocalStrings.customerSummery,
-                              style: regularLarge.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.bodyMedium!.color,
+                        flexibleSpace: FlexibleSpaceBar(
+                          title: Text(
+                            LocalStrings.customers.tr,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                          background: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  ColorResources.primaryColor,
+                                  ColorResources.secondaryColor.withValues(alpha: 0.8),
+                                ],
                               ),
                             ),
-                            shape: const Border(),
-                            initiallyExpanded: true,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: Dimensions.space15,
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        CustomContainer(
-                                          name: LocalStrings.totalCustomers.tr,
-                                          number:
-                                              controller
-                                                  .customersModel
-                                                  .overview
-                                                  ?.customersTotal ??
-                                              '',
-                                          icon: Icons.group,
-                                          color: ColorResources.blueColor,
-                                        ),
-                                        const SizedBox(
-                                          width: Dimensions.space10,
-                                        ),
-                                        CustomContainer(
-                                          name: LocalStrings.activeCustomers.tr,
-                                          number:
-                                              controller
-                                                  .customersModel
-                                                  .overview
-                                                  ?.customersActive ??
-                                              '',
-                                          icon: Icons.group_add,
-                                          color: ColorResources.greenColor,
-                                        ),
-                                        const SizedBox(
-                                          width: Dimensions.space10,
-                                        ),
-                                        CustomContainer(
-                                          name:
-                                              LocalStrings.inactiveCustomers.tr,
-                                          number:
-                                              controller
-                                                  .customersModel
-                                                  .overview
-                                                  ?.customersInactive ??
-                                              '',
-                                          icon: Icons.group_remove,
-                                          color: ColorResources.redColor,
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: Dimensions.space10),
-                                    Row(
-                                      children: [
-                                        CustomContainer(
-                                          name: LocalStrings.activeContacts.tr,
-                                          number:
-                                              controller
-                                                  .customersModel
-                                                  .overview
-                                                  ?.contactsActive ??
-                                              '',
-                                          icon:
-                                              Icons.add_circle_outline_outlined,
-                                          color: ColorResources.greenColor,
-                                        ),
-                                        const SizedBox(
-                                          width: Dimensions.space10,
-                                        ),
-                                        CustomContainer(
-                                          name:
-                                              LocalStrings.inactiveContacts.tr,
-                                          number:
-                                              controller
-                                                  .customersModel
-                                                  .overview
-                                                  ?.contactsInactive ??
-                                              '',
-                                          icon: Icons
-                                              .remove_circle_outline_outlined,
-                                          color: ColorResources.redColor,
-                                        ),
-                                        const SizedBox(
-                                          width: Dimensions.space10,
-                                        ),
-                                        CustomContainer(
-                                          name:
-                                              LocalStrings.lastLoginContacts.tr,
-                                          number:
-                                              controller
-                                                  .customersModel
-                                                  .overview
-                                                  ?.contactsLastLogin ??
-                                              '',
-                                          icon: Icons.login_rounded,
-                                          color: ColorResources.yellowColor,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        Padding(
-                          padding: const EdgeInsets.all(Dimensions.space15),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                LocalStrings.customers.tr,
-                                style: regularLarge.copyWith(
-                                  color: Theme.of(
-                                    context,
-                                  ).textTheme.bodyMedium!.color,
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () {},
-                                child: TextIcon(
-                                  text: LocalStrings.filter.tr,
-                                  icon: Icons.sort_outlined,
-                                ),
-                              ),
-                            ],
                           ),
                         ),
-                        controller.customersModel.data?.isNotEmpty ?? false
-                            ? Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: Dimensions.space15,
-                                ),
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemBuilder: (context, index) {
-                                    return CustomersCard(
-                                      index: index,
-                                      customerModel: controller.customersModel,
-                                    );
-                                  },
-                                  itemCount:
-                                      controller.customersModel.data!.length,
+                         actions: [
+                          IconButton(
+                              onPressed: () => controller.changeSearchIcon(),
+                              icon: Icon(controller.isSearch ? Icons.clear : Icons.search, color: Colors.white)),
+                        ],
+                        bottom: controller.isSearch
+                            ? PreferredSize(
+                                preferredSize: const Size.fromHeight(60),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  color: Colors.white,
+                                  child: SearchField(
+                                    title: LocalStrings.customerDetails.tr,
+                                    searchController: controller.searchController,
+                                    onTap: () => controller.searchCustomer(),
+                                  ),
                                 ),
                               )
-                            : const NoDataWidget(),
-                      ],
-                    ),
+                            : null,
+                      ),
+
+                      if (controller.customersModel.overview != null)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: SizedBox(
+                              height: 120,
+                              child: ListView(
+                                scrollDirection: Axis.horizontal,
+                                physics: const BouncingScrollPhysics(),
+                                children: [
+                                  _buildOverviewCard(
+                                    context,
+                                    LocalStrings.totalCustomers.tr,
+                                    controller.customersModel.overview?.customersTotal ?? '0',
+                                    Icons.group,
+                                    ColorResources.blueColor,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  _buildOverviewCard(
+                                    context,
+                                    LocalStrings.activeCustomers.tr,
+                                    controller.customersModel.overview?.customersActive ?? '0',
+                                    Icons.group_add,
+                                    ColorResources.greenColor,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  _buildOverviewCard(
+                                    context,
+                                    LocalStrings.inactiveCustomers.tr,
+                                    controller.customersModel.overview?.customersInactive ?? '0',
+                                    Icons.group_remove,
+                                    ColorResources.redColor,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      controller.customersModel.data?.isNotEmpty ?? false
+                          ? SliverPadding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              sliver: SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 12),
+                                      child: CustomersCard(
+                                        index: index,
+                                        customerModel: controller.customersModel,
+                                      ),
+                                    );
+                                  },
+                                  childCount: controller.customersModel.data!.length,
+                                ),
+                              ),
+                            )
+                          : const SliverToBoxAdapter(child: NoDataWidget()),
+                    ],
                   ),
                 ),
         );
       },
+    );
+  }
+
+  Widget _buildOverviewCard(BuildContext context, String title, String count, IconData icon, Color color) {
+    return Container(
+      width: 150,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            count,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            maxLines: 1,
+             overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).hintColor,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

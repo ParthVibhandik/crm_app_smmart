@@ -22,13 +22,20 @@ class CustomLinerProgress extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                name,
-                style: regularSmall,
+              Flexible(
+                child: Text(
+                  name,
+                  style: regularSmall,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              Text(
-                data,
-                style: regularSmall,
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  data,
+                  style: regularSmall,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),

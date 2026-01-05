@@ -36,9 +36,9 @@ class AttendanceHistoryScreen extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  ColorResources.gradientStart,
-                  ColorResources.gradientMid,
-                  ColorResources.gradientEnd,
+                  ColorResources.primaryColor,
+                  ColorResources.secondaryColor,
+                  ColorResources.tertiaryColor,
                 ],
               ),
             ),

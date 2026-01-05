@@ -46,26 +46,16 @@ class _TaskScreenState extends State<TaskScreen> {
     return GetBuilder<TaskController>(
       builder: (controller) {
         return Scaffold(
-          appBar: CustomAppBar(
-            title: LocalStrings.tasks.tr,
-            isShowActionBtn: true,
-            actionWidget: IconButton(
-              onPressed: () => controller.changeSearchIcon(),
-              icon: Icon(controller.isSearch ? Icons.clear : Icons.search),
-            ),
-          ),
           floatingActionButton: AnimatedSlide(
             offset: controller.showFab ? Offset.zero : const Offset(0, 2),
             duration: const Duration(milliseconds: 300),
             child: AnimatedOpacity(
               opacity: controller.showFab ? 1 : 0,
               duration: const Duration(milliseconds: 300),
-              child: CustomFAB(
-                isShowIcon: true,
-                isShowText: false,
-                press: () {
-                  Get.toNamed(RouteHelper.addTaskScreen);
-                },
+              child: FloatingActionButton(
+                onPressed: () => Get.toNamed(RouteHelper.addTaskScreen),
+                backgroundColor: ColorResources.secondaryColor,
+                child: const Icon(Icons.add, color: Colors.white),
               ),
             ),
           ),
@@ -76,151 +66,171 @@ class _TaskScreenState extends State<TaskScreen> {
                   onRefresh: () async {
                     await controller.initialData();
                   },
-                  child: Column(
-                    children: [
-                      Visibility(
-                        visible: controller.isSearch,
-                        child: SearchField(
-                          title: LocalStrings.taskDetails.tr,
-                          searchController: controller.searchController,
-                          onTap: () => controller.searchTask(),
+                  child: CustomScrollView(
+                    controller: controller.scrollController,
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                       SliverAppBar(
+                        pinned: true,
+                        floating: true,
+                        snap: true,
+                        backgroundColor: ColorResources.primaryColor,
+                        expandedHeight: 120.0,
+                        leading: IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                          onPressed: () => Get.back(),
                         ),
-                      ),
-                      if (controller.tasksModel.overview != null)
-                        ExpansionTile(
-                          title: Row(
-                            children: [
-                              Container(
-                                width: Dimensions.space3,
-                                height: Dimensions.space15,
-                                color: Colors.blue,
+                        flexibleSpace: FlexibleSpaceBar(
+                          title: Text(
+                            LocalStrings.tasks.tr,
+                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                          background: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  ColorResources.primaryColor,
+                                  ColorResources.secondaryColor.withValues(alpha: 0.8),
+                                ],
                               ),
-                              const SizedBox(width: Dimensions.space5),
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          IconButton(
+                            icon: const Icon(Icons.search, color: Colors.white),
+                            onPressed: () => controller.changeSearchIcon(),
+                          ),
+                        ],
+                        bottom: controller.isSearch
+                            ? PreferredSize(
+                                preferredSize: const Size.fromHeight(60),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  color: Colors.white,
+                                  child: SearchField(
+                                    title: LocalStrings.taskDetails.tr,
+                                    searchController: controller.searchController,
+                                    onTap: () => controller.searchTask(),
+                                  ),
+                                ),
+                              )
+                            : null,
+                      ),
+                      
+                      if (controller.tasksModel.overview != null)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: SizedBox(
+                              height: 100,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                physics: const BouncingScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    width: 160,
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).cardColor,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.05),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 5),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          controller.tasksModel.overview![index].total.toString(),
+                                           style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                             color: ColorResources.taskStatusColor(controller.tasksModel.overview![index].status?.tr ?? ''),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          controller.tasksModel.overview![index].status?.tr ?? '',
+                                          style: const TextStyle(fontSize: 14, color: ColorResources.hintColor),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                separatorBuilder: (context, index) => const SizedBox(width: 12),
+                                itemCount: controller.tasksModel.overview!.length,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        sliver: SliverToBoxAdapter(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
                               Text(
-                                LocalStrings.taskSummery.tr,
-                                style: Theme.of(context).textTheme.bodyLarge,
+                                LocalStrings.tasks.tr,
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () => CustomBottomSheet(child: TaskFilterBottomSheet()).customBottomSheet(context),
+                                    icon: const Icon(Icons.filter_alt_outlined),
+                                    color: ColorResources.primaryColor,
+                                  ),
+                                  IconButton(
+                                    onPressed: () => CustomBottomSheet(child: TaskSortBottomSheet()).customBottomSheet(context),
+                                    icon: const Icon(Icons.sort),
+                                    color: ColorResources.primaryColor,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                          shape: const Border(),
-                          initiallyExpanded: true,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: Dimensions.space15,
-                              ),
-                              child: SizedBox(
-                                height: 80,
-                                child: ListView.separated(
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) {
-                                    return OverviewCard(
-                                      name:
-                                          controller
-                                              .tasksModel
-                                              .overview![index]
-                                              .status
-                                              ?.tr ??
-                                          '',
-                                      number: controller
-                                          .tasksModel
-                                          .overview![index]
-                                          .total
-                                          .toString(),
-                                      color: ColorResources.blueColor,
-                                    );
-                                  },
-                                  separatorBuilder: (context, index) =>
-                                      const SizedBox(width: Dimensions.space5),
-                                  itemCount:
-                                      controller.tasksModel.overview!.length,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: Dimensions.space15,
-                          vertical: Dimensions.space10,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              LocalStrings.tasks.tr,
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                            Row(
-                              spacing: Dimensions.space15,
-                              children: [
-                                InkWell(
-                                  onTap: () => CustomBottomSheet(
-                                    child: TaskFilterBottomSheet(),
-                                  ).customBottomSheet(context),
-                                  child: TextIcon(
-                                    text: LocalStrings.filter.tr,
-                                    icon: Icons.filter_alt,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () => CustomBottomSheet(
-                                    child: TaskSortBottomSheet(),
-                                  ).customBottomSheet(context),
-                                  child: TextIcon(
-                                    text: LocalStrings.sortBy.tr,
-                                    icon: Icons.sort,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
                         ),
                       ),
+
                       controller.tasks.isNotEmpty
-                          ? Flexible(
-                              child: Obx(
-                                () => ListView.separated(
-                                  controller: controller.scrollController,
-                                  padding: const EdgeInsets.fromLTRB(
-                                    Dimensions.space15,
-                                    0,
-                                    Dimensions.space15,
-                                    Dimensions.space15,
-                                  ),
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    bool isLastItem =
-                                        index == controller.tasks.length - 1;
+                          ? SliverPadding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              sliver: SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                    bool isLastItem = index == controller.tasks.length - 1;
                                     if (isLastItem && controller.hasMoreData) {
                                       return Column(
                                         children: [
-                                          TaskCard(
-                                            task: controller.tasks[index],
-                                          ),
-                                          const SizedBox(
-                                            height: Dimensions.space10,
-                                          ),
-                                          const CustomLoader(
-                                            isFullScreen: false,
-                                            isPagination: true,
+                                          TaskCard(task: controller.tasks[index]),
+                                          const Padding(
+                                            padding: EdgeInsets.all(16.0),
+                                            child: CircularProgressIndicator(),
                                           ),
                                         ],
                                       );
                                     }
-                                    return TaskCard(
-                                      task: controller.tasks[index],
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 12),
+                                      child: TaskCard(task: controller.tasks[index]),
                                     );
                                   },
-                                  separatorBuilder: (context, index) =>
-                                      const SizedBox(
-                                        height: Dimensions.space10,
-                                      ),
-                                  itemCount: controller.tasks.length,
+                                  childCount: controller.tasks.length,
                                 ),
                               ),
                             )
-                          : const NoDataWidget(),
+                          : const SliverToBoxAdapter(child: NoDataWidget()),
                     ],
                   ),
                 ),

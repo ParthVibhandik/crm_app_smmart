@@ -2,18 +2,18 @@ import 'package:flutter/cupertino.dart';
 
 class Dimensions {
   // font-size
-  static const double fontOverSmall = 7.00;
-  static const double fontExtraSmall = 9.00;
-  static const double fontSmall = 11.00;
-  static const double fontDefault = 13.00;
-  static const double fontLarge = 14.00;
-  static const double fontMediumLarge = 17.00;
-  static const double fontExtraLarge = 19.00;
-  static const double fontOverLarge = 21.00;
-  static const double fontMegaLarge = 28.00;
+  static const double fontOverSmall = 10.00;
+  static const double fontExtraSmall = 11.00;
+  static const double fontSmall = 12.00;
+  static const double fontDefault = 14.00; // Bumped up for readability
+  static const double fontLarge = 16.00;
+  static const double fontMediumLarge = 18.00;
+  static const double fontExtraLarge = 22.00;
+  static const double fontOverLarge = 26.00;
+  static const double fontMegaLarge = 32.00;
 
-  static const double defaultButtonH = 45;
-  static const double defaultRadius = 8;
+  static const double defaultButtonH = 52; // Taller buttons
+  static const double defaultRadius = 12; // Softer corners
 
   static const double space5 = 5;
   static const double space7 = 7;
@@ -41,14 +41,14 @@ class Dimensions {
   static const double space200 = 200;
 
   static const EdgeInsets screenPaddingHV =
-      EdgeInsets.symmetric(horizontal: space15, vertical: space20);
+      EdgeInsets.symmetric(horizontal: space20, vertical: space20);
   static const EdgeInsets defaultPaddingHV =
-      EdgeInsets.symmetric(vertical: space20, horizontal: space15);
+      EdgeInsets.symmetric(vertical: space20, horizontal: space20);
 
-  static const double buttonRadius = 4;
-  static const double cardRadius = 8;
-  static const double bottomSheetRadius = 15;
-  static const double groupCardRadius = 10;
-  static const double groupRadius = 20;
-  static const double textToTextSpace = 8;
+  static const double buttonRadius = 12;
+  static const double cardRadius = 16; // Modern rounded cards
+  static const double bottomSheetRadius = 24;
+  static const double groupCardRadius = 16;
+  static const double groupRadius = 24;
+  static const double textToTextSpace = 10;
 }

@@ -47,31 +47,16 @@ class _LeadScreenState extends State<LeadScreen> {
     return GetBuilder<LeadController>(
       builder: (controller) {
         return Scaffold(
-          appBar: CustomAppBar(
-            title: LocalStrings.leads.tr,
-            isShowActionBtn: true,
-            actionWidget: IconButton(
-              onPressed: () => Get.toNamed(RouteHelper.kanbanLeadScreen),
-              icon: const Icon(Icons.grid_view_outlined),
-            ),
-            isShowActionBtnTwo: true,
-            actionWidgetTwo: IconButton(
-              onPressed: () => controller.changeSearchIcon(),
-              icon: Icon(controller.isSearch ? Icons.clear : Icons.search),
-            ),
-          ),
           floatingActionButton: AnimatedSlide(
             offset: controller.showFab ? Offset.zero : const Offset(0, 2),
             duration: const Duration(milliseconds: 300),
             child: AnimatedOpacity(
               opacity: controller.showFab ? 1 : 0,
               duration: const Duration(milliseconds: 300),
-              child: CustomFAB(
-                isShowIcon: true,
-                isShowText: false,
-                press: () {
-                  Get.toNamed(RouteHelper.addLeadScreen);
-                },
+              child: FloatingActionButton(
+                onPressed: () => Get.toNamed(RouteHelper.addLeadScreen),
+                backgroundColor: ColorResources.secondaryColor,
+                child: const Icon(Icons.add, color: Colors.white),
               ),
             ),
           ),
@@ -83,158 +68,228 @@ class _LeadScreenState extends State<LeadScreen> {
                   onRefresh: () async {
                     controller.initialData();
                   },
-                  child: Column(
-                    children: [
-                      Visibility(
-                        visible: controller.isSearch,
-                        child: SearchField(
-                          title: LocalStrings.leadDetails.tr,
-                          searchController: controller.searchController,
-                          onTap: () => controller.searchLead(),
+                  child: CustomScrollView(
+                    controller: controller.scrollController,
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                       SliverAppBar(
+                        pinned: true,
+                        floating: true,
+                        snap: true,
+                        backgroundColor: ColorResources.primaryColor,
+                        expandedHeight: 120.0,
+                        leading: IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                          onPressed: () => Get.back(),
                         ),
-                      ),
-                      if (controller.leadsModel.overview != null)
-                        ExpansionTile(
-                          title: Row(
-                            children: [
-                              Container(
-                                width: Dimensions.space3,
-                                height: Dimensions.space15,
-                                color: Colors.blue,
+                        flexibleSpace: FlexibleSpaceBar(
+                          title: Text(
+                            LocalStrings.leads.tr,
+                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                          background: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  ColorResources.primaryColor,
+                                  ColorResources.secondaryColor.withValues(alpha: 0.8),
+                                ],
                               ),
-                              const SizedBox(width: Dimensions.space5),
-                              Text(
-                                LocalStrings.leadSummery.tr,
-                                style: regularLarge.copyWith(
-                                  color: Theme.of(
-                                    context,
-                                  ).textTheme.bodyMedium!.color,
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          IconButton(
+                            onPressed: () => Get.toNamed(RouteHelper.kanbanLeadScreen),
+                            icon: const Icon(Icons.grid_view_rounded, color: Colors.white),
+                          ),
+                          IconButton(
+                            onPressed: () => controller.changeSearchIcon(),
+                            icon: Icon(controller.isSearch ? Icons.clear : Icons.search, color: Colors.white),
+                          ),
+                        ],
+                        bottom: controller.isSearch
+                            ? PreferredSize(
+                                preferredSize: const Size.fromHeight(60),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  color: Colors.white,
+                                  child: SearchField(
+                                    title: LocalStrings.leadDetails.tr,
+                                    searchController: controller.searchController,
+                                    onTap: () => controller.searchLead(),
+                                  ),
+                                ),
+                              )
+                            : null,
+                      ),
+                      
+                       SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                               InkWell(
+                                onTap: () => CustomBottomSheet(
+                                  child: LeadFilterBottomSheet(),
+                                ).customBottomSheet(context),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                       BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.05),
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.filter_alt_outlined, size: 16, color: Theme.of(context).primaryColor),
+                                      const SizedBox(width: 6),
+                                      Text(LocalStrings.filter.tr, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              InkWell(
+                                onTap: () => CustomBottomSheet(
+                                  child: LeadSortBottomSheet(),
+                                ).customBottomSheet(context),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    borderRadius: BorderRadius.circular(20),
+                                     boxShadow: [
+                                       BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.05),
+                                        blurRadius: 5,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.sort, size: 16, color: Theme.of(context).primaryColor),
+                                      const SizedBox(width: 6),
+                                      Text(LocalStrings.sortBy.tr, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                          shape: const Border(),
-                          initiallyExpanded: true,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: Dimensions.space15,
-                              ),
-                              child: SizedBox(
-                                height: 80,
-                                child: ListView.separated(
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) {
-                                    return OverviewCard(
-                                      name: controller
-                                          .leadsModel
-                                          .overview![index]
-                                          .status!
-                                          .tr,
-                                      number: controller
-                                          .leadsModel
-                                          .overview![index]
-                                          .total
-                                          .toString(),
-                                      color: ColorResources.blueColor,
-                                    );
-                                  },
-                                  separatorBuilder: (context, index) =>
-                                      const SizedBox(width: Dimensions.space5),
-                                  itemCount:
-                                      controller.leadsModel.overview!.length,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: Dimensions.space15,
-                          vertical: Dimensions.space10,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              LocalStrings.leads.tr,
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                            Row(
-                              spacing: Dimensions.space15,
-                              children: [
-                                InkWell(
-                                  onTap: () => CustomBottomSheet(
-                                    child: LeadFilterBottomSheet(),
-                                  ).customBottomSheet(context),
-                                  child: TextIcon(
-                                    text: LocalStrings.filter.tr,
-                                    icon: Icons.filter_alt,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () => CustomBottomSheet(
-                                    child: LeadSortBottomSheet(),
-                                  ).customBottomSheet(context),
-                                  child: TextIcon(
-                                    text: LocalStrings.sortBy.tr,
-                                    icon: Icons.sort,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
                         ),
                       ),
+
+
+                      if (controller.leadsModel.overview != null)
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            child: SizedBox(
+                              height: 100,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                physics: const BouncingScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  return _buildOverviewCard(
+                                    context,
+                                    controller.leadsModel.overview![index].status!.tr,
+                                    controller.leadsModel.overview![index].total.toString(),
+                                  );
+                                },
+                                separatorBuilder: (context, index) => const SizedBox(width: 12),
+                                itemCount: controller.leadsModel.overview!.length,
+                              ),
+                            ),
+                          ),
+                        ),
+
                       controller.leads.isNotEmpty
-                          ? Flexible(
-                              child: Obx(
-                                () => ListView.separated(
-                                  controller: controller.scrollController,
-                                  padding: const EdgeInsets.fromLTRB(
-                                    Dimensions.space15,
-                                    0,
-                                    Dimensions.space15,
-                                    Dimensions.space15,
-                                  ),
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    bool isLastItem =
-                                        index == controller.leads.length - 1;
-                                    if (isLastItem && controller.hasMoreData) {
-                                      return Column(
-                                        children: [
-                                          LeadCard(
-                                            lead: controller.leads[index],
-                                          ),
-                                          const SizedBox(
-                                            height: Dimensions.space10,
-                                          ),
-                                          const CustomLoader(
-                                            isFullScreen: false,
-                                            isPagination: true,
-                                          ),
-                                        ],
+                          ? SliverPadding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              sliver: Obx(
+                                () => SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(bottom: 12),
+                                        child: Column(
+                                          children: [
+                                            LeadCard(
+                                              lead: controller.leads[index],
+                                            ),
+                                            if (index == controller.leads.length - 1 && controller.hasMoreData)
+                                              const Padding(
+                                                padding: EdgeInsets.all(16.0),
+                                                child: CustomLoader(isFullScreen: false, isPagination: true),
+                                              ),
+                                          ],
+                                        ),
                                       );
-                                    }
-                                    return LeadCard(
-                                      lead: controller.leads[index],
-                                    );
-                                  },
-                                  separatorBuilder: (context, index) =>
-                                      const SizedBox(
-                                        height: Dimensions.space10,
-                                      ),
-                                  itemCount: controller.leads.length,
+                                    },
+                                    childCount: controller.leads.length,
+                                  ),
                                 ),
                               ),
                             )
-                          : const NoDataWidget(),
+                          : const SliverToBoxAdapter(child: NoDataWidget()),
                     ],
                   ),
                 ),
         );
       },
+    );
+  }
+
+  Widget _buildOverviewCard(BuildContext context, String title, String count) {
+    return Container(
+      width: 140,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+         color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            count,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+             style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).hintColor,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

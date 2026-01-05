@@ -22,10 +22,9 @@ class OverviewCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(Dimensions.cardRadius),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).shadowColor.withValues(alpha: 0.05),
-            spreadRadius: 1,
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
-            offset: const Offset(0, 3),
+            blurStyle: BlurStyle.outer,
           ),
         ],
       ),

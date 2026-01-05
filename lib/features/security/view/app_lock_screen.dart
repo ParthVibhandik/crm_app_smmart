@@ -48,7 +48,7 @@ class _AppLockScreenState extends State<AppLockScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [ColorResources.gradientStart, ColorResources.gradientEnd],
+            colors: [ColorResources.primaryColor, ColorResources.secondaryColor],
           ),
         ),
         child: Center(

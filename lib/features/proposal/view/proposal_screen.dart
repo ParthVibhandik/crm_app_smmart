@@ -65,25 +65,16 @@ class _ProposalScreenState extends State<ProposalScreen> {
   Widget build(BuildContext context) {
     return GetBuilder<ProposalController>(builder: (controller) {
       return Scaffold(
-        appBar: CustomAppBar(
-          title: LocalStrings.proposals.tr,
-          isShowActionBtn: true,
-          actionWidget: IconButton(
-              onPressed: () => controller.changeSearchIcon(),
-              icon: Icon(controller.isSearch ? Icons.clear : Icons.search)),
-        ),
         floatingActionButton: AnimatedSlide(
           offset: showFab ? Offset.zero : const Offset(0, 2),
           duration: const Duration(milliseconds: 300),
           child: AnimatedOpacity(
             opacity: showFab ? 1 : 0,
             duration: const Duration(milliseconds: 300),
-            child: CustomFAB(
-                isShowIcon: true,
-                isShowText: false,
-                press: () {
-                  Get.toNamed(RouteHelper.addProposalScreen);
-                }),
+            child: FloatingActionButton(
+                onPressed: () => Get.toNamed(RouteHelper.addProposalScreen),
+                backgroundColor: ColorResources.secondaryColor,
+                child: const Icon(Icons.add, color: Colors.white)),
           ),
         ),
         body: controller.isLoading
@@ -94,102 +85,157 @@ class _ProposalScreenState extends State<ProposalScreen> {
                 onRefresh: () async {
                   await controller.initialData(shouldLoad: false);
                 },
-                child: SingleChildScrollView(
+                child: CustomScrollView(
                   controller: scrollController,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    children: [
-                      Visibility(
-                        visible: controller.isSearch,
-                        child: SearchField(
-                          title: LocalStrings.proposalDetails.tr,
-                          searchController: controller.searchController,
-                          onTap: () => controller.searchProposal(),
-                        ),
+                  physics: const BouncingScrollPhysics(),
+                  slivers: [
+                    SliverAppBar(
+                      pinned: true,
+                      floating: true,
+                      snap: true,
+                      backgroundColor: ColorResources.primaryColor,
+                      expandedHeight: 120.0,
+                      leading: IconButton(
+                        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                        onPressed: () => Get.back(),
                       ),
-                      if (controller.proposalsModel.overview != null)
-                        ExpansionTile(
-                          title: Row(
-                            children: [
-                              Container(
-                                width: Dimensions.space3,
-                                height: Dimensions.space15,
-                                color: Colors.blue,
-                              ),
-                              const SizedBox(width: Dimensions.space5),
-                              Text(
-                                LocalStrings.proposalSummery.tr,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                            ],
+                      flexibleSpace: FlexibleSpaceBar(
+                        title: Text(
+                          LocalStrings.proposals.tr,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        background: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                ColorResources.primaryColor,
+                                ColorResources.secondaryColor.withValues(alpha: 0.8),
+                              ],
+                            ),
                           ),
-                          shape: const Border(),
-                          initiallyExpanded: true,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: Dimensions.space15),
-                              child: SizedBox(
-                                height: 80,
-                                child: ListView.separated(
-                                    scrollDirection: Axis.horizontal,
-                                    itemBuilder: (context, index) {
-                                      return OverviewCard(
-                                          name: controller.proposalsModel
-                                              .overview![index].status!.tr,
-                                          number: controller.proposalsModel
-                                              .overview![index].total
-                                              .toString(),
-                                          color: ColorResources.blueColor);
-                                    },
-                                    separatorBuilder: (context, index) =>
-                                        const SizedBox(
-                                            width: Dimensions.space5),
-                                    itemCount: controller
-                                        .proposalsModel.overview!.length),
-                              ),
-                            ),
-                          ],
-                        ),
-                      Padding(
-                        padding: const EdgeInsets.all(Dimensions.space15),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              LocalStrings.proposals.tr,
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                            InkWell(
-                              onTap: () {},
-                              child: TextIcon(
-                                  text: LocalStrings.filter.tr,
-                                  icon: Icons.sort_outlined),
-                            ),
-                          ],
                         ),
                       ),
-                      controller.proposalsModel.data!.isNotEmpty
-                          ? ListView.separated(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: Dimensions.space15),
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
+                       actions: [
+                        IconButton(
+                            onPressed: () => controller.changeSearchIcon(),
+                            icon: Icon(controller.isSearch ? Icons.clear : Icons.search, color: Colors.white)),
+                      ],
+                      bottom: controller.isSearch
+                          ? PreferredSize(
+                              preferredSize: const Size.fromHeight(60),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                color: Colors.white,
+                                child: SearchField(
+                                  title: LocalStrings.proposalDetails.tr,
+                                  searchController: controller.searchController,
+                                  onTap: () => controller.searchProposal(),
+                                ),
+                              ),
+                            )
+                          : null,
+                    ),
+
+                    if (controller.proposalsModel.overview != null)
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: SizedBox(
+                            height: 120,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: controller.proposalsModel.overview!.length,
                               itemBuilder: (context, index) {
-                                return ProposalCard(
-                                  index: index,
-                                  proposalModel: controller.proposalsModel,
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 12),
+                                  child: _buildOverviewCard(
+                                    context,
+                                    controller.proposalsModel.overview![index].status!.tr,
+                                    controller.proposalsModel.overview![index].total.toString(),
+                                  ),
                                 );
                               },
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(height: Dimensions.space10),
-                              itemCount: controller.proposalsModel.data!.length)
-                          : const NoDataWidget(),
-                    ],
-                  ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    
+                    controller.proposalsModel.data?.isNotEmpty ?? false
+                        ? SliverPadding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            sliver: SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: ProposalCard(
+                                      index: index,
+                                      proposalModel: controller.proposalsModel,
+                                    ),
+                                  );
+                                },
+                                childCount: controller.proposalsModel.data!.length,
+                              ),
+                            ),
+                          )
+                        : const SliverToBoxAdapter(child: NoDataWidget()),
+                  ],
                 ),
               ),
       );
     });
+  }
+
+  Widget _buildOverviewCard(BuildContext context, String title, String count) {
+    return Container(
+      width: 150,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: ColorResources.blueColor.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.file_copy_outlined, color: ColorResources.blueColor, size: 24),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            count,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+             style: TextStyle(
+              fontSize: 12,
+              color: Theme.of(context).hintColor,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

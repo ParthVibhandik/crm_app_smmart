@@ -1,10 +1,6 @@
-import 'package:flutex_admin/common/components/card/custom_card.dart';
-import 'package:flutex_admin/common/components/divider/custom_divider.dart';
-import 'package:flutex_admin/common/components/text/text_icon.dart';
 import 'package:flutex_admin/core/utils/color_resources.dart';
 import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
-import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/invoice/model/invoice_details_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,38 +16,103 @@ class InvoicePaymentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${LocalStrings.payment.tr} #${payment.paymentId ?? ''}',
-                style: regularDefault,
-              ),
-              Text('$currency${payment.amount ?? ''}', style: regularDefault),
-            ],
-          ),
-          const SizedBox(height: Dimensions.space5),
-          if (payment.transactionId?.isNotEmpty ?? false)
-            Text(
-              '${LocalStrings.transactionId.tr}: ${payment.transactionId ?? ''}',
-              style: lightDefault.copyWith(color: ColorResources.blueGreyColor),
-            ),
-          const CustomDivider(space: Dimensions.space10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextIcon(
-                text: payment.methodName ?? '',
-                icon: Icons.payments_outlined,
-              ),
-              TextIcon(text: payment.date ?? '', icon: Icons.calendar_month),
-            ],
+    return Container(
+      margin: const EdgeInsets.only(bottom: 5),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(Dimensions.cardRadius),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            blurStyle: BlurStyle.outer,
           ),
         ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    '${LocalStrings.payment.tr} #${payment.paymentId ?? ''}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '$currency${payment.amount ?? ''}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ],
+            ),
+            if (payment.transactionId?.isNotEmpty ?? false) ...[
+              const SizedBox(height: 6),
+              Text(
+                '${LocalStrings.transactionId.tr}: ${payment.transactionId ?? ''}',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: ColorResources.blueGreyColor,
+                ),
+              ),
+            ],
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Divider(height: 1),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Icon(Icons.payments_outlined,
+                          size: 16, color: Theme.of(context).hintColor),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          payment.methodName ?? '',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Theme.of(context).hintColor,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Row(
+                  children: [
+                    Icon(Icons.calendar_month,
+                        size: 14, color: Theme.of(context).hintColor),
+                    const SizedBox(width: 6),
+                    Text(
+                      payment.date ?? '',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).hintColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

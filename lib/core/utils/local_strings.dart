@@ -649,6 +649,15 @@ class LocalStrings {
   static const String transferDatadesc =
       "Some data for this staff member needs to be transferred to another user. Please select user where you want to transfer the data.";
   static const String staffMember = "Staff Member";
+
+  // Attendance & Calendar
+  static const String attendance = "Attendance";
+  static const String attendanceHistory = "Attendance History";
+  static const String calendar = "Calendar";
+  static const String checkIn = "Check In";
+  static const String checkOut = "Check Out";
+  static const String noEventsFound = "No Events Found";
+  static const String notCheckedIn = "Not Checked In";
 }
 
 class Messages extends Translations {

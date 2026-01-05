@@ -1,9 +1,5 @@
-import 'package:flutex_admin/common/components/card/custom_card.dart';
-import 'package:flutex_admin/common/components/divider/custom_divider.dart';
-import 'package:flutex_admin/common/components/text/text_icon.dart';
 import 'package:flutex_admin/core/route/route.dart';
 import 'package:flutex_admin/core/utils/dimensions.dart';
-import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/expense/model/expense_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,36 +14,93 @@ class ExpenseCard extends StatelessWidget {
       onTap: () {
         Get.toNamed(RouteHelper.expenseDetailsScreen, arguments: expense.id!);
       },
-      child: CustomCard(
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.65,
-                  child: Text(
-                    expense.expenseName ?? '',
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                    style: regularDefault,
-                  ),
-                ),
-                Text(expense.amount ?? '', style: regularDefault),
-              ],
-            ),
-            const CustomDivider(space: Dimensions.space8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextIcon(
-                  text: expense.categoryName ?? '',
-                  icon: Icons.category,
-                ),
-                TextIcon(text: expense.date ?? '', icon: Icons.calendar_month),
-              ],
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 5),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(Dimensions.cardRadius),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 4,
+              blurStyle: BlurStyle.outer,
             ),
           ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      expense.expenseName ?? '',
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    expense.amount ?? '',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: Divider(height: 1),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Icon(Icons.category,
+                            size: 16, color: Theme.of(context).hintColor),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            expense.categoryName ?? '',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Theme.of(context).hintColor,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_month,
+                          size: 14, color: Theme.of(context).hintColor),
+                      const SizedBox(width: 6),
+                      Text(
+                        expense.date ?? '',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).hintColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
