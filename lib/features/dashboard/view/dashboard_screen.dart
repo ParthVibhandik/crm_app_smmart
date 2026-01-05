@@ -21,6 +21,7 @@ import 'package:flutex_admin/features/dashboard/widget/home_estimates_card.dart'
 import 'package:flutex_admin/features/dashboard/widget/home_invoices_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/home_proposals_card.dart';
 import 'package:flutex_admin/features/attendance/attendance_screen.dart';
+import 'package:flutex_admin/features/attendance/manual_punch_out_helper.dart';
 import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,6 +46,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       controller.initialData();
+      
+      try {
+        final token = Get.find<ApiClient>().sharedPreferences.getString('access_token');
+        if (token != null && token.isNotEmpty) {
+          // Delayed slightly to ensure dashboard is ready/rendered
+          Future.delayed(const Duration(seconds: 1), () {
+             if (mounted) {
+               ManualPunchOutHelper.checkAndShow(context, token);
+             }
+          });
+        }
+      } catch (e) {
+        print('Dashboard manual punch out check error: $e');
+      }
     });
   }
 

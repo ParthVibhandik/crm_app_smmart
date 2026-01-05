@@ -3,6 +3,7 @@ import 'attendance_service.dart';
 import 'attendance_status.dart';
 import 'package:get/get.dart';
 import 'package:flutex_admin/core/route/route.dart';
+import 'manual_punch_out_helper.dart';
 
 class AttendanceScreen extends StatefulWidget {
   final String authToken;
@@ -34,6 +35,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
     try {
       status = await service.getTodayStatus();
+      
+      // Check for manual punch out requirement
+      if (mounted) {
+        ManualPunchOutHelper.checkAndShow(context, widget.authToken);
+      }
     } catch (e) {
       error = e.toString();
     }

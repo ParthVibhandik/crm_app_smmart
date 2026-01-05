@@ -231,4 +231,41 @@ class AttendanceService {
     final service = FlutterBackgroundService();
     service.invoke('stop');
   }
+
+  /// ==============================
+  /// MANUAL PUNCH OUT (FORGOT PUNCH OUT)
+  /// ==============================
+  Future<Map<String, dynamic>?> getPendingManualPunchOut() async {
+    try {
+      // Using the exact endpoint requested by user
+      final response = await _dio.get('/api/attendance/pending-manual-punch-out'); 
+      if (response.data != null && response.data['requires_manual_punch_out'] == true) {
+        return response.data;
+      }
+      return null;
+    } catch (e) {
+      // Ignore errors (e.g. 404 if endpoint doesn't exist yet, or network issue)
+      // We don't want to block the app if the check fails due to network (unless strict?)
+      // User said "Block UI" if "requires_manual_punch_out = true". If call fails, we assume false.
+      print('Manual Punchout Check Error: $e');
+      return null;
+    }
+  }
+
+  Future<void> submitManualPunchOut(String time, String reason) async {
+    final response = await _dio.post('/api/attendance/manual-punch-out', data: {
+      'punch_out_time': time,
+      'reason': reason,
+    });
+    
+    if (response.data is Map && response.data['status'] == true) {
+       return;
+    }
+    throw Exception(response.data['message'] ?? 'Submission failed');
+  }
+
+  Future<Map<String, dynamic>> getManualPunchOutStatus() async {
+    final response = await _dio.get('/api/attendance/manual-punch-out-status');
+    return response.data;
+  }
 }

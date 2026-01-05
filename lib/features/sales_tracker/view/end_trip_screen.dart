@@ -238,6 +238,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
                               DropdownButtonFormField<String>(
                                 value: _selectedInvoiceId,
                                 isExpanded: true,
+                                itemHeight: null, // Allow variable height for items
                                 decoration: InputDecoration(
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -251,10 +252,25 @@ class _EndTripScreenState extends State<EndTripScreen> {
                                   ..._invoices.take(50).map((inv) {
                                      return DropdownMenuItem<String>(
                                        value: inv.id,
-                                       child: Text(
-                                         "${inv.prefix ?? ''}${inv.number ?? ''} - ${inv.clientName ?? 'Unknown'} - ${inv.total ?? ''} (${inv.date ?? ''})",
-                                         overflow: TextOverflow.ellipsis,
-                                         style: const TextStyle(fontSize: 13),
+                                       child: Padding(
+                                         padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                         child: Column(
+                                           crossAxisAlignment: CrossAxisAlignment.start,
+                                           mainAxisSize: MainAxisSize.min,
+                                           children: [
+                                             Text(
+                                               "${inv.prefix ?? ''}${inv.number ?? ''} - ${inv.clientName ?? 'Unknown'}",
+                                               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                               maxLines: 2,
+                                               overflow: TextOverflow.ellipsis,
+                                             ),
+                                             const SizedBox(height: 2),
+                                             Text(
+                                               "${inv.total ?? ''} (${inv.date ?? ''})",
+                                               style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                             ),
+                                           ],
+                                         ),
                                        ),
                                      );
                                   }),
@@ -263,6 +279,32 @@ class _EndTripScreenState extends State<EndTripScreen> {
                                   setState(() {
                                     _selectedInvoiceId = val;
                                   });
+                                },
+                                selectedItemBuilder: (BuildContext context) {
+                                  return [
+                                    const Text("None (Do not send any invoice)", overflow: TextOverflow.ellipsis, maxLines: 1),
+                                    ..._invoices.take(50).map((inv) {
+                                      return Column(
+                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                         mainAxisAlignment: MainAxisAlignment.center,
+                                         mainAxisSize: MainAxisSize.min,
+                                         children: [
+                                           Text(
+                                             "${inv.prefix ?? ''}${inv.number ?? ''} - ${inv.clientName ?? 'Unknown'}",
+                                             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                             maxLines: 1, 
+                                             overflow: TextOverflow.ellipsis,
+                                           ),
+                                           Text(
+                                             "${inv.total ?? ''} (${inv.date ?? ''})",
+                                             style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                             maxLines: 1,
+                                             overflow: TextOverflow.ellipsis,
+                                           ),
+                                         ],
+                                       );
+                                    }),
+                                  ];
                                 },
                               ),
                               const SizedBox(height: 20),
