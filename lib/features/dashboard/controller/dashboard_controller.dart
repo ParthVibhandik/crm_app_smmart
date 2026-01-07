@@ -6,6 +6,9 @@ import 'package:flutex_admin/core/route/route.dart';
 import 'package:flutex_admin/common/models/response_model.dart';
 import 'package:flutex_admin/features/dashboard/model/dashboard_model.dart';
 import 'package:flutex_admin/features/dashboard/repo/dashboard_repo.dart';
+import 'package:flutex_admin/features/attendance/attendance_service.dart';
+import 'package:flutex_admin/features/attendance/view/manual_punch_out_dialog.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class DashboardController extends GetxController {
@@ -37,6 +40,8 @@ class DashboardController extends GetxController {
     }
     isLoading = false;
     update();
+    
+    _checkPendingPunchOut();
   }
 
   Future<void> logout() async {
@@ -65,5 +70,27 @@ class DashboardController extends GetxController {
 
     logoutLoading = false;
     update();
+  }
+
+  Future<void> _checkPendingPunchOut() async {
+    try {
+      String token = dashboardRepo.apiClient.sharedPreferences.getString(SharedPreferenceHelper.accessTokenKey) ?? '';
+      if (token.isEmpty) return;
+
+      final attendanceService = AttendanceService(token);
+      final pendingData = await attendanceService.getPendingManualPunchOut();
+
+      if (pendingData != null) {
+        Get.dialog(
+          ManualPunchOutDialog(
+            attendanceId: pendingData['attendance_id'].toString(),
+            attendanceDate: pendingData['attendance_date'].toString(),
+          ),
+          barrierDismissible: false,
+        );
+      }
+    } catch (e) {
+      print('Error checking pending punch out: $e');
+    }
   }
 }

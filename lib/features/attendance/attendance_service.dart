@@ -238,7 +238,7 @@ class AttendanceService {
   Future<Map<String, dynamic>?> getPendingManualPunchOut() async {
     try {
       // Using the exact endpoint requested by user
-      final response = await _dio.get('/api/attendance/pending-manual-punch-out'); 
+      final response = await _dio.get('/flutex_admin_api/attendance/pending-manual-punch-out'); 
       if (response.data != null && response.data['requires_manual_punch_out'] == true) {
         return response.data;
       }
@@ -253,7 +253,7 @@ class AttendanceService {
   }
 
   Future<void> submitManualPunchOut(String time, String reason) async {
-    final response = await _dio.post('/api/attendance/manual-punch-out', data: {
+    final response = await _dio.post('/flutex_admin_api/attendance/manual-punch-out', data: {
       'punch_out_time': time,
       'reason': reason,
     });
@@ -265,7 +265,7 @@ class AttendanceService {
   }
 
   Future<Map<String, dynamic>> getManualPunchOutStatus() async {
-    final response = await _dio.get('/api/attendance/manual-punch-out-status');
+    final response = await _dio.get('/flutex_admin_api/attendance/manual-punch-out-status');
     return response.data;
   }
 }
