@@ -83,13 +83,17 @@ class _CallStartComponentState extends State<CallStartComponent> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
                         Icon(Icons.call_outlined, size: 28, color: Colors.blue),
                         SizedBox(width: 8),
-                        Text(
-                          'Start your call with the customer',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w600),
+                        Flexible(
+                          child: Text(
+                            'Start your call with the customer',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w600),
+                            softWrap: true,
+                          ),
                         ),
                       ],
                     ),

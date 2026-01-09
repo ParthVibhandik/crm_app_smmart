@@ -184,14 +184,18 @@ class _ActiveTripStatusScreenState extends State<ActiveTripStatusScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: const <Widget>[
                             Icon(Icons.place_outlined,
                                 size: 28, color: Colors.green),
                             SizedBox(width: 8),
-                            Text(
-                              'Have you reached the destination?',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w600),
+                            Flexible(
+                              child: Text(
+                                'Have you reached the destination?',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w600),
+                                softWrap: true,
+                              ),
                             ),
                           ],
                         ),

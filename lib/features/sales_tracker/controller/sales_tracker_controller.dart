@@ -31,6 +31,7 @@ class SalesTrackerController extends GetxController {
   TextEditingController searchController = TextEditingController();
   final MapController mapController = MapController();
   LatLng currentCenter = const LatLng(20.5937, 78.9629); // Default India
+  bool mapReady = false;
 
   @override
   void onInit() {
@@ -130,6 +131,12 @@ class SalesTrackerController extends GetxController {
     try {
       Position position = await Geolocator.getCurrentPosition();
       currentCenter = LatLng(position.latitude, position.longitude);
+      _setCurrentLocationMarker();
+      // Nudge map to current position when available
+      if (mapReady) {
+        mapController.move(currentCenter, 15);
+      }
+      update();
     } catch (e) {
       print("Error getting location: $e");
     }
@@ -144,6 +151,8 @@ class SalesTrackerController extends GetxController {
 
     leads.clear();
     markers.clear();
+    // Preserve user's current location marker
+    _setCurrentLocationMarker();
     itemTypes.clear(); // Clear types
 
     try {
@@ -216,6 +225,37 @@ class SalesTrackerController extends GetxController {
     }
 
     isLoading = false;
+    update();
+  }
+
+  // Keep a dedicated marker for the user's current location so it stays visible on the map
+  void _setCurrentLocationMarker() {
+    // Remove any existing current-location marker
+    markers.removeWhere(
+      (m) => m.key == const ValueKey('current_location'),
+    );
+
+    markers.insert(
+      0,
+      Marker(
+        key: const ValueKey('current_location'),
+        point: currentCenter,
+        width: 36,
+        height: 36,
+        child: const Icon(
+          Icons.my_location,
+          color: Colors.blue,
+          size: 32,
+        ),
+      ),
+    );
+  }
+
+  void setMapReady() {
+    mapReady = true;
+    // On ready, ensure we show the current location marker and center the map
+    _setCurrentLocationMarker();
+    mapController.move(currentCenter, 15);
     update();
   }
 

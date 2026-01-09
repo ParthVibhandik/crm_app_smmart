@@ -83,6 +83,7 @@ class _SalesTrackerScreenState extends State<SalesTrackerScreen> {
                 options: MapOptions(
                   initialCenter: controller.currentCenter,
                   initialZoom: 13.0,
+                  onMapReady: () => controller.setMapReady(),
                 ),
                 children: [
                   TileLayer(
