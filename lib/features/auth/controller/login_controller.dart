@@ -8,6 +8,9 @@ import 'package:flutex_admin/core/helper/shared_preference_helper.dart';
 import 'package:flutex_admin/core/route/route.dart';
 import 'package:flutex_admin/common/models/response_model.dart';
 import 'package:flutex_admin/common/components/snack_bar/show_custom_snackbar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutex_admin/core/service/notification_service.dart';
+
 
 class LoginController extends GetxController {
   AuthRepo loginRepo;
@@ -47,7 +50,16 @@ class LoginController extends GetxController {
     );
     String? token = responseModel.data?.accessToken.toString() ?? '';
     print('Access Token: $token');
+
+    // Send FCM token to backend
+    FirebaseMessaging.instance.getToken().then((fcmToken) {
+      if (fcmToken != null) {
+        NotificationService.sendTokenToBackend(fcmToken);
+      }
+    });
+
     Get.offAndToNamed(RouteHelper.dashboardScreen);
+
 
     if (remember) {
       changeRememberMe();

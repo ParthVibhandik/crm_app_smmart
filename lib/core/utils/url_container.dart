@@ -14,6 +14,7 @@ class UrlContainer {
   // Authentication
   static const String loginUrl = 'auth/login';
   static const String tokenUrl = 'auth/firebase-token';
+  static const String fcmTokenUrl = 'push-notifications/save-fcm-token';
   static const String logoutUrl = 'auth/logout';
   static const String forgotPasswordUrl = 'auth/forgot-password';
 
