@@ -68,6 +68,26 @@ class NotificationService {
       FlutterLocalNotificationsPlugin localNotifications) async {
     final notification = message.notification;
     if (notification != null) {
+      String? imageUrl = notification.android?.imageUrl ?? notification.apple?.imageUrl;
+
+      BigPictureStyleInformation? bigPictureStyleInformation;
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        try {
+          final String largeIconPath =
+              await _downloadAndSaveFile(imageUrl, 'largeIcon');
+          final String bigPicturePath =
+              await _downloadAndSaveFile(imageUrl, 'bigPicture');
+          bigPictureStyleInformation = BigPictureStyleInformation(
+            FilePathAndroidBitmap(bigPicturePath),
+            largeIcon: FilePathAndroidBitmap(largeIconPath),
+            contentTitle: notification.title,
+            summaryText: notification.body,
+          );
+        } catch (e) {
+          debugPrint('====> Error downloading notification image: $e');
+        }
+      }
+
       localNotifications.show(
         notification.hashCode,
         notification.title,
@@ -79,8 +99,13 @@ class NotificationService {
             importance: Importance.max,
             priority: Priority.high,
             icon: 'notification_icon',
+            styleInformation: bigPictureStyleInformation,
           ),
-          iOS: DarwinNotificationDetails(),
+          iOS: const DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
         ),
         payload: jsonEncode(message.data),
       );
