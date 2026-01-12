@@ -44,19 +44,21 @@ class DashboardController extends GetxController {
     // Format date as yyyy-MM-dd (e.g., 2026-01-11)
     String formattedDate = DateFormat('yyyy-MM-dd').format(date);
 
-    ResponseModel responseModel = await dashboardRepo.getAttendanceDate(formattedDate);
+    ResponseModel responseModel =
+        await dashboardRepo.getAttendanceDate(formattedDate);
 
     if (responseModel.status) {
       try {
-        Map<String, dynamic> responseData = jsonDecode(responseModel.responseJson);
+        Map<String, dynamic> responseData =
+            jsonDecode(responseModel.responseJson);
         // Assuming the backend returns keys "punch_in" and "punch_out" directly or inside a data object.
         // Based on "backend responds with {punch_in , punch_out}", I'll assume root level or simple structure.
         // Safe access
-        if(responseData.containsKey('punch_in')){
-           punchInTime = responseData['punch_in'];
+        if (responseData.containsKey('punch_in')) {
+          punchInTime = responseData['punch_in'];
         }
-        if(responseData.containsKey('punch_out')){
-           punchOutTime = responseData['punch_out'];
+        if (responseData.containsKey('punch_out')) {
+          punchOutTime = responseData['punch_out'];
         }
       } catch (e) {
         print("Error parsing attendance date: $e");
@@ -65,7 +67,7 @@ class DashboardController extends GetxController {
       // Optional: Show error or just show empty
       // CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
-    
+
     isAttendanceLoading = false;
     update();
   }
