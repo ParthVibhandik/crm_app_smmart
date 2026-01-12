@@ -238,7 +238,20 @@ class NotificationService {
     String? accessToken =
         sharedPreferences.getString(SharedPreferenceHelper.accessTokenKey);
 
-    if (accessToken != null) {
+    // Debug: ensure we actually have both tokens before posting
+    if (accessToken == null || accessToken.isEmpty) {
+      debugPrint('====> Send Token skipped: no access token saved');
+      return;
+    }
+
+    final maskedAccess = accessToken.length > 12
+        ? '${accessToken.substring(0, 6)}...${accessToken.substring(accessToken.length - 4)}'
+        : accessToken;
+    final maskedFcm = token.length > 12
+        ? '${token.substring(0, 6)}...${token.substring(token.length - 4)}'
+        : token;
+
+    try {
       try {
         String url = '${UrlContainer.baseUrl}${UrlContainer.fcmTokenUrl}';
         var body = jsonEncode({
@@ -248,6 +261,8 @@ class NotificationService {
 
         debugPrint('====> Send Token URL: $url');
         debugPrint('====> Send Token Body: $body');
+        debugPrint('====> Access token (masked): $maskedAccess');
+        debugPrint('====> FCM token (masked): $maskedFcm');
 
         final response = await http.post(
           Uri.parse(url),
@@ -262,6 +277,8 @@ class NotificationService {
       } catch (e) {
         debugPrint('====> Send Token Error: ${e.toString()}');
       }
+    } catch (e) {
+      debugPrint('====> Send Token Outer Error: ${e.toString()}');
     }
   }
 }

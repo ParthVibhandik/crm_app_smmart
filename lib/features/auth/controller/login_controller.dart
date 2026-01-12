@@ -11,7 +11,6 @@ import 'package:flutex_admin/common/components/snack_bar/show_custom_snackbar.da
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutex_admin/core/service/notification_service.dart';
 
-
 class LoginController extends GetxController {
   AuthRepo loginRepo;
 
@@ -54,12 +53,15 @@ class LoginController extends GetxController {
     // Send FCM token to backend
     FirebaseMessaging.instance.getToken().then((fcmToken) {
       if (fcmToken != null) {
+        debugPrint('====> FCM token acquired (masked): '
+            '${fcmToken.length > 12 ? '${fcmToken.substring(0, 6)}...${fcmToken.substring(fcmToken.length - 4)}' : fcmToken}');
         NotificationService.sendTokenToBackend(fcmToken);
+      } else {
+        debugPrint('====> FCM token is null; skipping send');
       }
     });
 
     Get.offAndToNamed(RouteHelper.dashboardScreen);
-
 
     if (remember) {
       changeRememberMe();
