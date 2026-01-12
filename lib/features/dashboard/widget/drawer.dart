@@ -207,6 +207,14 @@ class HomeDrawer extends StatelessWidget {
                       Get.toNamed(RouteHelper.telecallingScreen);
                     },
                   ),
+                  buildListTile(
+                    leadingIcon: Icons.edit_calendar_outlined,
+                    title: "Regularize Attendance",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Get.toNamed(RouteHelper.regularizationScreen);
+                    },
+                  ),
                   homeModel.menuItems?.expenses ?? false
                       ? buildListTile(
                           leadingIcon: Icons.monetization_on_outlined,

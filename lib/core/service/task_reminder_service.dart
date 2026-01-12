@@ -17,7 +17,7 @@ class TaskReminderService {
     if (reminderDate.isBefore(DateTime.now())) return;
 
     tz.initializeTimeZones();
-    
+
     await fln.zonedSchedule(
       int.parse(task.id ?? '0'),
       'Task Reminder',
@@ -29,6 +29,7 @@ class TaskReminderService {
           'Task Reminders',
           importance: Importance.high,
           priority: Priority.high,
+          icon: 'icon',
         ),
         iOS: DarwinNotificationDetails(),
       ),

@@ -14,13 +14,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutex_admin/core/helper/shared_preference_helper.dart';
 import 'package:flutex_admin/core/utils/url_container.dart';
 
-
 class NotificationService {
   static Future<void> initialize(
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
     // Initialize Local Notifications first (doesn't hang)
-    var androidInitialize =
-        const AndroidInitializationSettings('notification_icon');
+    var androidInitialize = const AndroidInitializationSettings('icon');
     var iOSInitialize = const DarwinInitializationSettings();
     var initializationsSettings =
         InitializationSettings(android: androidInitialize, iOS: iOSInitialize);
@@ -68,7 +66,8 @@ class NotificationService {
       FlutterLocalNotificationsPlugin localNotifications) async {
     final notification = message.notification;
     if (notification != null) {
-      String? imageUrl = notification.android?.imageUrl ?? notification.apple?.imageUrl;
+      String? imageUrl =
+          notification.android?.imageUrl ?? notification.apple?.imageUrl;
 
       BigPictureStyleInformation? bigPictureStyleInformation;
       if (imageUrl != null && imageUrl.isNotEmpty) {
@@ -98,7 +97,7 @@ class NotificationService {
             'Notifications',
             importance: Importance.max,
             priority: Priority.high,
-            icon: 'notification_icon',
+            icon: 'icon',
             styleInformation: bigPictureStyleInformation,
           ),
           iOS: const DarwinNotificationDetails(

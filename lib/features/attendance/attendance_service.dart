@@ -7,6 +7,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'attendance_status.dart';
 import 'biometric_service.dart';
 import 'camera_service.dart';
+import 'pending_attendance.dart';
 
 class AttendanceService {
   final Dio _dio;
@@ -230,5 +231,50 @@ class AttendanceService {
 
     final service = FlutterBackgroundService();
     service.invoke('stop');
+  }
+
+  /// ==============================
+  /// GET PENDING ATTENDANCES
+  /// ==============================
+  Future<List<PendingAttendance>> getPendingAttendances() async {
+    final response = await _dio.get(
+      '/flutex_admin_api/attendance/get_all_pending_attendances',
+    );
+
+    if (response.data['status'] != true) {
+      throw Exception(
+          response.data['message'] ?? 'Failed to fetch pending attendances');
+    }
+
+    final List<dynamic> attendancesList = response.data['attendances'] ?? [];
+    return attendancesList
+        .map((json) => PendingAttendance.fromJson(json))
+        .toList();
+  }
+
+  /// ==============================
+  /// REGULARIZE ATTENDANCE
+  /// ==============================
+  Future<Map<String, dynamic>> regularizeAttendance({
+    required String attendanceId,
+    required String punchedOutTime,
+    required String reason,
+  }) async {
+    final FormData formData = FormData.fromMap({
+      'attendance_id': attendanceId,
+      'punched_out_time': punchedOutTime,
+      'reason': reason,
+    });
+
+    final response = await _dio.post(
+      '/flutex_admin_api/attendance/regularize',
+      data: formData,
+    );
+
+    return {
+      'success': response.data['status'] == true,
+      'message': response.data['message'] ?? 'Unknown error',
+      'code': response.data['code'] ?? response.statusCode,
+    };
   }
 }

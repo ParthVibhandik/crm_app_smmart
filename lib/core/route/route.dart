@@ -48,6 +48,8 @@ import 'package:flutex_admin/features/proposal/view/update_proposal_screen.dart'
 import 'package:flutex_admin/features/sales_tracker/view/sales_tracker_screen.dart';
 import 'package:flutex_admin/features/telecalling/view/telecalling_screen.dart';
 import 'package:flutex_admin/features/dcr/view/dcr_screen.dart';
+import 'package:flutex_admin/features/attendance/view/regularization_screen.dart';
+import 'package:flutex_admin/features/attendance/controller/regularization_binding.dart';
 import 'package:flutex_admin/features/splash/view/splash_screen.dart';
 import 'package:flutex_admin/features/staff/view/add_staff_screen.dart';
 import 'package:flutex_admin/features/staff/view/staff_details_screen.dart';
@@ -126,6 +128,7 @@ class RouteHelper {
   static const String salesTrackerScreen = "/sales_tracker_screen";
   static const String telecallingScreen = "/telecalling_screen";
   static const String dcrScreen = "/dcr_screen";
+  static const String regularizationScreen = "/regularization_screen";
 
   List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => const SplashScreen()),
@@ -265,5 +268,10 @@ class RouteHelper {
     GetPage(name: salesTrackerScreen, page: () => const SalesTrackerScreen()),
     GetPage(name: telecallingScreen, page: () => const TelecallingScreen()),
     GetPage(name: dcrScreen, page: () => const DCRScreen()),
+    GetPage(
+      name: regularizationScreen,
+      page: () => const RegularizationScreen(),
+      binding: RegularizationBinding(),
+    ),
   ];
 }
