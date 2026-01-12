@@ -25,6 +25,8 @@ import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -222,6 +224,115 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   () => AttendanceScreen(authToken: token),
                                 );
                               },
+                            ),
+                          ),
+
+                          const SizedBox(height: Dimensions.space15),
+
+                          /// ATTENDANCE CALENDAR
+                          Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(Dimensions.cardRadius),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                children: [
+                                  TableCalendar(
+                                    firstDay: DateTime.utc(2020, 1, 1),
+                                    lastDay: DateTime.utc(2030, 12, 31),
+                                    focusedDay: controller.focusedDay,
+                                    currentDay: DateTime.now(),
+                                    selectedDayPredicate: (day) =>
+                                        isSameDay(controller.selectedDay, day),
+                                    calendarFormat: CalendarFormat.month,
+                                    startingDayOfWeek: StartingDayOfWeek.monday,
+                                    headerStyle: const HeaderStyle(
+                                      formatButtonVisible: false,
+                                      titleCentered: true,
+                                    ),
+                                    availableGestures: AvailableGestures.all,
+                                    onDaySelected: controller.onDaySelected,
+                                    onPageChanged: (focusedDay) {
+                                      controller.focusedDay = focusedDay;
+                                    },
+                                    calendarStyle: CalendarStyle(
+                                      selectedDecoration: BoxDecoration(
+                                        color: Theme.of(context).primaryColor,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      todayDecoration: BoxDecoration(
+                                        color: Theme.of(context).primaryColor.withOpacity(0.5),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                                  if (controller.selectedDay != null || controller.isAttendanceLoading) ...[
+                                    const CustomDivider(),
+                                    const SizedBox(height: 10),
+                                    if (controller.isAttendanceLoading)
+                                      const Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Center(child: CircularProgressIndicator()),
+                                      )
+                                    else
+                                      Column(
+                                        children: [
+                                          Text(
+                                            DateFormat('MMMM d, y').format(controller.selectedDay!),
+                                            style: boldLarge,
+                                          ),
+                                          const SizedBox(height: 15),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  Text('Punch In', style: regularDefault.copyWith(color: ColorResources.blueGreyColor)),
+                                                  const SizedBox(height: 5),
+                                                  Text(
+                                                    controller.punchInTime ?? '--:--',
+                                                    style: boldExtraLarge.copyWith(
+                                                      color: Colors.green,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Container(
+                                                height: 40,
+                                                width: 1,
+                                                color: Colors.grey.withOpacity(0.3),
+                                              ),
+                                              Column(
+                                                children: [
+                                                  Text('Punch Out', style: regularDefault.copyWith(color: ColorResources.blueGreyColor)),
+                                                  const SizedBox(height: 5),
+                                                  Text(
+                                                    controller.punchOutTime ?? '--:--',
+                                                    style: boldExtraLarge.copyWith(
+                                                      color: Colors.red,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                        ],
+                                      ),
+                                  ] else
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: Text(
+                                        'Select a date to view attendance details',
+                                        style: regularSmall.copyWith(
+                                          color: ColorResources.blueGreyColor,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
                           ),
 

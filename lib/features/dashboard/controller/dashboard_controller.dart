@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 import 'package:flutex_admin/common/components/snack_bar/show_custom_snackbar.dart';
 import 'package:flutex_admin/core/helper/shared_preference_helper.dart';
 import 'package:flutex_admin/core/route/route.dart';
@@ -16,6 +18,57 @@ class DashboardController extends GetxController {
   bool logoutLoading = false;
   int currentPageIndex = 0;
   DashboardModel homeModel = DashboardModel();
+
+  // Calendar State
+  DateTime focusedDay = DateTime.now();
+  DateTime? selectedDay;
+  bool isAttendanceLoading = false;
+  String? punchInTime;
+  String? punchOutTime;
+
+  void onDaySelected(DateTime selected, DateTime focused) {
+    if (!isSameDay(selectedDay, selected)) {
+      selectedDay = selected;
+      focusedDay = focused;
+      update();
+      getAttendanceLog(selected);
+    }
+  }
+
+  Future<void> getAttendanceLog(DateTime date) async {
+    isAttendanceLoading = true;
+    punchInTime = null;
+    punchOutTime = null;
+    update();
+
+    // Format date as yyyy-MM-dd (e.g., 2026-01-11)
+    String formattedDate = DateFormat('yyyy-MM-dd').format(date);
+
+    ResponseModel responseModel = await dashboardRepo.getAttendanceDate(formattedDate);
+
+    if (responseModel.status) {
+      try {
+        Map<String, dynamic> responseData = jsonDecode(responseModel.responseJson);
+        // Assuming the backend returns keys "punch_in" and "punch_out" directly or inside a data object.
+        // Based on "backend responds with {punch_in , punch_out}", I'll assume root level or simple structure.
+        // Safe access
+        if(responseData.containsKey('punch_in')){
+           punchInTime = responseData['punch_in'];
+        }
+        if(responseData.containsKey('punch_out')){
+           punchOutTime = responseData['punch_out'];
+        }
+      } catch (e) {
+        print("Error parsing attendance date: $e");
+      }
+    } else {
+      // Optional: Show error or just show empty
+      // CustomSnackBar.error(errorList: [responseModel.message.tr]);
+    }
+    
+    isAttendanceLoading = false;
+    update();
+  }
 
   Future<void> initialData({bool shouldLoad = true}) async {
     isLoading = shouldLoad ? true : false;

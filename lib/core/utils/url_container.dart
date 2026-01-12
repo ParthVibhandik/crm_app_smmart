@@ -21,6 +21,7 @@ class UrlContainer {
   // Pages
   static const String overviewUrl = 'overview';
   static const String dashboardUrl = 'dashboard';
+  static const String getAttendanceDateUrl = 'get-attendance-date';
   static const String profileUrl = 'profile';
   static const String customersUrl = 'customers';
   static const String contactsUrl = 'contacts';

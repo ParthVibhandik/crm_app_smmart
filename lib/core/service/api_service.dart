@@ -106,7 +106,14 @@ class ApiClient extends GetxService {
     if (sharedPreferences.containsKey(SharedPreferenceHelper.accessTokenKey)) {
       String? t =
           sharedPreferences.getString(SharedPreferenceHelper.accessTokenKey);
-      token = t ?? '';
+      // Ensure the token has the "Bearer " prefix if it's not already there.
+      // Some backends require "Bearer <token>", others just "<token>".
+      // Given the 401, trying standard Bearer format is a strong potential fix.
+      if (t != null && t.isNotEmpty) {
+         token = t.startsWith('Bearer ') ? t : 'Bearer $t';
+      } else {
+        token = '';
+      }
     } else {
       token = '';
     }
