@@ -17,6 +17,9 @@ class HomeInvoicesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Use a safe local list to avoid null issues when invoices is absent
+    final data = invoices ?? const <DataField>[];
+
     return Padding(
       padding: const EdgeInsets.symmetric(
           horizontal: Dimensions.space5, vertical: Dimensions.space5),
@@ -56,17 +59,21 @@ class HomeInvoicesCard extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: Dimensions.space15),
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
+                  final invoice = data[index];
+                  final percentValue =
+                      (double.tryParse(invoice.percent ?? '0') ?? 0) / 100;
+
                   return CustomLinerProgress(
-                    name: invoices![index].status?.tr ?? '',
+                    name: invoice.status?.tr ?? '',
                     color: ColorResources.invoiceTextStatusColor(
-                        invoices![index].status.toString()),
-                    value: double.parse(invoices![index].percent!) / 100,
-                    data: invoices![index].total.toString(),
+                        invoice.status?.toString() ?? ''),
+                    value: percentValue,
+                    data: invoice.total?.toString() ?? '0',
                   );
                 },
                 separatorBuilder: (context, index) =>
                     const SizedBox(height: Dimensions.space2),
-                itemCount: invoices!.length),
+                itemCount: data.length),
           ],
         ),
       ),

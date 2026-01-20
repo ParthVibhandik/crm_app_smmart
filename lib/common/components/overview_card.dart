@@ -14,8 +14,8 @@ class OverviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Dimensions.space60,
-      width: Dimensions.space100,
+      height: Dimensions.space100,
+      width: 200,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -40,7 +40,9 @@ class OverviewCard extends StatelessWidget {
           const SizedBox(height: Dimensions.space5),
           Text(
             name,
-            maxLines: 1,
+            maxLines: 2,
+            overflow: TextOverflow.fade,
+            softWrap: true,
             style: regularSmall.copyWith(
                 color: Theme.of(context).textTheme.bodyMedium!.color),
           ),

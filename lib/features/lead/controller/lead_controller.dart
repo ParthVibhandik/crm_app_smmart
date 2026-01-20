@@ -90,15 +90,30 @@ class LeadController extends GetxController {
       source: source,
       status: status,
     );
-    leadsModel = LeadsModel.fromJson(jsonDecode(responseModel.responseJson));
-    if (responseModel.status) {
-      leads.addAll(leadsModel.data ?? []);
-      if ((leadsModel.data?.length ?? 0) < int.parse(UrlContainer.limit)) {
+    final raw = responseModel.responseJson;
+
+    if (raw.isEmpty) {
+      hasMoreData = false;
+      isLoading = false;
+      update();
+      return;
+    }
+
+    try {
+      leadsModel = LeadsModel.fromJson(jsonDecode(raw));
+      if (responseModel.status) {
+        leads.addAll(leadsModel.data ?? []);
+        if ((leadsModel.data?.length ?? 0) < int.parse(UrlContainer.limit)) {
+          hasMoreData = false;
+        }
+      } else {
         hasMoreData = false;
       }
-    } else {
+    } catch (e) {
       hasMoreData = false;
+      CustomSnackBar.error(errorList: [LocalStrings.somethingWentWrong.tr]);
     }
+
     isLoading = false;
     update();
   }
