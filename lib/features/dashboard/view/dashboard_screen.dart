@@ -20,6 +20,11 @@ import 'package:flutex_admin/features/dashboard/widget/drawer.dart';
 import 'package:flutex_admin/features/dashboard/widget/home_estimates_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/home_invoices_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/home_proposals_card.dart';
+import 'package:flutex_admin/features/dashboard/widget/leads_tasks_card.dart';
+import 'package:flutex_admin/features/dashboard/widget/lead_journey_card.dart';
+import 'package:flutex_admin/features/dashboard/widget/goals_card.dart';
+import 'package:flutex_admin/features/dashboard/widget/leads_status_pie_chart.dart';
+import 'package:flutex_admin/features/dashboard/widget/calendar_schedule_card.dart';
 import 'package:flutex_admin/features/attendance/attendance_screen.dart';
 import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
@@ -229,223 +234,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                           const SizedBox(height: Dimensions.space15),
 
-                          /// ATTENDANCE CALENDAR
-                          Card(
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(Dimensions.cardRadius),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  TableCalendar(
-                                    firstDay: DateTime.utc(2020, 1, 1),
-                                    lastDay: DateTime.utc(2030, 12, 31),
-                                    focusedDay: controller.focusedDay,
-                                    currentDay: DateTime.now(),
-                                    selectedDayPredicate: (day) =>
-                                        isSameDay(controller.selectedDay, day),
-                                    calendarFormat: CalendarFormat.month,
-                                    startingDayOfWeek: StartingDayOfWeek.monday,
-                                    headerStyle: const HeaderStyle(
-                                      formatButtonVisible: false,
-                                      titleCentered: true,
-                                    ),
-                                    availableGestures: AvailableGestures.all,
-                                    onDaySelected: controller.onDaySelected,
-                                    onPageChanged: (focusedDay) {
-                                      controller.focusedDay = focusedDay;
-                                    },
-                                    calendarStyle: CalendarStyle(
-                                      selectedDecoration: BoxDecoration(
-                                        color: Theme.of(context).primaryColor,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      todayDecoration: BoxDecoration(
-                                        color: Theme.of(context).primaryColor.withOpacity(0.5),
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                  ),
-                                  if (controller.selectedDay != null || controller.isAttendanceLoading) ...[
-                                    const CustomDivider(),
-                                    const SizedBox(height: 10),
-                                    if (controller.isAttendanceLoading)
-                                      const Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Center(child: CircularProgressIndicator()),
-                                      )
-                                    else
-                                      Column(
-                                        children: [
-                                          Text(
-                                            DateFormat('MMMM d, y').format(controller.selectedDay!),
-                                            style: boldLarge,
-                                          ),
-                                          const SizedBox(height: 15),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                            children: [
-                                              Column(
-                                                children: [
-                                                  Text('Punch In', style: regularDefault.copyWith(color: ColorResources.blueGreyColor)),
-                                                  const SizedBox(height: 5),
-                                                  Text(
-                                                    controller.punchInTime ?? '--:--',
-                                                    style: boldExtraLarge.copyWith(
-                                                      color: Colors.green,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Container(
-                                                height: 40,
-                                                width: 1,
-                                                color: Colors.grey.withOpacity(0.3),
-                                              ),
-                                              Column(
-                                                children: [
-                                                  Text('Punch Out', style: regularDefault.copyWith(color: ColorResources.blueGreyColor)),
-                                                  const SizedBox(height: 5),
-                                                  Text(
-                                                    controller.punchOutTime ?? '--:--',
-                                                    style: boldExtraLarge.copyWith(
-                                                      color: Colors.red,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 10),
-                                        ],
-                                      ),
-                                  ] else
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: Text(
-                                        'Select a date to view attendance details',
-                                        style: regularSmall.copyWith(
-                                          color: ColorResources.blueGreyColor,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
 
+                          /// NEW WIDGETS SECTION
+                          LeadsTasksCard(summary: controller.newStats.leadsTasks),
                           const SizedBox(height: Dimensions.space15),
+                          
+                          LeadJourneyCard(steps: controller.newStats.leadJourney),
+                          const SizedBox(height: Dimensions.space15),
+                          
+                          GoalsCard(goals: controller.newStats.goals),
+                          const SizedBox(height: Dimensions.space15),
+                          
+                          LeadsStatusPieChart(data: controller.newStats.leadStatusPie),
+                          const SizedBox(height: Dimensions.space15),
+                          
+                          const CalendarScheduleCard(),
+                          const SizedBox(height: Dimensions.space20),
 
-                          /// DASHBOARD STATS
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              DashboardCard(
-                                currentValue: controller.homeModel.overview
-                                        ?.invoicesAwaitingPaymentTotal ??
-                                    '0',
-                                totalValue: controller
-                                        .homeModel.overview?.totalInvoices ??
-                                    '0',
-                                percent: controller.homeModel.overview
-                                        ?.invoicesAwaitingPaymentPercent ??
-                                    '0',
-                                icon: Icons.attach_money_rounded,
-                                title: LocalStrings.invoicesAwaitingPayment.tr,
-                              ),
-                              DashboardCard(
-                                currentValue: controller.homeModel.overview
-                                        ?.leadsConvertedTotal ??
-                                    '0',
-                                totalValue:
-                                    controller.homeModel.overview?.totalLeads ??
-                                        '0',
-                                percent: controller.homeModel.overview
-                                        ?.leadsConvertedPercent ??
-                                    '0',
-                                icon: Icons.move_up_rounded,
-                                title: LocalStrings.convertedLeads.tr,
-                              ),
-                            ],
-                          ),
 
-                          Row(
-                            children: [
-                              DashboardCard(
-                                currentValue: controller.homeModel.overview
-                                        ?.notFinishedTasksTotal ??
-                                    '0',
-                                totalValue:
-                                    controller.homeModel.overview?.totalTasks ??
-                                        '0',
-                                percent: controller.homeModel.overview
-                                        ?.notFinishedTasksPercent ??
-                                    '0',
-                                icon: Icons.task_outlined,
-                                title: LocalStrings.notCompleted.tr,
-                              ),
-                              DashboardCard(
-                                currentValue: controller.homeModel.overview
-                                        ?.projectsInProgressTotal ??
-                                    '0',
-                                totalValue: controller
-                                        .homeModel.overview?.totalProjects ??
-                                    '0',
-                                percent: controller.homeModel.overview
-                                        ?.inProgressProjectsPercent ??
-                                    '0',
-                                icon: Icons.dashboard_customize_rounded,
-                                title: LocalStrings.projectsInProgress.tr,
-                              ),
-                            ],
-                          ),
 
-                          /// CAROUSEL (INVOICES / ESTIMATES / PROPOSALS)
-                          if ((controller.homeModel.menuItems?.invoices ??
-                                  false) ||
-                              (controller.homeModel.menuItems?.estimates ??
-                                  false) ||
-                              (controller.homeModel.menuItems?.proposals ??
-                                  false))
-                            Stack(
-                              children: [
-                                CarouselSlider(
-                                  options: CarouselOptions(
-                                    height: 440.0,
-                                    viewportFraction: 1,
-                                    onPageChanged: (index, i) {
-                                      controller.currentPageIndex = index;
-                                      controller.update();
-                                    },
-                                  ),
-                                  items: [
-                                    if (controller
-                                            .homeModel.menuItems?.invoices ??
-                                        false)
-                                      HomeInvoicesCard(
-                                        invoices:
-                                            controller.homeModel.data?.invoices,
-                                      ),
-                                    if (controller
-                                            .homeModel.menuItems?.estimates ??
-                                        false)
-                                      HomeEstimatesCard(
-                                        estimates: controller
-                                            .homeModel.data?.estimates,
-                                      ),
-                                    if (controller
-                                            .homeModel.menuItems?.proposals ??
-                                        false)
-                                      HomeProposalsCard(
-                                        proposals: controller
-                                            .homeModel.data?.proposals,
-                                      ),
-                                  ],
-                                ),
-                              ],
-                            ),
                         ],
                       ),
                     ),

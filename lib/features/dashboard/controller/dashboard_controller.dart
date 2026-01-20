@@ -7,6 +7,7 @@ import 'package:flutex_admin/core/helper/shared_preference_helper.dart';
 import 'package:flutex_admin/core/route/route.dart';
 import 'package:flutex_admin/common/models/response_model.dart';
 import 'package:flutex_admin/features/dashboard/model/dashboard_model.dart';
+import 'package:flutex_admin/features/dashboard/model/dashboard_stats_model.dart';
 import 'package:flutex_admin/features/dashboard/repo/dashboard_repo.dart';
 import 'package:get/get.dart';
 
@@ -18,13 +19,16 @@ class DashboardController extends GetxController {
   bool logoutLoading = false;
   int currentPageIndex = 0;
   DashboardModel homeModel = DashboardModel();
+  DashboardNewStats newStats = DashboardNewStats.empty();
 
   // Calendar State
   DateTime focusedDay = DateTime.now();
   DateTime? selectedDay;
   bool isAttendanceLoading = false;
+
   String? punchInTime;
   String? punchOutTime;
+  List<CalendarAppointment> selectedDayAppointments = [];
 
   void onDaySelected(DateTime selected, DateTime focused) {
     if (!isSameDay(selectedDay, selected)) {
@@ -69,6 +73,11 @@ class DashboardController extends GetxController {
     }
 
     isAttendanceLoading = false;
+    // Mock appointments for the selected date
+    selectedDayAppointments = [
+      CalendarAppointment(time: '10:00 AM', title: 'Meeting', client: 'Client A'),
+      CalendarAppointment(time: '02:30 PM', title: 'Site Visit', client: 'Client B'),
+    ];
     update();
   }
 
@@ -91,7 +100,34 @@ class DashboardController extends GetxController {
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
     isLoading = false;
+    _generateMockData();
     update();
+  }
+
+  void _generateMockData() {
+    newStats = DashboardNewStats(
+      leadsTasks: LeadsTasksSummary(
+          todayLeads: 5, pendingLeads: 12, todayTasks: 3, pendingTasks: 8),
+      leadJourney: [
+        LeadJourneyStep(step: 1, label: 'Hot Lead', count: 10),
+        LeadJourneyStep(step: 2, label: 'Warm Lead', count: 5),
+        LeadJourneyStep(step: 3, label: 'Not Interested', count: 3),
+        LeadJourneyStep(step: 4, label: 'Not Reachable', count: 2),
+        LeadJourneyStep(step: 5, label: 'Follow Up', count: 1),
+      ],
+      goals: [
+        GoalTarget(period: 'Today', target: 5000, achieved: 1200),
+        GoalTarget(period: 'Month', target: 150000, achieved: 85000),
+        GoalTarget(period: 'Year', target: 2000000, achieved: 450000),
+      ],
+      leadStatusPie: {
+        'Hot Lead': 10,
+        'Warm Lead': 5,
+        'Not Interested': 3,
+        'Not Reachable': 2,
+        'Follow Up': 1,
+      },
+    );
   }
 
   Future<void> logout() async {
