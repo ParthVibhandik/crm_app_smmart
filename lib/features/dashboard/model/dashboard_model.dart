@@ -4,6 +4,7 @@ class DashboardModel {
   DashboardModel({
     bool? status,
     String? message,
+    Goals? goals,
     Overview? overview,
     Data? data,
     Staff? staff,
@@ -15,11 +16,13 @@ class DashboardModel {
     _data = data;
     _staff = staff;
     _menuItems = menuItems;
+    _goals = goals;
   }
 
   DashboardModel.fromJson(dynamic json) {
     _status = json['status'];
     _message = json['message'];
+    _goals = json['goals'] != null ? Goals.fromJson(json['goals']) : null;
     _overview =
         json['overview'] != null ? Overview.fromJson(json['overview']) : null;
     _data = json['data'] != null ? Data.fromJson(json['data']) : null;
@@ -30,6 +33,7 @@ class DashboardModel {
   }
   bool? _status;
   String? _message;
+  Goals? _goals;
   Overview? _overview;
   Data? _data;
   Staff? _staff;
@@ -37,6 +41,7 @@ class DashboardModel {
 
   bool? get status => _status;
   String? get message => _message;
+  Goals? get goals => _goals;
   Overview? get overview => _overview;
   Data? get data => _data;
   Staff? get staff => _staff;
@@ -58,6 +63,177 @@ class DashboardModel {
     if (_menuItems != null) {
       map['menu_items'] = _menuItems?.toJson();
     }
+    if (_goals != null) {
+      map['goals'] = _goals?.toJson();
+    }
+    return map;
+  }
+}
+
+class Goals {
+  Goals({
+    List<Goal>? selfGoals,
+    List<Goal>? assignedGoals,
+    List<Goal>? subordinatesGoals,
+  }) {
+    _selfGoals = selfGoals;
+    _assignedGoals = assignedGoals;
+    _subordinatesGoals = subordinatesGoals;
+  }
+
+  Goals.fromJson(dynamic json) {
+    if (json['self_goals'] != null) {
+      _selfGoals = [];
+      json['self_goals'].forEach((v) {
+        _selfGoals?.add(Goal.fromJson(v));
+      });
+    }
+    if (json['assigned_goals'] != null) {
+      _assignedGoals = [];
+      json['assigned_goals'].forEach((v) {
+        _assignedGoals?.add(Goal.fromJson(v));
+      });
+    }
+    if (json['subordinates_goals'] != null) {
+      _subordinatesGoals = [];
+      json['subordinates_goals'].forEach((v) {
+        _subordinatesGoals?.add(Goal.fromJson(v));
+      });
+    }
+  }
+
+  List<Goal>? _selfGoals;
+  List<Goal>? _assignedGoals;
+  List<Goal>? _subordinatesGoals;
+
+  List<Goal>? get selfGoals => _selfGoals;
+  List<Goal>? get assignedGoals => _assignedGoals;
+  List<Goal>? get subordinatesGoals => _subordinatesGoals;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    if (_selfGoals != null) {
+      map['self_goals'] = _selfGoals?.map((v) => v.toJson()).toList();
+    }
+    if (_assignedGoals != null) {
+      map['assigned_goals'] = _assignedGoals?.map((v) => v.toJson()).toList();
+    }
+    if (_subordinatesGoals != null) {
+      map['subordinates_goals'] =
+          _subordinatesGoals?.map((v) => v.toJson()).toList();
+    }
+    return map;
+  }
+}
+
+class Goal {
+  Goal({
+    String? id,
+    String? subject,
+    String? description,
+    String? startDate,
+    String? endDate,
+    String? goalType,
+    String? achievement,
+    String? staffId,
+    String? contractType,
+    String? notifyWhenFail,
+    String? notifyWhenAchieve,
+    String? notified,
+    String? addedFrom,
+    String? type,
+    String? staffFirstname,
+    String? staffLastname,
+  }) {
+    _id = id;
+    _subject = subject;
+    _description = description;
+    _startDate = startDate;
+    _endDate = endDate;
+    _goalType = goalType;
+    _achievement = achievement;
+    _staffId = staffId;
+    _contractType = contractType;
+    _notifyWhenFail = notifyWhenFail;
+    _notifyWhenAchieve = notifyWhenAchieve;
+    _notified = notified;
+    _addedFrom = addedFrom;
+    _type = type;
+    _staffFirstname = staffFirstname;
+    _staffLastname = staffLastname;
+  }
+
+  Goal.fromJson(dynamic json) {
+    _id = json['id'];
+    _subject = json['subject'];
+    _description = json['description'];
+    _startDate = json['start_date'];
+    _endDate = json['end_date'];
+    _goalType = json['goal_type'];
+    _achievement = json['achievement'];
+    _staffId = json['staff_id'];
+    _contractType = json['contract_type'];
+    _notifyWhenFail = json['notify_when_fail'];
+    _notifyWhenAchieve = json['notify_when_achieve'];
+    _notified = json['notified'];
+    _addedFrom = json['added_from'];
+    _type = json['type'];
+    _staffFirstname = json['staff_firstname'];
+    _staffLastname = json['staff_lastname'];
+  }
+
+  String? _id;
+  String? _subject;
+  String? _description;
+  String? _startDate;
+  String? _endDate;
+  String? _goalType;
+  String? _achievement;
+  String? _staffId;
+  String? _contractType;
+  String? _notifyWhenFail;
+  String? _notifyWhenAchieve;
+  String? _notified;
+  String? _addedFrom;
+  String? _type;
+  String? _staffFirstname;
+  String? _staffLastname;
+
+  String? get id => _id;
+  String? get subject => _subject;
+  String? get description => _description;
+  String? get startDate => _startDate;
+  String? get endDate => _endDate;
+  String? get goalType => _goalType;
+  String? get achievement => _achievement;
+  String? get staffId => _staffId;
+  String? get contractType => _contractType;
+  String? get notifyWhenFail => _notifyWhenFail;
+  String? get notifyWhenAchieve => _notifyWhenAchieve;
+  String? get notified => _notified;
+  String? get addedFrom => _addedFrom;
+  String? get type => _type;
+  String? get staffFirstname => _staffFirstname;
+  String? get staffLastname => _staffLastname;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['id'] = _id;
+    map['subject'] = _subject;
+    map['description'] = _description;
+    map['start_date'] = _startDate;
+    map['end_date'] = _endDate;
+    map['goal_type'] = _goalType;
+    map['achievement'] = _achievement;
+    map['staff_id'] = _staffId;
+    map['contract_type'] = _contractType;
+    map['notify_when_fail'] = _notifyWhenFail;
+    map['notify_when_achieve'] = _notifyWhenAchieve;
+    map['notified'] = _notified;
+    map['added_from'] = _addedFrom;
+    map['type'] = _type;
+    map['staff_firstname'] = _staffFirstname;
+    map['staff_lastname'] = _staffLastname;
     return map;
   }
 }

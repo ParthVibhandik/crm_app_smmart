@@ -130,6 +130,33 @@ class DashboardController extends GetxController {
     );
   }
 
+  // Goals Card State
+  String selectedGoalMainTab = 'my'; // 'my' or staff_id
+  String selectedGoalSubTab = 'assigned';
+  String selectedGoalDateFilter = 'all'; // 'all', 'mtd', 'ytd', 'custom'
+
+  void changeGoalMainTab(String tab) {
+    selectedGoalMainTab = tab;
+    // Reset sub-tab based on main tab selection logic
+    if (tab == 'my') {
+      selectedGoalSubTab = 'assigned';
+    } else {
+      // Logic for subordinate tabs if any
+      selectedGoalSubTab = 'subordinate_goals'; 
+    }
+    update();
+  }
+
+  void changeGoalSubTab(String tab) {
+    selectedGoalSubTab = tab;
+    update();
+  }
+  
+  void changeGoalDateFilter(String filter) {
+    selectedGoalDateFilter = filter;
+    update();
+  }
+
   Future<void> logout() async {
     logoutLoading = true;
     update();

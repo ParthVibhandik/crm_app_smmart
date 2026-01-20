@@ -236,13 +236,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 
                           /// NEW WIDGETS SECTION
+                          GoalsCard(controller: controller),
+                          const SizedBox(height: Dimensions.space15),
+
                           LeadsTasksCard(summary: controller.newStats.leadsTasks),
                           const SizedBox(height: Dimensions.space15),
                           
                           LeadJourneyCard(steps: controller.newStats.leadJourney),
-                          const SizedBox(height: Dimensions.space15),
-                          
-                          GoalsCard(goals: controller.newStats.goals),
                           const SizedBox(height: Dimensions.space15),
                           
                           LeadsStatusPieChart(data: controller.newStats.leadStatusPie),
