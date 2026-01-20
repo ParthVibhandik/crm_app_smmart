@@ -78,8 +78,8 @@ class LeadCard extends StatelessWidget {
                                   if (lead.phoneNumber != null &&
                                       lead.phoneNumber!.isNotEmpty)
                                     IconButton(
-                                      onPressed: () =>
-                                          UrlLauncherHelper.call(lead.phoneNumber),
+                                      onPressed: () => UrlLauncherHelper.call(
+                                          lead.phoneNumber),
                                       icon: const Icon(Icons.call,
                                           size: 20,
                                           color: ColorResources.primaryColor),
@@ -101,7 +101,8 @@ class LeadCard extends StatelessWidget {
                                 ],
                               ),
                               ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 160),
+                                constraints:
+                                    const BoxConstraints(maxWidth: 160),
                                 child: Text(
                                   lead.sourceName ?? '-',
                                   style: lightSmall,

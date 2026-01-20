@@ -47,7 +47,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Future<void> punchIn() async {
     setState(() => loading = true);
     try {
-      await service.punchIn();
+      await service.punchIn(context);
       await loadStatus();
     } catch (e) {
       setState(() => loading = false);

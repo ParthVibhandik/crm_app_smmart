@@ -12,7 +12,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutex_admin/core/helper/shared_preference_helper.dart';
-import 'package:flutex_admin/core/helper/header_helper.dart';
 import 'package:flutex_admin/core/utils/url_container.dart';
 
 class NotificationService {
@@ -260,17 +259,17 @@ class NotificationService {
           'device': Platform.isAndroid ? 'android' : 'ios',
         });
 
-        final headers = await HeaderHelper.getAuthHeaders(accessToken);
-
         debugPrint('====> Send Token URL: $url');
         debugPrint('====> Send Token Body: $body');
         debugPrint('====> Access token (masked): $maskedAccess');
         debugPrint('====> FCM token (masked): $maskedFcm');
-        HeaderHelper.logHeaders(headers);
 
         final response = await http.post(
           Uri.parse(url),
-          headers: headers,
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+            'Content-Type': 'application/json',
+          },
           body: body,
         );
         debugPrint('====> Send Token Status: ${response.statusCode}');

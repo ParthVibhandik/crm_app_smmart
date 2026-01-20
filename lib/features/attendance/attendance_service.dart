@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -91,7 +92,7 @@ class AttendanceService {
   /// ==============================
   /// PUNCH IN
   /// ==============================
-  Future<void> punchIn() async {
+  Future<void> punchIn(BuildContext context) async {
     // 1️⃣ Biometric
     final biometricAvailable = await _biometric.isBiometricAvailable();
     if (biometricAvailable) {
@@ -104,7 +105,10 @@ class AttendanceService {
     }
 
     // 2️⃣ Selfie
-    final XFile? photo = await _camera.takeSelfie(maxWidth: 600);
+    final XFile? photo = await _camera.takeSelfie(
+      context: context,
+      imageQuality: 80,
+    );
 
     if (photo == null) {
       throw Exception('Selfie is required to punch in');
