@@ -2,116 +2,332 @@ import 'package:flutter/material.dart';
 import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/core/utils/color_resources.dart';
-import 'package:flutex_admin/features/dashboard/model/dashboard_stats_model.dart';
+import 'package:flutex_admin/features/dashboard/controller/dashboard_controller.dart';
+import 'package:flutex_admin/features/dashboard/model/dashboard_model.dart';
 import 'package:get/get.dart';
-import 'package:flutex_admin/core/route/route.dart'; // Import for navigation
 
-class LeadsTasksCard extends StatefulWidget {
-  final LeadsTasksSummary summary;
-  const LeadsTasksCard({super.key, required this.summary});
-
-  @override
-  State<LeadsTasksCard> createState() => _LeadsTasksCardState();
-}
-
-class _LeadsTasksCardState extends State<LeadsTasksCard> {
-  bool isToday = true;
+class LeadsTasksCard extends StatelessWidget {
+  final DashboardController controller;
+  const LeadsTasksCard({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.cardRadius)),
-      child: Padding(
-        padding: const EdgeInsets.all(Dimensions.space15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return GetBuilder<DashboardController>(
+      builder: (controller) {
+        // Extract unique subordinates from goals
+        List<Goal> allSubGoals = controller.homeModel.goals?.subordinatesGoals ?? [];
+        Set<String> subIds = {};
+        List<Goal> uniqueSubordinates = [];
+        
+        for(var g in allSubGoals) {
+          if(g.staffId != null && !subIds.contains(g.staffId)) {
+            subIds.add(g.staffId!);
+            uniqueSubordinates.add(g);
+          }
+        }
+
+        return Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(Dimensions.cardRadius),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(Dimensions.space15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Leads & Tasks', style: regularLarge.copyWith(fontWeight: FontWeight.bold)),
+                // Header with Category Toggle
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildTab('Today', true),
-                    const SizedBox(width: 8),
-                    _buildTab('Pending', false),
+                    Text(
+                      'Leads & Tasks',
+                      style: regularLarge.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    Row(
+                      children: [
+                        _buildCategoryButton(controller, 'leads', 'Leads'),
+                        const SizedBox(width: 8),
+                        _buildCategoryButton(controller, 'tasks', 'Tasks'),
+                      ],
+                    )
                   ],
-                )
+                ),
+                const SizedBox(height: Dimensions.space15),
+
+                // Main Tabs (My / Subordinates)
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                       _buildMainTabButton(
+                         'My', 
+                         controller.selectedLeadsMainTab == 'my',
+                         () => controller.changeLeadsMainTab('my')
+                       ),
+                       if(uniqueSubordinates.isNotEmpty)
+                         ...uniqueSubordinates.map((sub) {
+                           String name = sub.staffFirstname ?? sub.staffLastname ?? 'Staff ${sub.staffId}';
+                           bool isSelected = controller.selectedLeadsMainTab == sub.staffId;
+                           return Padding(
+                             padding: const EdgeInsets.only(left: 10),
+                             child: _buildMainTabButton(
+                               name, 
+                               isSelected,
+                               () => controller.changeLeadsMainTab(sub.staffId!)
+                             ),
+                           );
+                         }),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                // Sub Tabs (Today / Pending) - ONLY FOR LEADS
+                if (controller.selectedLeadsCategory == 'leads') ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildSubTabButton(
+                          'Today (${_getTabCount(controller, 'today')})',
+                          controller.selectedLeadsSubTab == 'today',
+                          () => controller.changeLeadsSubTab('today'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                         child: _buildSubTabButton(
+                          'Pending (${_getTabCount(controller, 'pending')})',
+                          controller.selectedLeadsSubTab == 'pending',
+                          () => controller.changeLeadsSubTab('pending'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                ],
+
+                // Content List
+                _buildContentList(controller),
               ],
             ),
-            const SizedBox(height: Dimensions.space20),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatItem(
-                    isToday ? 'Today Leads' : 'Pending Leads', // Dynamic label
-                    isToday ? widget.summary.todayLeads : widget.summary.pendingLeads,
-                    Colors.blue,
-                    () => Get.toNamed(RouteHelper.leadScreen), // Navigation
-                  ),
-                ),
-                Expanded(
-                  child: _buildStatItem(
-                    isToday ? 'Today Tasks' : 'Pending Tasks', // Dynamic label
-                    isToday ? widget.summary.todayTasks : widget.summary.pendingTasks,
-                    Colors.orange,
-                    () => Get.toNamed(RouteHelper.taskScreen), // Navigation
-                  ),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
+          ),
+        );
+      }
     );
   }
 
-  Widget _buildTab(String title, bool today) {
-    bool selected = isToday == today;
+  Widget _buildCategoryButton(DashboardController controller, String value, String label) {
+    bool isSelected = controller.selectedLeadsCategory == value;
     return InkWell(
-      onTap: () {
-        setState(() {
-          isToday = today;
-        });
-      },
+      onTap: () => controller.changeLeadsCategory(value),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: selected ? ColorResources.primaryColor : Colors.grey[200],
-          borderRadius: BorderRadius.circular(20),
+          color: isSelected ? ColorResources.primaryColor : Colors.white,
+          border: Border.all(color: ColorResources.primaryColor),
+          borderRadius: BorderRadius.circular(15),
         ),
         child: Text(
-          title,
-          style: regularSmall.copyWith(
-            color: selected ? Colors.white : Colors.black,
-            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+          label,
+          style: regularDefault.copyWith(
+            color: isSelected ? Colors.white : ColorResources.primaryColor,
+            fontSize: 12,
+            fontWeight: FontWeight.bold
           ),
         ),
       ),
     );
   }
 
-  Widget _buildStatItem(String title, int count, Color color, VoidCallback onTap) {
+  Widget _buildMainTabButton(String text, bool isSelected, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: const EdgeInsets.all(12),
-        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.3)),
+          color: isSelected ? ColorResources.primaryColor : Colors.grey[200],
+          borderRadius: BorderRadius.circular(20),
         ),
-        child: Column(
-          children: [
-            Text(count.toString(), style: boldExtraLarge.copyWith(color: color)),
-            const SizedBox(height: 4),
-            Text(title, style: regularSmall.copyWith(color: Colors.grey[700]), textAlign: TextAlign.center),
-          ],
+        alignment: Alignment.center,
+        child: Text(
+          text,
+          style: regularDefault.copyWith(
+            color: isSelected ? Colors.white : Colors.black87,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal
+          ),
         ),
       ),
     );
+  }
+
+  Widget _buildSubTabButton(String text, bool isSelected, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? ColorResources.primaryColor.withOpacity(0.1)
+              : Colors.grey[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? ColorResources.primaryColor : (Colors.grey[300] ?? Colors.grey)
+          ),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          text,
+          style: regularDefault.copyWith(
+            color: isSelected ? ColorResources.primaryColor : Colors.black87,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContentList(DashboardController controller) {
+    List<LeadTaskItem> items = [];
+    LeadsTasks? data = controller.homeModel.leadsTasks;
+
+    if (data == null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text("No data found.", style: regularDefault),
+        ),
+      );
+    }
+    
+    // LEADS LOGIC
+    if (controller.selectedLeadsCategory == 'leads') {
+      if (controller.selectedLeadsMainTab == 'my') {
+        if (controller.selectedLeadsSubTab == 'today') {
+          items = data.todaySelf ?? [];
+        } else {
+          items = data.pendingSelf ?? [];
+        }
+      } else {
+        // Subordinates Logic
+        String staffId = controller.selectedLeadsMainTab;
+        Goal? sub = controller.homeModel.goals?.subordinatesGoals?.firstWhereOrNull((g) => g.staffId == staffId);
+        
+        if(sub != null) {
+           String firstName = sub.staffFirstname ?? '';
+           String lastName = sub.staffLastname ?? '';
+           String keyName = "$firstName $lastName".trim();
+
+           if (controller.selectedLeadsSubTab == 'today') {
+              items = data.todaySubords?[keyName] ?? [];
+           } else {
+              items = data.pendingSubords?[keyName] ?? [];
+           }
+        }
+      }
+    } 
+    // TASKS LOGIC
+    else {
+      if (controller.selectedLeadsMainTab == 'my') {
+        items = data.selfTasks ?? [];
+      } else {
+         String staffId = controller.selectedLeadsMainTab;
+         Goal? sub = controller.homeModel.goals?.subordinatesGoals?.firstWhereOrNull((g) => g.staffId == staffId);
+         if(sub != null) {
+            String firstName = sub.staffFirstname ?? '';
+            String lastName = sub.staffLastname ?? '';
+            String keyName = "$firstName $lastName".trim();
+            items = data.subordinatesTasks?[keyName] ?? [];
+         }
+      }
+    }
+
+    if (items.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text("No items found for ${controller.selectedLeadsCategory}.", style: regularDefault),
+        ),
+      );
+    }
+
+    return Column(
+      children: items.map((item) => _buildListItem(item)).toList(),
+    );
+  }
+
+  Widget _buildListItem(LeadTaskItem item) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                item.name ?? item.subject ?? 'No Name',
+                style: regularDefault.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          if (item.title != null && item.title!.isNotEmpty)
+            Text(
+              item.title!,
+              style: regularSmall.copyWith(color: Colors.black87),
+            ),
+          if (item.company != null && item.company!.isNotEmpty)
+             Text(
+              item.company!,
+              style: regularSmall.copyWith(color: Colors.grey[600]),
+            ),
+          if (item.description != null && item.description!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              item.description!,
+              style: regularSmall.copyWith(color: Colors.grey[500]),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ]
+        ],
+      ),
+    );
+  }
+
+  int _getTabCount(DashboardController controller, String type) {
+    LeadsTasks? data = controller.homeModel.leadsTasks;
+    if (data == null) return 0;
+    
+    // Only strictly relevant for Leads category where tabs exist
+    if (controller.selectedLeadsMainTab == 'my') {
+      if (type == 'today') return data.todaySelf?.length ?? 0;
+      if (type == 'pending') return data.pendingSelf?.length ?? 0;
+    } else {
+      String staffId = controller.selectedLeadsMainTab;
+      Goal? sub = controller.homeModel.goals?.subordinatesGoals?.firstWhereOrNull((g) => g.staffId == staffId);
+      if(sub != null) {
+         String keyName = "${sub.staffFirstname ?? ''} ${sub.staffLastname ?? ''}".trim();
+         if (type == 'today') return data.todaySubords?[keyName]?.length ?? 0;
+         if (type == 'pending') return data.pendingSubords?[keyName]?.length ?? 0;
+      }
+    }
+    return 0;
   }
 }

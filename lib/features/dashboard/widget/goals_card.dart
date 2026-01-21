@@ -46,9 +46,31 @@ class GoalsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
-            Text(
-              'Goals',
-              style: regularLarge.copyWith(fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Goals',
+                  style: regularLarge.copyWith(fontWeight: FontWeight.bold),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                       _buildFilterTab('All', 'all', controller),
+                       _buildFilterTab('MTD', 'mtd', controller),
+                       _buildFilterTab('YTD', 'ytd', controller),
+                       _buildFilterTab('Custom', 'custom', controller),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: Dimensions.space15),
 
@@ -80,23 +102,7 @@ class GoalsCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-             // Row 2: Date Filters Navbar
-             Container(
-               padding: const EdgeInsets.all(2),
-               decoration: BoxDecoration(
-                 color: Colors.grey[100],
-                 borderRadius: BorderRadius.circular(8),
-               ),
-               child: Row(
-                 mainAxisSize: MainAxisSize.min,
-                 children: [
-                    _buildFilterTab('All', 'all', controller),
-                    _buildFilterTab('MTD', 'mtd', controller),
-                    _buildFilterTab('YTD', 'ytd', controller),
-                    _buildFilterTab('Custom', 'custom', controller),
-                 ],
-               ),
-             ),
+
              const SizedBox(height: 10),
 
             // Row 3: Conditional Sub-tabs (Only for "My")

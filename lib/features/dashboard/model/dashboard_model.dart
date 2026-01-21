@@ -9,14 +9,16 @@ class DashboardModel {
     Data? data,
     Staff? staff,
     MenuItems? menuItems,
+    LeadsTasks? leadsTasks,
   }) {
     _status = status;
     _message = message;
+    _goals = goals;
     _overview = overview;
     _data = data;
     _staff = staff;
     _menuItems = menuItems;
-    _goals = goals;
+    _leadsTasks = leadsTasks;
   }
 
   DashboardModel.fromJson(dynamic json) {
@@ -30,6 +32,45 @@ class DashboardModel {
     _menuItems = json['menu_items'] != null
         ? MenuItems.fromJson(json['menu_items'])
         : null;
+    
+    // Logic for leads_tasks
+    if (json['leads_tasks'] != null) {
+      _leadsTasks = LeadsTasks.fromJson(json['leads_tasks']);
+    } else if (json['data'] != null && json['data']['leads_tasks'] != null) {
+      _leadsTasks = LeadsTasks.fromJson(json['data']['leads_tasks']);
+    }
+
+    // Capture tasks from separate 'tasks' key if present
+    var tasksData = json['tasks'];
+    if (tasksData == null && json['data'] != null) {
+      tasksData = json['data']['tasks'];
+    }
+
+    if (tasksData != null) {
+      // Ensure _leadsTasks is initialized
+      _leadsTasks ??= LeadsTasks();
+
+      // Check self_tasks
+      if (tasksData['self_tasks'] != null) {
+        _leadsTasks!.selfTasks = [];
+        if (tasksData['self_tasks'] is List) {
+          tasksData['self_tasks'].forEach((v) => _leadsTasks!.selfTasks!.add(LeadTaskItem.fromJson(v)));
+        }
+      }
+      
+      // Check subordinates_tasks (or subordinate_tasks/subordinate_goals variants)
+      // User said "subordinate_tasks", checking plural too just in case
+      var subTasks = tasksData['subordinate_tasks'] ?? tasksData['subordinates_tasks'];
+      
+      if (subTasks != null && subTasks is Map) {
+        _leadsTasks!.subordinatesTasks = {};
+        subTasks.forEach((key, value) {
+          if (value is List) {
+            _leadsTasks!.subordinatesTasks![key] = value.map((v) => LeadTaskItem.fromJson(v)).toList();
+          }
+        });
+      }
+    }
   }
   bool? _status;
   String? _message;
@@ -38,6 +79,7 @@ class DashboardModel {
   Data? _data;
   Staff? _staff;
   MenuItems? _menuItems;
+  LeadsTasks? _leadsTasks;
 
   bool? get status => _status;
   String? get message => _message;
@@ -46,6 +88,7 @@ class DashboardModel {
   Data? get data => _data;
   Staff? get staff => _staff;
   MenuItems? get menuItems => _menuItems;
+  LeadsTasks? get leadsTasks => _leadsTasks;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -66,7 +109,104 @@ class DashboardModel {
     if (_goals != null) {
       map['goals'] = _goals?.toJson();
     }
+    if (_leadsTasks != null) {
+      map['leads_tasks'] = _leadsTasks?.toJson();
+    }
     return map;
+  }
+}
+
+class LeadsTasks {
+  List<LeadTaskItem>? todaySelf;
+  List<LeadTaskItem>? pendingSelf;
+  Map<String, List<LeadTaskItem>>? todaySubords;
+  Map<String, List<LeadTaskItem>>? pendingSubords;
+  // Tasks
+  List<LeadTaskItem>? selfTasks;
+  Map<String, List<LeadTaskItem>>? subordinatesTasks;
+
+  LeadsTasks({
+    this.todaySelf,
+    this.pendingSelf,
+    this.todaySubords,
+    this.pendingSubords,
+    this.selfTasks,
+    this.subordinatesTasks,
+  });
+
+  LeadsTasks.fromJson(Map<String, dynamic> json) {
+    // leads
+    if (json['today_self'] != null) {
+      todaySelf = [];
+      if (json['today_self'] is List) {
+        json['today_self'].forEach((v) => todaySelf!.add(LeadTaskItem.fromJson(v)));
+      }
+    }
+    if (json['pending_self'] != null) {
+      pendingSelf = [];
+      if (json['pending_self'] is List) {
+        json['pending_self'].forEach((v) => pendingSelf!.add(LeadTaskItem.fromJson(v)));
+      }
+    }
+    // subord leads - dynamic keys (staff names)
+    if (json['today_subords'] != null && json['today_subords'] is Map) {
+      todaySubords = {};
+      json['today_subords'].forEach((key, value) {
+        if (value is List) {
+          todaySubords![key] = value.map((v) => LeadTaskItem.fromJson(v)).toList();
+        }
+      });
+    }
+    if (json['pending_subords'] != null && json['pending_subords'] is Map) {
+      pendingSubords = {};
+      json['pending_subords'].forEach((key, value) {
+        if (value is List) {
+          pendingSubords![key] = value.map((v) => LeadTaskItem.fromJson(v)).toList();
+        }
+      });
+    }
+
+    // tasks
+    // Check for "self_tasks" OR "tasks_self" or similar variants if strictly not found
+    if (json['self_tasks'] != null) {
+      selfTasks = [];
+      if (json['self_tasks'] is List) {
+        json['self_tasks'].forEach((v) => selfTasks!.add(LeadTaskItem.fromJson(v)));
+      }
+    } else if (json['tasks_self'] != null) { // Fallback check
+       selfTasks = [];
+       if (json['tasks_self'] is List) {
+         json['tasks_self'].forEach((v) => selfTasks!.add(LeadTaskItem.fromJson(v)));
+       }
+    }
+
+    if (json['subordinates_tasks'] != null && json['subordinates_tasks'] is Map) {
+      subordinatesTasks = {};
+      json['subordinates_tasks'].forEach((key, value) {
+        if (value is List) {
+          subordinatesTasks![key] = value.map((v) => LeadTaskItem.fromJson(v)).toList();
+        }
+      });
+    } else if (json['tasks_subords'] != null && json['tasks_subords'] is Map) { // Fallback
+       subordinatesTasks = {};
+       json['tasks_subords'].forEach((key, value) {
+         if (value is List) {
+           subordinatesTasks![key] = value.map((v) => LeadTaskItem.fromJson(v)).toList();
+         }
+       });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (todaySelf != null) {
+      data['today_self'] = todaySelf!.map((v) => v.toJson()).toList();
+    }
+    if (pendingSelf != null) {
+      data['pending_self'] = pendingSelf!.map((v) => v.toJson()).toList();
+    }
+    // Subords and others can be added if needed for serialization, mostly read-only
+    return data;
   }
 }
 
@@ -710,3 +850,54 @@ class CustomerSummery {
     return map;
   }
 }
+
+class LeadTaskItem {
+  String? id;
+  String? hash;
+  String? name;
+  String? subject;
+  String? title;
+  String? company;
+  String? companyIndustry;
+  String? description;
+  String? country;
+
+  LeadTaskItem({
+    this.id,
+    this.hash,
+    this.name,
+    this.subject,
+    this.title,
+    this.company,
+    this.companyIndustry,
+    this.description,
+    this.country,
+  });
+
+  LeadTaskItem.fromJson(Map<String, dynamic> json) {
+    id = json['id']?.toString();
+    hash = json['hash'];
+    name = json['name'];
+    subject = json['subject'];
+    title = json['title'];
+    company = json['company'];
+    companyIndustry = json['company_industry'];
+    description = json['description'];
+    country = json['country'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['hash'] = hash;
+    data['name'] = name;
+    data['subject'] = subject;
+    data['title'] = title;
+    data['company'] = company;
+    data['company_industry'] = companyIndustry;
+    data['description'] = description;
+    data['country'] = country;
+    return data;
+  }
+}
+

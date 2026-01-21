@@ -93,9 +93,12 @@ class DashboardController extends GetxController {
   Future<dynamic> loadData() async {
     ResponseModel responseModel = await dashboardRepo.getData();
     if (responseModel.status) {
-      homeModel = DashboardModel.fromJson(
-        jsonDecode(responseModel.responseJson),
-      );
+      try {
+        var decoded = jsonDecode(responseModel.responseJson);
+        homeModel = DashboardModel.fromJson(decoded);
+      } catch (e) {
+        CustomSnackBar.error(errorList: ["Data parsing error: $e"]);
+      }
     } else {
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
@@ -154,6 +157,26 @@ class DashboardController extends GetxController {
   
   void changeGoalDateFilter(String filter) {
     selectedGoalDateFilter = filter;
+    update();
+  }
+
+  // Leads & Tasks Card State
+  String selectedLeadsCategory = 'leads'; // 'leads' or 'tasks'
+  String selectedLeadsMainTab = 'my';
+  String selectedLeadsSubTab = 'today'; // 'today' or 'pending'
+
+  void changeLeadsCategory(String category) {
+    selectedLeadsCategory = category;
+    update();
+  }
+
+  void changeLeadsMainTab(String tab) {
+    selectedLeadsMainTab = tab;
+    update();
+  }
+
+  void changeLeadsSubTab(String tab) {
+    selectedLeadsSubTab = tab;
     update();
   }
 

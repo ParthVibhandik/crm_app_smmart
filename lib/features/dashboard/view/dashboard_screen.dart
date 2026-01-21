@@ -239,7 +239,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           GoalsCard(controller: controller),
                           const SizedBox(height: Dimensions.space15),
 
-                          LeadsTasksCard(summary: controller.newStats.leadsTasks),
+                          LeadsTasksCard(controller: controller),
                           const SizedBox(height: Dimensions.space15),
                           
                           LeadJourneyCard(steps: controller.newStats.leadJourney),
