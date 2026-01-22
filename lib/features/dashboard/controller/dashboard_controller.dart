@@ -14,7 +14,9 @@ import 'package:get/get.dart';
 class DashboardSubordinate {
   final String id;
   final String name;
-  DashboardSubordinate({required this.id, required this.name});
+  final bool hasData; // Whether this subordinate has any goals, leads, or tasks
+  DashboardSubordinate(
+      {required this.id, required this.name, this.hasData = false});
 
   @override
   bool operator ==(Object other) =>
@@ -32,8 +34,9 @@ class DashboardController extends GetxController {
   void _extractUnifiedSubordinates() {
     unifiedSubordinates = [];
     Map<String, String> idToName = {};
+    Set<String> idsWithData = {}; // Track which IDs have actual data
 
-    // 1. From Goals
+    // 1. From Goals (subordinatesGoals) - Build ID to Name mapping
     if (homeModel.goals?.subordinatesGoals != null) {
       for (var goal in homeModel.goals!.subordinatesGoals!) {
         if (goal.staffId != null) {
@@ -41,43 +44,92 @@ class DashboardController extends GetxController {
               "${goal.staffFirstname ?? ''} ${goal.staffLastname ?? ''}".trim();
           if (name.isEmpty) name = "Staff ${goal.staffId}";
           idToName[goal.staffId!] = name;
+          idsWithData.add(goal.staffId!); // Has goals
         }
       }
     }
 
-    // 2. From LeadsTasks (today_subords & pending_subords)
-    // The keys are NAMES. We need to find IDs from items if possible, or mapping.
-    // Items in the list have 'assigned' field which is Staff ID.
+    // 2. From LeadsTasks - Extract ALL subordinate names (even with empty arrays)
     LeadsTasks? tasks = homeModel.leadsTasks;
     if (tasks != null) {
-      void scanMap(Map<String, List<LeadTaskItem>>? map) {
+      // Helper to scan maps and extract IDs from items OR match names with existing IDs
+      void scanMap(
+          Map<String, List<LeadTaskItem>>? map, bool markAsHavingData) {
         if (map == null) return;
         map.forEach((name, items) {
+          // First check if this name already exists in idToName
+          bool nameAlreadyExists = false;
+          String? existingId;
+          for (var entry in idToName.entries) {
+            if (entry.value == name) {
+              nameAlreadyExists = true;
+              existingId = entry.key;
+              break;
+            }
+          }
+
+          // If name already exists, just mark as having data if needed and skip
+          if (nameAlreadyExists &&
+              items.isNotEmpty &&
+              markAsHavingData &&
+              existingId != null) {
+            idsWithData.add(existingId);
+            return; // Skip further processing for this name
+          } else if (nameAlreadyExists) {
+            return; // Name already processed, skip entirely
+          }
+
+          // Try to find an assigned ID from items
+          String? foundId;
           if (items.isNotEmpty) {
-            // Try to find an assigned ID in the items
-            String? foundId;
             for (var item in items) {
               if (item.assigned != null && item.assigned!.isNotEmpty) {
                 foundId = item.assigned;
+                if (markAsHavingData && foundId != null) {
+                  idsWithData.add(foundId); // Has data
+                }
                 break;
               }
             }
+          }
 
-            if (foundId != null) {
-              // Update/Add mapping
-              idToName[foundId] = name;
-            }
+          if (foundId != null) {
+            // We found an ID from items
+            idToName[foundId] = name;
+          } else {
+            // No ID found, create a synthetic ID from the name
+            // This ensures the subordinate is visible even without an ID
+            String syntheticId = name.replaceAll(' ', '_').toLowerCase();
+            idToName[syntheticId] = name;
           }
         });
       }
 
-      scanMap(tasks.todaySubords);
-      scanMap(tasks.pendingSubords);
+      // Scan all maps
+      scanMap(tasks.todaySubords, true);
+      scanMap(tasks.pendingSubords, true);
+
+      // 3. From subordinatesTasks
+      if (tasks.subordinatesTasks != null) {
+        scanMap(tasks.subordinatesTasks, true);
+      }
     }
 
+    // Convert to list and sort: those with data first, then those without
+    List<DashboardSubordinate> withData = [];
+    List<DashboardSubordinate> withoutData = [];
+
     idToName.forEach((id, name) {
-      unifiedSubordinates.add(DashboardSubordinate(id: id, name: name));
+      if (idsWithData.contains(id)) {
+        withData.add(DashboardSubordinate(id: id, name: name, hasData: true));
+      } else {
+        withoutData
+            .add(DashboardSubordinate(id: id, name: name, hasData: false));
+      }
     });
+
+    // Combine: data first, then no data
+    unifiedSubordinates = [...withData, ...withoutData];
   }
 
   bool isLoading = true;
