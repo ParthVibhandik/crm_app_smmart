@@ -130,7 +130,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                     const SizedBox(height: Dimensions.space10),
                                 itemCount: controller.expenseModel.data!.length,
                               )
-                            : const NoDataWidget(),
+                            : NoDataWidget(
+                                text: controller.expenseModel.message ??
+                                    LocalStrings.noDataFound),
                       ],
                     ),
                   ),

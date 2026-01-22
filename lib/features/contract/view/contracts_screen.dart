@@ -133,7 +133,9 @@ class _ContractsScreenState extends State<ContractsScreen> {
                                     ),
                                 itemCount:
                                     controller.contractsModel.data!.length)
-                            : const NoDataWidget(),
+                            : NoDataWidget(
+                                text: controller.contractsModel.message ??
+                                    LocalStrings.noDataFound),
                       ],
                     ),
                   ));

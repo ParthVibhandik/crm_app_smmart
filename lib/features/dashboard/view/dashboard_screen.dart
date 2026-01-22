@@ -23,7 +23,6 @@ import 'package:flutex_admin/features/dashboard/widget/home_proposals_card.dart'
 import 'package:flutex_admin/features/dashboard/widget/leads_tasks_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/lead_journey_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/goals_card.dart';
-import 'package:flutex_admin/features/dashboard/widget/leads_status_pie_chart.dart';
 import 'package:flutex_admin/features/dashboard/widget/calendar_schedule_card.dart';
 import 'package:flutex_admin/features/attendance/attendance_screen.dart';
 import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
@@ -234,25 +233,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                           const SizedBox(height: Dimensions.space15),
 
-
                           /// NEW WIDGETS SECTION
                           GoalsCard(controller: controller),
                           const SizedBox(height: Dimensions.space15),
 
                           LeadsTasksCard(controller: controller),
                           const SizedBox(height: Dimensions.space15),
-                          
-                          LeadJourneyCard(steps: controller.newStats.leadJourney),
+
+                          LeadJourneyCard(controller: controller),
                           const SizedBox(height: Dimensions.space15),
-                          
-                          LeadsStatusPieChart(data: controller.newStats.leadStatusPie),
-                          const SizedBox(height: Dimensions.space15),
-                          
+
                           const CalendarScheduleCard(),
                           const SizedBox(height: Dimensions.space20),
-
-
-
                         ],
                       ),
                     ),

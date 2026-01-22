@@ -212,7 +212,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                 itemCount:
                                     controller.projectsModel.data!.length,
                               )
-                            : const NoDataWidget(),
+                            : NoDataWidget(
+                                text: controller.projectsModel.message ??
+                                    LocalStrings.noDataFound),
                       ],
                     ),
                   ),

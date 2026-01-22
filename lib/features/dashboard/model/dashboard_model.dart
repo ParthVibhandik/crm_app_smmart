@@ -19,6 +19,7 @@ class DashboardModel {
     _staff = staff;
     _menuItems = menuItems;
     _leadsTasks = leadsTasks;
+    _leadsStatsFromTasks = null;
   }
 
   DashboardModel.fromJson(dynamic json) {
@@ -34,10 +35,132 @@ class DashboardModel {
         : null;
     
     // Logic for leads_tasks
-    if (json['leads_tasks'] != null) {
-      _leadsTasks = LeadsTasks.fromJson(json['leads_tasks']);
-    } else if (json['data'] != null && json['data']['leads_tasks'] != null) {
-      _leadsTasks = LeadsTasks.fromJson(json['data']['leads_tasks']);
+    var leadsTasksJson = json['leads_tasks'];
+    if (leadsTasksJson == null && json['data'] != null) {
+      leadsTasksJson = json['data']['leads_tasks'];
+    }
+
+    if (leadsTasksJson != null) {
+      // Try to parse as LeadsTasks object (lists of items)
+      try {
+         // Only if it has specific keys we expect, otherwise simple map extraction might be preferred
+         // But LeadsTasks.fromJson is permissive
+         if (leadsTasksJson is Map) {
+             _leadsTasks = LeadsTasks.fromJson(leadsTasksJson as Map<String, dynamic>);
+         }
+      } catch (e) {
+        // ignore
+      }
+
+      // ALSO try to parse stats from the lists inside leads_tasks
+      if (leadsTasksJson is Map) {
+        _leadsStatsFromTasks = [];
+        Map<String, int> statusCounts = {};
+        Set<String> processedIds = {};
+
+        // Helper function to process lists with deduplication
+        void processList(dynamic list, Set<String> processedIdsRef, Map<String, int> countsRef) {
+          if (list is List) {
+            for (var item in list) {
+              if (item is Map && item.containsKey('status')) {
+                String id = item['id']?.toString() ?? '';
+                // Deduplicate by ID if present
+                if (id.isNotEmpty) {
+                  if (processedIdsRef.contains(id)) continue;
+                  processedIdsRef.add(id);
+                }
+
+                String status = item['status'].toString();
+                countsRef[status] = (countsRef[status] ?? 0) + 1;
+              }
+            }
+          }
+        }
+
+        // Process known lists for SELF
+        if (leadsTasksJson.containsKey('today_self')) {
+          processList(leadsTasksJson['today_self'], processedIds, statusCounts);
+        }
+        if (leadsTasksJson.containsKey('pending_self')) {
+          processList(leadsTasksJson['pending_self'], processedIds, statusCounts);
+        }
+        
+        // Convert map to List<DataField>
+        statusCounts.forEach((key, value) {
+           _leadsStatsFromTasks!.add(DataField(status: key, total: value.toString()));
+        });
+
+
+        // --- Subordinates (Team & Individual) Stats Logic ---
+        _leadsStatsFromTasksSubordinates = [];
+        _leadsStatsPerSubordinate = {};
+        
+        Map<String, int> subStatusCountsTotal = {};
+        Set<String> processedSubIdsTotal = {};
+        
+        // Helper for subordinates maps (Staff Name -> List)
+        void processSubordMap(dynamic mapData) {
+          if (mapData is Map) {
+            mapData.forEach((staffName, list) {
+              // 1. Aggregate for Total "Team" View
+              processList(list, processedSubIdsTotal, subStatusCountsTotal);
+              
+              // 2. Aggregate for Individual View
+              if (!_leadsStatsPerSubordinate!.containsKey(staffName)) {
+                _leadsStatsPerSubordinate![staffName] = [];
+              }
+              
+              // We need a temporary map for this specific staff/call to accumulate properly
+              // But since we might hit 'today' and 'pending' separate calls for same staff,
+              // we can't just overwrite.
+              // We need to parse list first, then ADD to the existing stats or build a Map<String, int> for each staff first.
+            });
+          }
+        }
+
+        // Better approach: First build Map<StaffName, Map<Status, Count>>
+        Map<String, Map<String, int>> perStaffCounts = {};
+        Map<String, Set<String>> perStaffIds = {};
+
+        void processSubordMapNew(dynamic mapData) {
+          if (mapData is Map) {
+            mapData.forEach((staffName, list) {
+               if (!perStaffCounts.containsKey(staffName)) perStaffCounts[staffName] = {};
+               if (!perStaffIds.containsKey(staffName)) perStaffIds[staffName] = {};
+               
+               processList(list, perStaffIds[staffName]!, perStaffCounts[staffName]!);
+               
+               // Also add to totals
+               processList(list, processedSubIdsTotal, subStatusCountsTotal);
+            });
+          }
+        }
+
+        if (leadsTasksJson.containsKey('today_subords')) {
+          processSubordMapNew(leadsTasksJson['today_subords']);
+        }
+        if (leadsTasksJson.containsKey('pending_subords')) {
+          processSubordMapNew(leadsTasksJson['pending_subords']);
+        }
+
+        // Convert totals
+        subStatusCountsTotal.forEach((key, value) {
+           _leadsStatsFromTasksSubordinates!.add(DataField(status: key, total: value.toString()));
+        });
+        
+        // Convert individuals
+        perStaffCounts.forEach((staffName, counts) {
+           List<DataField> fields = [];
+           counts.forEach((key, value) {
+              fields.add(DataField(status: key, total: value.toString()));
+           });
+           _leadsStatsPerSubordinate![staffName] = fields;
+        });
+        // Excluded tasks_subords/subordinates_tasks to avoid mixing Tasks with Lead Stats
+        // and to prevent incorrectly counting Tasks as Leads.
+
+
+      }
     }
 
     // Capture tasks from separate 'tasks' key if present
@@ -80,6 +203,10 @@ class DashboardModel {
   Staff? _staff;
   MenuItems? _menuItems;
   LeadsTasks? _leadsTasks;
+  List<DataField>? _leadsStatsFromTasks;
+
+  List<DataField>? _leadsStatsFromTasksSubordinates;
+  Map<String, List<DataField>>? _leadsStatsPerSubordinate;
 
   bool? get status => _status;
   String? get message => _message;
@@ -89,6 +216,9 @@ class DashboardModel {
   Staff? get staff => _staff;
   MenuItems? get menuItems => _menuItems;
   LeadsTasks? get leadsTasks => _leadsTasks;
+  List<DataField>? get leadsStatsFromTasks => _leadsStatsFromTasks;
+  List<DataField>? get leadsStatsFromTasksSubordinates => _leadsStatsFromTasksSubordinates;
+  Map<String, List<DataField>>? get leadsStatsPerSubordinate => _leadsStatsPerSubordinate;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -111,6 +241,12 @@ class DashboardModel {
     }
     if (_leadsTasks != null) {
       map['leads_tasks'] = _leadsTasks?.toJson();
+    }
+    // Note: _leadsStatsFromTasks is derived from leads_tasks, so we don't strictly need to serialize it 
+    // back to a separate field if we preserve leads_tasks. 
+    // But for completeness if we want to inspect it:
+    if (_leadsStatsFromTasks != null) {
+      map['leads_stats_map'] = _leadsStatsFromTasks!.map((v) => v.toJson()).toList();
     }
     return map;
   }
@@ -861,6 +997,7 @@ class LeadTaskItem {
   String? companyIndustry;
   String? description;
   String? country;
+  String? assigned;
 
   LeadTaskItem({
     this.id,
@@ -872,6 +1009,7 @@ class LeadTaskItem {
     this.companyIndustry,
     this.description,
     this.country,
+    this.assigned,
   });
 
   LeadTaskItem.fromJson(Map<String, dynamic> json) {
@@ -884,6 +1022,7 @@ class LeadTaskItem {
     companyIndustry = json['company_industry'];
     description = json['description'];
     country = json['country'];
+    assigned = json['assigned']?.toString();
   }
 
   Map<String, dynamic> toJson() {

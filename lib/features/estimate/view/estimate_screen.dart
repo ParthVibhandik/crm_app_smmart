@@ -184,7 +184,9 @@ class _EstimateScreenState extends State<EstimateScreen> {
                               separatorBuilder: (context, index) =>
                                   const SizedBox(height: Dimensions.space10),
                               itemCount: controller.estimatesModel.data!.length)
-                          : const NoDataWidget(),
+                          : NoDataWidget(
+                              text: controller.estimatesModel.message ??
+                                  LocalStrings.noDataFound),
                     ],
                   ),
                 ),

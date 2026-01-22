@@ -229,7 +229,9 @@ class _LeadScreenState extends State<LeadScreen> {
                                 ),
                               ),
                             )
-                          : const NoDataWidget(),
+                          : NoDataWidget(
+                              text: controller.leadsModel.message ??
+                                  LocalStrings.noDataFound),
                     ],
                   ),
                 ),

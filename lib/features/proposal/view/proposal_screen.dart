@@ -169,7 +169,8 @@ class _ProposalScreenState extends State<ProposalScreen> {
                           ],
                         ),
                       ),
-                      controller.proposalsModel.data!.isNotEmpty
+                      controller.proposalsModel.data != null &&
+                              controller.proposalsModel.data!.isNotEmpty
                           ? ListView.separated(
                               padding: const EdgeInsets.fromLTRB(
                                 Dimensions.space15,
@@ -188,7 +189,9 @@ class _ProposalScreenState extends State<ProposalScreen> {
                               separatorBuilder: (context, index) =>
                                   const SizedBox(height: Dimensions.space10),
                               itemCount: controller.proposalsModel.data!.length)
-                          : const NoDataWidget(),
+                          : NoDataWidget(
+                              text: controller.proposalsModel.message ??
+                                  LocalStrings.noDataFound),
                     ],
                   ),
                 ),

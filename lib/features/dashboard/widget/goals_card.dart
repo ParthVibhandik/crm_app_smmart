@@ -23,17 +23,8 @@ class GoalsCard extends StatelessWidget {
       );
     }
 
-    // Extract unique subordinates
-    List<Goal> allSubGoals = goals.subordinatesGoals ?? [];
-    Set<String> subIds = {};
-    List<Goal> uniqueSubordinates = [];
-    
-    for(var g in allSubGoals) {
-      if(g.staffId != null && !subIds.contains(g.staffId)) {
-        subIds.add(g.staffId!);
-        uniqueSubordinates.add(g);
-      }
-    }
+    // Use unified subordinates from controller (includes both goals and leads/tasks)
+    List<DashboardSubordinate> unifiedSubs = controller.unifiedSubordinates;
 
     return Card(
       elevation: 2,
@@ -63,10 +54,10 @@ class GoalsCard extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                       _buildFilterTab('All', 'all', controller),
-                       _buildFilterTab('MTD', 'mtd', controller),
-                       _buildFilterTab('YTD', 'ytd', controller),
-                       _buildFilterTab('Custom', 'custom', controller),
+                      _buildFilterTab('All', 'all', controller),
+                      _buildFilterTab('MTD', 'mtd', controller),
+                      _buildFilterTab('YTD', 'ytd', controller),
+                      _buildFilterTab('Custom', 'custom', controller),
                     ],
                   ),
                 ),
@@ -79,31 +70,27 @@ class GoalsCard extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                   _buildMainTabButton(
-                     'My', 
-                     controller.selectedGoalMainTab == 'my',
-                     () => controller.changeGoalMainTab('my')
-                   ),
-                   if(uniqueSubordinates.isNotEmpty)
-                     ...uniqueSubordinates.map((sub) {
-                       String name = sub.staffFirstname ?? sub.staffLastname ?? 'Staff ${sub.staffId}';
-                       bool isSelected = controller.selectedGoalMainTab == sub.staffId;
-                       return Padding(
-                         padding: const EdgeInsets.only(left: 10),
-                         child: _buildMainTabButton(
-                           name, 
-                           isSelected,
-                           () => controller.changeGoalMainTab(sub.staffId!)
-                         ),
-                       );
-                     }),
+                  _buildMainTabButton(
+                      'My',
+                      controller.selectedGoalMainTab == 'my',
+                      () => controller.changeGoalMainTab('my')),
+                  if (unifiedSubs.isNotEmpty)
+                    ...unifiedSubs.map((sub) {
+                      String name = sub.name;
+                      bool isSelected =
+                          controller.selectedGoalMainTab == sub.id;
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: _buildMainTabButton(name, isSelected,
+                            () => controller.changeGoalMainTab(sub.id)),
+                      );
+                    }),
                 ],
               ),
             ),
             const SizedBox(height: 10),
 
-
-             const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
             // Row 3: Conditional Sub-tabs (Only for "My")
             if (controller.selectedGoalMainTab == 'my') ...[
@@ -118,7 +105,7 @@ class GoalsCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                     child: _buildSubTabButton(
+                    child: _buildSubTabButton(
                       'Self Assigned Goals',
                       controller.selectedGoalSubTab == 'self',
                       () => controller.changeGoalSubTab('self'),
@@ -151,9 +138,8 @@ class GoalsCard extends StatelessWidget {
         child: Text(
           text,
           style: regularDefault.copyWith(
-            color: isSelected ? Colors.white : Colors.black87,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal
-          ),
+              color: isSelected ? Colors.white : Colors.black87,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
         ),
       ),
     );
@@ -170,22 +156,23 @@ class GoalsCard extends StatelessWidget {
               : Colors.grey[50],
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? ColorResources.primaryColor : (Colors.grey[300] ?? Colors.grey)
-          ),
+              color: isSelected
+                  ? ColorResources.primaryColor
+                  : (Colors.grey[300] ?? Colors.grey)),
         ),
         alignment: Alignment.center,
         child: Text(
           text,
           style: regularDefault.copyWith(
-            color: isSelected ? ColorResources.primaryColor : Colors.black87,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal
-          ),
+              color: isSelected ? ColorResources.primaryColor : Colors.black87,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal),
         ),
       ),
     );
   }
 
-  Widget _buildFilterTab(String label, String value, DashboardController controller) {
+  Widget _buildFilterTab(
+      String label, String value, DashboardController controller) {
     bool isSelected = controller.selectedGoalDateFilter == value;
     return InkWell(
       onTap: () {
@@ -194,35 +181,40 @@ class GoalsCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
-          boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 2)] : null
-        ),
+            color: isSelected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.05), blurRadius: 2)
+                  ]
+                : null),
         child: Text(
           label,
           style: regularSmall.copyWith(
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            color: isSelected ? Colors.black : Colors.grey[600]
-          ),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected ? Colors.black : Colors.grey[600]),
         ),
       ),
     );
   }
-  
+
   Widget _buildGoalsList(BuildContext context, Goals goals) {
     List<Goal> sourceGoals = [];
-    
+
     // 1. Select Source
     if (controller.selectedGoalMainTab == 'my') {
-       if (controller.selectedGoalSubTab == 'assigned') {
-         sourceGoals = goals.assignedGoals ?? [];
-       } else {
-         sourceGoals = goals.selfGoals ?? [];
-       }
+      if (controller.selectedGoalSubTab == 'assigned') {
+        sourceGoals = goals.assignedGoals ?? [];
+      } else {
+        sourceGoals = goals.selfGoals ?? [];
+      }
     } else {
       // It's a specific subordinate
       String staffId = controller.selectedGoalMainTab;
-      sourceGoals = (goals.subordinatesGoals ?? []).where((g) => g.staffId == staffId).toList();
+      sourceGoals = (goals.subordinatesGoals ?? [])
+          .where((g) => g.staffId == staffId)
+          .toList();
     }
 
     // 2. Apply Type Filter (MTD, YTD, Custom)
@@ -238,14 +230,16 @@ class GoalsCard extends StatelessWidget {
     }
 
     return Column(
-      children: displayGoals.map((goal) => _buildGoalItem(context, goal)).toList(),
+      children:
+          displayGoals.map((goal) => _buildGoalItem(context, goal)).toList(),
     );
   }
 
-  List<Goal> _filterGoalsByType(List<Goal> goals, DashboardController controller) {
+  List<Goal> _filterGoalsByType(
+      List<Goal> goals, DashboardController controller) {
     String filter = controller.selectedGoalDateFilter;
     if (filter == 'all') return goals;
-    
+
     // Filter goals where type matches the selected filter (MTD, YTD, Custom)
     // Using case-insensitive comparison
     return goals.where((goal) {
@@ -289,21 +283,23 @@ class GoalsCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                   decoration: BoxDecoration(
-                     color: (statusInfo['color'] as Color).withOpacity(0.1),
-                     borderRadius: BorderRadius.circular(4)
-                   ),
-                   child: Text(
-                     statusInfo['text'],
-                     style: regularSmall.copyWith(color: statusInfo['color']),
-                   ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                      color: (statusInfo['color'] as Color).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4)),
+                  child: Text(
+                    statusInfo['text'],
+                    style: regularSmall.copyWith(color: statusInfo['color']),
+                  ),
                 )
               ],
             ),
             const SizedBox(height: 5),
             Text(
-              goal.description != null && goal.description!.isNotEmpty ? goal.description! : '—',
+              goal.description != null && goal.description!.isNotEmpty
+                  ? goal.description!
+                  : '—',
               style: regularSmall.copyWith(color: Colors.grey[600]),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -312,14 +308,16 @@ class GoalsCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                 Text(
-                   '${goal.startDate ?? '-'} to ${goal.endDate ?? '-'}',
-                   style: regularSmall.copyWith(fontSize: 10, color: Colors.grey),
-                 ),
-                 Text(
-                   'Target: ${goal.achievement ?? '0'}',
-                   style: regularDefault.copyWith(fontWeight: FontWeight.bold, color: Colors.green),
-                 )
+                Text(
+                  '${goal.startDate ?? '-'} to ${goal.endDate ?? '-'}',
+                  style:
+                      regularSmall.copyWith(fontSize: 10, color: Colors.grey),
+                ),
+                Text(
+                  'Target: ${goal.achievement ?? '0'}',
+                  style: regularDefault.copyWith(
+                      fontWeight: FontWeight.bold, color: Colors.green),
+                )
               ],
             )
           ],
@@ -330,7 +328,7 @@ class GoalsCard extends StatelessWidget {
 
   void _showGoalDetailModal(BuildContext context, Goal goal) {
     Map<String, dynamic> statusInfo = _getGoalStatusInfo(goal);
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -353,7 +351,8 @@ class GoalsCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         goal.subject ?? 'Goal Details',
-                        style: regularExtraLarge.copyWith(fontWeight: FontWeight.bold),
+                        style: regularExtraLarge.copyWith(
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                     IconButton(
@@ -364,20 +363,20 @@ class GoalsCard extends StatelessWidget {
                 ),
                 const Divider(),
                 const SizedBox(height: 10),
-                
                 Container(
-                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                   decoration: BoxDecoration(
-                     color: (statusInfo['color'] as Color).withOpacity(0.1),
-                     borderRadius: BorderRadius.circular(20)
-                   ),
-                   child: Text(
-                     statusInfo['text'],
-                     style: regularDefault.copyWith(color: statusInfo['color'], fontWeight: FontWeight.bold),
-                   ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                      color: (statusInfo['color'] as Color).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20)),
+                  child: Text(
+                    statusInfo['text'],
+                    style: regularDefault.copyWith(
+                        color: statusInfo['color'],
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
                 const SizedBox(height: 20),
-
                 _buildDetailRow('Start Date', goal.startDate ?? '-'),
                 _buildDetailRow('End Date', goal.endDate ?? '-'),
                 _buildDetailRow('Achievement', goal.achievement ?? '-'),
@@ -385,23 +384,27 @@ class GoalsCard extends StatelessWidget {
                 _buildDetailRow('Type', goal.type ?? 'N/A'),
                 _buildDetailRow('Contract Type', goal.contractType ?? '-'),
                 _buildDetailRow('Staff ID', goal.staffId ?? '-'),
-                _buildDetailRow('Staff Name', '${goal.staffFirstname ?? ''} ${goal.staffLastname ?? ''}'),
-
+                _buildDetailRow('Staff Name',
+                    '${goal.staffFirstname ?? ''} ${goal.staffLastname ?? ''}'),
                 const SizedBox(height: 20),
-                Text('Description:', style: regularDefault.copyWith(fontWeight: FontWeight.bold)),
+                Text('Description:',
+                    style:
+                        regularDefault.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 5),
                 Container(
-                   width: double.infinity,
-                   padding: const EdgeInsets.all(12),
-                   decoration: BoxDecoration(
-                     color: Colors.grey[50],
-                     borderRadius: BorderRadius.circular(8),
-                     border: Border.all(color: Colors.grey.shade200),
-                   ),
-                   child: Text(
-                     goal.description != null && goal.description!.isNotEmpty ? goal.description! : 'No description provided.',
-                     style: regularDefault.copyWith(color: Colors.black87),
-                   ),
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Text(
+                    goal.description != null && goal.description!.isNotEmpty
+                        ? goal.description!
+                        : 'No description provided.',
+                    style: regularDefault.copyWith(color: Colors.black87),
+                  ),
                 ),
                 const SizedBox(height: 20),
               ],
@@ -413,7 +416,7 @@ class GoalsCard extends StatelessWidget {
   }
 
   Widget _buildDetailRow(String label, String value) {
-    if(value.trim().isEmpty) return const SizedBox();
+    if (value.trim().isEmpty) return const SizedBox();
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Row(
@@ -439,7 +442,7 @@ class GoalsCard extends StatelessWidget {
 
   Map<String, dynamic> _getGoalStatusInfo(Goal goal) {
     String text = goal.type ?? goal.goalType ?? 'Unknown';
-    Color color = Colors.blue; 
+    Color color = Colors.blue;
     return {'text': text, 'color': color};
   }
 }

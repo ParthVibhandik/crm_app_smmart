@@ -12,112 +12,99 @@ class LeadsTasksCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<DashboardController>(
-      builder: (controller) {
-        // Extract unique subordinates from goals
-        List<Goal> allSubGoals = controller.homeModel.goals?.subordinatesGoals ?? [];
-        Set<String> subIds = {};
-        List<Goal> uniqueSubordinates = [];
-        
-        for(var g in allSubGoals) {
-          if(g.staffId != null && !subIds.contains(g.staffId)) {
-            subIds.add(g.staffId!);
-            uniqueSubordinates.add(g);
-          }
-        }
+    return GetBuilder<DashboardController>(builder: (controller) {
+      // Use unified subordinates from controller (includes both goals and leads/tasks)
+      List<DashboardSubordinate> unifiedSubs = controller.unifiedSubordinates;
 
-        return Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(Dimensions.cardRadius),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(Dimensions.space15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header with Category Toggle
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Leads & Tasks',
-                      style: regularLarge.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    Row(
-                      children: [
-                        _buildCategoryButton(controller, 'leads', 'Leads'),
-                        const SizedBox(width: 8),
-                        _buildCategoryButton(controller, 'tasks', 'Tasks'),
-                      ],
-                    )
-                  ],
-                ),
-                const SizedBox(height: Dimensions.space15),
-
-                // Main Tabs (My / Subordinates)
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                       _buildMainTabButton(
-                         'My', 
-                         controller.selectedLeadsMainTab == 'my',
-                         () => controller.changeLeadsMainTab('my')
-                       ),
-                       if(uniqueSubordinates.isNotEmpty)
-                         ...uniqueSubordinates.map((sub) {
-                           String name = sub.staffFirstname ?? sub.staffLastname ?? 'Staff ${sub.staffId}';
-                           bool isSelected = controller.selectedLeadsMainTab == sub.staffId;
-                           return Padding(
-                             padding: const EdgeInsets.only(left: 10),
-                             child: _buildMainTabButton(
-                               name, 
-                               isSelected,
-                               () => controller.changeLeadsMainTab(sub.staffId!)
-                             ),
-                           );
-                         }),
-                    ],
+      return Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Dimensions.cardRadius),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(Dimensions.space15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with Category Toggle
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Leads & Tasks',
+                    style: regularLarge.copyWith(fontWeight: FontWeight.bold),
                   ),
-                ),
-                const SizedBox(height: 15),
-
-                // Sub Tabs (Today / Pending) - ONLY FOR LEADS
-                if (controller.selectedLeadsCategory == 'leads') ...[
                   Row(
                     children: [
-                      Expanded(
-                        child: _buildSubTabButton(
-                          'Today (${_getTabCount(controller, 'today')})',
-                          controller.selectedLeadsSubTab == 'today',
-                          () => controller.changeLeadsSubTab('today'),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                         child: _buildSubTabButton(
-                          'Pending (${_getTabCount(controller, 'pending')})',
-                          controller.selectedLeadsSubTab == 'pending',
-                          () => controller.changeLeadsSubTab('pending'),
-                        ),
-                      ),
+                      _buildCategoryButton(controller, 'leads', 'Leads'),
+                      const SizedBox(width: 8),
+                      _buildCategoryButton(controller, 'tasks', 'Tasks'),
                     ],
-                  ),
-                  const SizedBox(height: 15),
+                  )
                 ],
+              ),
+              const SizedBox(height: Dimensions.space15),
 
-                // Content List
-                _buildContentList(controller),
+              // Main Tabs (My / Subordinates)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildMainTabButton(
+                        'My',
+                        controller.selectedLeadsMainTab == 'my',
+                        () => controller.changeLeadsMainTab('my')),
+                    if (unifiedSubs.isNotEmpty)
+                      ...unifiedSubs.map((sub) {
+                        String name = sub.name;
+                        bool isSelected =
+                            controller.selectedLeadsMainTab == sub.id;
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: _buildMainTabButton(name, isSelected,
+                              () => controller.changeLeadsMainTab(sub.id)),
+                        );
+                      }),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 15),
+
+              // Sub Tabs (Today / Pending) - ONLY FOR LEADS
+              if (controller.selectedLeadsCategory == 'leads') ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildSubTabButton(
+                        'Today (${_getTabCount(controller, 'today')})',
+                        controller.selectedLeadsSubTab == 'today',
+                        () => controller.changeLeadsSubTab('today'),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _buildSubTabButton(
+                        'Pending (${_getTabCount(controller, 'pending')})',
+                        controller.selectedLeadsSubTab == 'pending',
+                        () => controller.changeLeadsSubTab('pending'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
               ],
-            ),
+
+              // Content List
+              _buildContentList(controller),
+            ],
           ),
-        );
-      }
-    );
+        ),
+      );
+    });
   }
 
-  Widget _buildCategoryButton(DashboardController controller, String value, String label) {
+  Widget _buildCategoryButton(
+      DashboardController controller, String value, String label) {
     bool isSelected = controller.selectedLeadsCategory == value;
     return InkWell(
       onTap: () => controller.changeLeadsCategory(value),
@@ -131,10 +118,9 @@ class LeadsTasksCard extends StatelessWidget {
         child: Text(
           label,
           style: regularDefault.copyWith(
-            color: isSelected ? Colors.white : ColorResources.primaryColor,
-            fontSize: 12,
-            fontWeight: FontWeight.bold
-          ),
+              color: isSelected ? Colors.white : ColorResources.primaryColor,
+              fontSize: 12,
+              fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -154,9 +140,8 @@ class LeadsTasksCard extends StatelessWidget {
         child: Text(
           text,
           style: regularDefault.copyWith(
-            color: isSelected ? Colors.white : Colors.black87,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal
-          ),
+              color: isSelected ? Colors.white : Colors.black87,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
         ),
       ),
     );
@@ -173,16 +158,16 @@ class LeadsTasksCard extends StatelessWidget {
               : Colors.grey[50],
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? ColorResources.primaryColor : (Colors.grey[300] ?? Colors.grey)
-          ),
+              color: isSelected
+                  ? ColorResources.primaryColor
+                  : (Colors.grey[300] ?? Colors.grey)),
         ),
         alignment: Alignment.center,
         child: Text(
           text,
           style: regularDefault.copyWith(
-            color: isSelected ? ColorResources.primaryColor : Colors.black87,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal
-          ),
+              color: isSelected ? ColorResources.primaryColor : Colors.black87,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal),
         ),
       ),
     );
@@ -200,7 +185,7 @@ class LeadsTasksCard extends StatelessWidget {
         ),
       );
     }
-    
+
     // LEADS LOGIC
     if (controller.selectedLeadsCategory == 'leads') {
       if (controller.selectedLeadsMainTab == 'my') {
@@ -210,36 +195,35 @@ class LeadsTasksCard extends StatelessWidget {
           items = data.pendingSelf ?? [];
         }
       } else {
-        // Subordinates Logic
+        // Subordinates Logic - Use unified subordinate list
         String staffId = controller.selectedLeadsMainTab;
-        Goal? sub = controller.homeModel.goals?.subordinatesGoals?.firstWhereOrNull((g) => g.staffId == staffId);
-        
-        if(sub != null) {
-           String firstName = sub.staffFirstname ?? '';
-           String lastName = sub.staffLastname ?? '';
-           String keyName = "$firstName $lastName".trim();
+        DashboardSubordinate? sub = controller.unifiedSubordinates
+            .firstWhereOrNull((s) => s.id == staffId);
 
-           if (controller.selectedLeadsSubTab == 'today') {
-              items = data.todaySubords?[keyName] ?? [];
-           } else {
-              items = data.pendingSubords?[keyName] ?? [];
-           }
+        if (sub != null) {
+          String keyName = sub.name;
+
+          if (controller.selectedLeadsSubTab == 'today') {
+            items = data.todaySubords?[keyName] ?? [];
+          } else {
+            items = data.pendingSubords?[keyName] ?? [];
+          }
         }
       }
-    } 
+    }
     // TASKS LOGIC
     else {
       if (controller.selectedLeadsMainTab == 'my') {
         items = data.selfTasks ?? [];
       } else {
-         String staffId = controller.selectedLeadsMainTab;
-         Goal? sub = controller.homeModel.goals?.subordinatesGoals?.firstWhereOrNull((g) => g.staffId == staffId);
-         if(sub != null) {
-            String firstName = sub.staffFirstname ?? '';
-            String lastName = sub.staffLastname ?? '';
-            String keyName = "$firstName $lastName".trim();
-            items = data.subordinatesTasks?[keyName] ?? [];
-         }
+        // Subordinates Logic - Use unified subordinate list
+        String staffId = controller.selectedLeadsMainTab;
+        DashboardSubordinate? sub = controller.unifiedSubordinates
+            .firstWhereOrNull((s) => s.id == staffId);
+        if (sub != null) {
+          String keyName = sub.name;
+          items = data.subordinatesTasks?[keyName] ?? [];
+        }
       }
     }
 
@@ -247,7 +231,8 @@ class LeadsTasksCard extends StatelessWidget {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Text("No items found for ${controller.selectedLeadsCategory}.", style: regularDefault),
+          child: Text("No items found for ${controller.selectedLeadsCategory}.",
+              style: regularDefault),
         ),
       );
     }
@@ -293,7 +278,7 @@ class LeadsTasksCard extends StatelessWidget {
               style: regularSmall.copyWith(color: Colors.black87),
             ),
           if (item.company != null && item.company!.isNotEmpty)
-             Text(
+            Text(
               item.company!,
               style: regularSmall.copyWith(color: Colors.grey[600]),
             ),
@@ -314,18 +299,21 @@ class LeadsTasksCard extends StatelessWidget {
   int _getTabCount(DashboardController controller, String type) {
     LeadsTasks? data = controller.homeModel.leadsTasks;
     if (data == null) return 0;
-    
+
     // Only strictly relevant for Leads category where tabs exist
     if (controller.selectedLeadsMainTab == 'my') {
       if (type == 'today') return data.todaySelf?.length ?? 0;
       if (type == 'pending') return data.pendingSelf?.length ?? 0;
     } else {
+      // Use unified subordinate list
       String staffId = controller.selectedLeadsMainTab;
-      Goal? sub = controller.homeModel.goals?.subordinatesGoals?.firstWhereOrNull((g) => g.staffId == staffId);
-      if(sub != null) {
-         String keyName = "${sub.staffFirstname ?? ''} ${sub.staffLastname ?? ''}".trim();
-         if (type == 'today') return data.todaySubords?[keyName]?.length ?? 0;
-         if (type == 'pending') return data.pendingSubords?[keyName]?.length ?? 0;
+      DashboardSubordinate? sub = controller.unifiedSubordinates
+          .firstWhereOrNull((s) => s.id == staffId);
+      if (sub != null) {
+        String keyName = sub.name;
+        if (type == 'today') return data.todaySubords?[keyName]?.length ?? 0;
+        if (type == 'pending')
+          return data.pendingSubords?[keyName]?.length ?? 0;
       }
     }
     return 0;

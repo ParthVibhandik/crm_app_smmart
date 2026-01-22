@@ -220,7 +220,9 @@ class _TaskScreenState extends State<TaskScreen> {
                                 ),
                               ),
                             )
-                          : const NoDataWidget(),
+                            : NoDataWidget(
+                                text: controller.tasksModel.message ??
+                                    LocalStrings.noDataFound),
                     ],
                   ),
                 ),

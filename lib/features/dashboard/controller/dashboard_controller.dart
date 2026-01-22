@@ -11,9 +11,74 @@ import 'package:flutex_admin/features/dashboard/model/dashboard_stats_model.dart
 import 'package:flutex_admin/features/dashboard/repo/dashboard_repo.dart';
 import 'package:get/get.dart';
 
+class DashboardSubordinate {
+  final String id;
+  final String name;
+  DashboardSubordinate({required this.id, required this.name});
+
+  @override
+  bool operator ==(Object other) =>
+      other is DashboardSubordinate && other.id == id;
+  @override
+  int get hashCode => id.hashCode;
+}
+
 class DashboardController extends GetxController {
   DashboardRepo dashboardRepo;
   DashboardController({required this.dashboardRepo});
+
+  List<DashboardSubordinate> unifiedSubordinates = [];
+
+  void _extractUnifiedSubordinates() {
+    unifiedSubordinates = [];
+    Map<String, String> idToName = {};
+
+    // 1. From Goals
+    if (homeModel.goals?.subordinatesGoals != null) {
+      for (var goal in homeModel.goals!.subordinatesGoals!) {
+        if (goal.staffId != null) {
+          String name =
+              "${goal.staffFirstname ?? ''} ${goal.staffLastname ?? ''}".trim();
+          if (name.isEmpty) name = "Staff ${goal.staffId}";
+          idToName[goal.staffId!] = name;
+        }
+      }
+    }
+
+    // 2. From LeadsTasks (today_subords & pending_subords)
+    // The keys are NAMES. We need to find IDs from items if possible, or mapping.
+    // Items in the list have 'assigned' field which is Staff ID.
+    LeadsTasks? tasks = homeModel.leadsTasks;
+    if (tasks != null) {
+      void scanMap(Map<String, List<LeadTaskItem>>? map) {
+        if (map == null) return;
+        map.forEach((name, items) {
+          if (items.isNotEmpty) {
+            // Try to find an assigned ID in the items
+            String? foundId;
+            for (var item in items) {
+              if (item.assigned != null && item.assigned!.isNotEmpty) {
+                foundId = item.assigned;
+                break;
+              }
+            }
+
+            if (foundId != null) {
+              // Update/Add mapping
+              idToName[foundId] = name;
+            }
+          }
+        });
+      }
+
+      scanMap(tasks.todaySubords);
+      scanMap(tasks.pendingSubords);
+    }
+
+    idToName.forEach((id, name) {
+      unifiedSubordinates.add(DashboardSubordinate(id: id, name: name));
+    });
+  }
 
   bool isLoading = true;
   bool logoutLoading = false;
@@ -75,8 +140,10 @@ class DashboardController extends GetxController {
     isAttendanceLoading = false;
     // Mock appointments for the selected date
     selectedDayAppointments = [
-      CalendarAppointment(time: '10:00 AM', title: 'Meeting', client: 'Client A'),
-      CalendarAppointment(time: '02:30 PM', title: 'Site Visit', client: 'Client B'),
+      CalendarAppointment(
+          time: '10:00 AM', title: 'Meeting', client: 'Client A'),
+      CalendarAppointment(
+          time: '02:30 PM', title: 'Site Visit', client: 'Client B'),
     ];
     update();
   }
@@ -103,33 +170,120 @@ class DashboardController extends GetxController {
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
     isLoading = false;
-    _generateMockData();
+    _configureDashboardStats();
     update();
   }
 
-  void _generateMockData() {
+  // Lead Stats State
+  String selectedLeadStatsTab =
+      'my'; // 'my', 'all_team', or specific staff name
+  List<String> subordinateNames = []; // List of staff names to show as tabs
+
+  // Store computed stats for switching
+  List<LeadJourneyStep> _journeySelf = [];
+  List<LeadJourneyStep> _journeyAllTeam = [];
+  Map<String, List<LeadJourneyStep>> _journeyPerSubordinate = {};
+
+  void changeLeadStatsTab(String tab) {
+    selectedLeadStatsTab = tab;
+    // Update the displayed stats in newStats
+    if (tab == 'my') {
+      newStats.leadJourney = _journeySelf;
+    } else if (tab == 'all_team') {
+      newStats.leadJourney = _journeyAllTeam;
+    } else {
+      // Specific subordinate
+      newStats.leadJourney = _journeyPerSubordinate[tab] ?? [];
+    }
+    update();
+  }
+
+  void _configureDashboardStats() {
+    // 0. Extract Unified Subordinates (Goals + Leads)
+    _extractUnifiedSubordinates();
+
+    // 1. Extract Lead Statistics (Lead Journey & Pie Chart) from Real Data
+    _journeySelf = [];
+    _journeyAllTeam = [];
+    _journeyPerSubordinate = {};
+    subordinateNames = [];
+    Map<String, int> pie = {};
+
+    // Populate subordinate names from unified list ensuring comprehensive coverage
+    subordinateNames = unifiedSubordinates.map((e) => e.name).toList();
+
+    print("DEBUG: Configuring Dashboard Stats");
+
+    // --- SELF STATS (Only Assigned Leads) ---
+    // Prioritize leadsStatsFromTasks which contains only leads assigned to the user
+    var leadsSourceSelf = homeModel.leadsStatsFromTasks;
+    if (leadsSourceSelf == null || leadsSourceSelf.isEmpty) {
+      leadsSourceSelf = homeModel.data?.leads;
+    }
+
+    if (leadsSourceSelf != null) {
+      int i = 1;
+      for (var lead in leadsSourceSelf) {
+        int count = int.tryParse(lead.total ?? '0') ?? 0;
+        String label = _mapStatusIdToLabel(lead.status ?? '');
+
+        _journeySelf
+            .add(LeadJourneyStep(step: i++, label: label, count: count));
+        if (label.isNotEmpty) pie[label] = count;
+      }
+    }
+
+    // --- SUBORDINATE STATS (ALL TEAM) ---
+    var leadsSourceSub = homeModel.leadsStatsFromTasksSubordinates;
+    if (leadsSourceSub != null) {
+      int i = 1;
+      for (var lead in leadsSourceSub) {
+        int count = int.tryParse(lead.total ?? '0') ?? 0;
+        String label = _mapStatusIdToLabel(lead.status ?? '');
+        _journeyAllTeam
+            .add(LeadJourneyStep(step: i++, label: label, count: count));
+      }
+    }
+
+    // --- SUBORDINATE STATS (INDIVIDUAL) ---
+    var perSubordinateMap = homeModel.leadsStatsPerSubordinate;
+    // Iterate unified list to ensure everyone gets an entry
+    for (var sub in unifiedSubordinates) {
+      List<DataField>? list = perSubordinateMap?[sub.name];
+      List<LeadJourneyStep> steps = [];
+      if (list != null) {
+        int i = 1;
+        for (var lead in list) {
+          int count = int.tryParse(lead.total ?? '0') ?? 0;
+          String label = _mapStatusIdToLabel(lead.status ?? '');
+          steps.add(LeadJourneyStep(step: i++, label: label, count: count));
+        }
+      }
+      _journeyPerSubordinate[sub.name] = steps;
+    }
+
+    // Set initial view
+
+    // 2. Mock Data for other cards (Goals, LeadsTasks) to preserve functionality
+    // TODO: Map these to real data when required
+    LeadsTasksSummary mockSummary = LeadsTasksSummary(
+        todayLeads: 5, pendingLeads: 12, todayTasks: 3, pendingTasks: 8);
+
+    List<GoalTarget> mockGoals = [
+      GoalTarget(period: 'Today', target: 5000, achieved: 1200),
+      GoalTarget(period: 'Month', target: 150000, achieved: 85000),
+      GoalTarget(period: 'Year', target: 2000000, achieved: 450000),
+    ];
+
     newStats = DashboardNewStats(
-      leadsTasks: LeadsTasksSummary(
-          todayLeads: 5, pendingLeads: 12, todayTasks: 3, pendingTasks: 8),
-      leadJourney: [
-        LeadJourneyStep(step: 1, label: 'Hot Lead', count: 10),
-        LeadJourneyStep(step: 2, label: 'Warm Lead', count: 5),
-        LeadJourneyStep(step: 3, label: 'Not Interested', count: 3),
-        LeadJourneyStep(step: 4, label: 'Not Reachable', count: 2),
-        LeadJourneyStep(step: 5, label: 'Follow Up', count: 1),
-      ],
-      goals: [
-        GoalTarget(period: 'Today', target: 5000, achieved: 1200),
-        GoalTarget(period: 'Month', target: 150000, achieved: 85000),
-        GoalTarget(period: 'Year', target: 2000000, achieved: 450000),
-      ],
-      leadStatusPie: {
-        'Hot Lead': 10,
-        'Warm Lead': 5,
-        'Not Interested': 3,
-        'Not Reachable': 2,
-        'Follow Up': 1,
-      },
+      leadsTasks: mockSummary,
+      leadJourney: selectedLeadStatsTab == 'my'
+          ? _journeySelf
+          : (selectedLeadStatsTab == 'all_team'
+              ? _journeyAllTeam
+              : (_journeyPerSubordinate[selectedLeadStatsTab] ?? [])),
+      goals: mockGoals,
+      leadStatusPie: pie,
     );
   }
 
@@ -145,7 +299,7 @@ class DashboardController extends GetxController {
       selectedGoalSubTab = 'assigned';
     } else {
       // Logic for subordinate tabs if any
-      selectedGoalSubTab = 'subordinate_goals'; 
+      selectedGoalSubTab = 'subordinate_goals';
     }
     update();
   }
@@ -154,7 +308,7 @@ class DashboardController extends GetxController {
     selectedGoalSubTab = tab;
     update();
   }
-  
+
   void changeGoalDateFilter(String filter) {
     selectedGoalDateFilter = filter;
     update();
@@ -206,5 +360,24 @@ class DashboardController extends GetxController {
 
     logoutLoading = false;
     update();
+  }
+
+  String _mapStatusIdToLabel(String status) {
+    switch (status) {
+      case '1':
+        return 'Customer';
+      case '2':
+        return 'Hot Lead';
+      case '3':
+        return 'Warm Lead';
+      case '4':
+        return 'Not Interested';
+      case '5':
+        return 'Not Reachable';
+      case '6':
+        return 'Follow Up';
+      default:
+        return status;
+    }
   }
 }
