@@ -170,20 +170,20 @@ class TaskInformation extends StatelessWidget {
                   ],
                 ),
                 const CustomDivider(space: Dimensions.space10),
-                taskModel.checklistItems!.isNotEmpty
+                (taskModel.checklistItems?.isNotEmpty ?? false)
                     ? ListView.separated(
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
+                          final checklistItem =
+                              taskModel.checklistItems![index];
                           return CheckboxListTile(
                             title: Text(
-                              taskModel.checklistItems![index].description ??
-                                  '',
+                              checklistItem.description ?? '',
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
-                            value: taskModel.checklistItems![index].finished ==
-                                '1',
+                            value: checklistItem.finished == '1',
                             contentPadding: EdgeInsets.zero,
                             controlAffinity: ListTileControlAffinity.leading,
                             activeColor: ColorResources.secondaryColor,

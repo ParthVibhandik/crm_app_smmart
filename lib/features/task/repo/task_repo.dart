@@ -31,7 +31,7 @@ class TaskRepo {
   }
 
   Future<ResponseModel> getTaskDetails(taskId) async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.tasksUrl}/id/$taskId";
+    String url = "${UrlContainer.baseUrl}${UrlContainer.tasksUrl}?id=$taskId";
     ResponseModel responseModel = await apiClient.request(
       url,
       Method.getMethod,

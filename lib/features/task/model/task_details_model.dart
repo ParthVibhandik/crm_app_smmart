@@ -10,9 +10,27 @@ class TaskDetailsModel {
   }
 
   TaskDetailsModel.fromJson(dynamic json) {
-    _status = json['status'];
-    _message = json['message'];
-    _data = json['data'] != null ? TaskDetails.fromJson(json['data']) : null;
+    // Check if response has the task data wrapped in 'data' key or directly
+    if (json['data'] != null && json['data'] is Map) {
+      // Old format: {status: true, message: "...", data: {...}}
+      var statusValue = json['status'];
+      _status =
+          (statusValue == true || statusValue == 'true' || statusValue == true);
+      _message = json['message']?.toString();
+      _data = TaskDetails.fromJson(json['data']);
+    } else if (json['id'] != null) {
+      // New format: task data directly in root {id: "4", name: "...", status: "5", ...}
+      // Here "status" is the task status (string like "5"), not API success status (bool)
+      _status = true; // API returned task successfully
+      _message = null;
+      _data = TaskDetails.fromJson(json);
+    } else {
+      // Error response
+      var statusValue = json['status'];
+      _status = (statusValue == true || statusValue == 'true');
+      _message = json['message']?.toString();
+      _data = null;
+    }
   }
 
   bool? _status;

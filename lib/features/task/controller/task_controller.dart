@@ -161,10 +161,14 @@ class TaskController extends GetxController {
   Future<void> loadTaskDetails(taskId) async {
     ResponseModel responseModel = await taskRepo.getTaskDetails(taskId);
     if (responseModel.status) {
+      print("Task Details Response: ${responseModel.responseJson}");
       taskDetailsModel = TaskDetailsModel.fromJson(
         jsonDecode(responseModel.responseJson),
       );
+      print("Task Details Data: ${taskDetailsModel.data}");
+      print("Task Name: ${taskDetailsModel.data?.name}");
     } else {
+      print("Task Details Error: ${responseModel.message}");
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
 

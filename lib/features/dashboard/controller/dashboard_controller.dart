@@ -216,9 +216,14 @@ class DashboardController extends GetxController {
         var decoded = jsonDecode(responseModel.responseJson);
         homeModel = DashboardModel.fromJson(decoded);
       } catch (e) {
+        print("Dashboard data parsing error: $e");
+        print("Response JSON: ${responseModel.responseJson}");
         CustomSnackBar.error(errorList: ["Data parsing error: $e"]);
       }
     } else {
+      print("Dashboard API error");
+      print("Response: ${responseModel.responseJson}");
+      print("Message: ${responseModel.message}");
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
     isLoading = false;
@@ -431,5 +436,115 @@ class DashboardController extends GetxController {
       default:
         return status;
     }
+  }
+
+  String _mapLabelToStatusId(String label) {
+    String lower = label.toLowerCase();
+    if (lower.contains('customer')) return '1';
+    if (lower.contains('hot')) return '2';
+    if (lower.contains('warm')) return '3';
+    if (lower.contains('not interested')) return '4';
+    if (lower.contains('not reachable')) return '5';
+    if (lower.contains('follow')) return '6';
+    return label;
+  }
+
+  List<LeadTaskItem> getLeadsByStatus(String statusLabel) {
+    String statusId = _mapLabelToStatusId(statusLabel);
+    List<LeadTaskItem> results = [];
+    Set<String> processedIds = {}; // To avoid duplicates
+
+    // Based on selected tab, get leads from appropriate source
+    if (selectedLeadStatsTab == 'my') {
+      // Get from self leads
+      LeadsTasks? tasks = homeModel.leadsTasks;
+      if (tasks != null) {
+        // Process today_self
+        if (tasks.todaySelf != null) {
+          for (var lead in tasks.todaySelf!) {
+            if (lead.id != null &&
+                !processedIds.contains(lead.id) &&
+                lead.status == statusId) {
+              results.add(lead);
+              processedIds.add(lead.id!);
+            }
+          }
+        }
+        // Process pending_self
+        if (tasks.pendingSelf != null) {
+          for (var lead in tasks.pendingSelf!) {
+            if (lead.id != null &&
+                !processedIds.contains(lead.id) &&
+                lead.status == statusId) {
+              results.add(lead);
+              processedIds.add(lead.id!);
+            }
+          }
+        }
+      }
+    } else if (selectedLeadStatsTab == 'all_team') {
+      // Get from all subordinates
+      LeadsTasks? tasks = homeModel.leadsTasks;
+      if (tasks != null) {
+        // Process today_subords
+        if (tasks.todaySubords != null) {
+          tasks.todaySubords!.forEach((name, leads) {
+            for (var lead in leads) {
+              if (lead.id != null &&
+                  !processedIds.contains(lead.id) &&
+                  lead.status == statusId) {
+                results.add(lead);
+                processedIds.add(lead.id!);
+              }
+            }
+          });
+        }
+        // Process pending_subords
+        if (tasks.pendingSubords != null) {
+          tasks.pendingSubords!.forEach((name, leads) {
+            for (var lead in leads) {
+              if (lead.id != null &&
+                  !processedIds.contains(lead.id) &&
+                  lead.status == statusId) {
+                results.add(lead);
+                processedIds.add(lead.id!);
+              }
+            }
+          });
+        }
+      }
+    } else {
+      // Get from specific subordinate
+      LeadsTasks? tasks = homeModel.leadsTasks;
+      String subName = selectedLeadStatsTab;
+      if (tasks != null) {
+        // Process today_subords for specific subordinate
+        if (tasks.todaySubords != null &&
+            tasks.todaySubords!.containsKey(subName)) {
+          for (var lead in tasks.todaySubords![subName]!) {
+            if (lead.id != null &&
+                !processedIds.contains(lead.id) &&
+                lead.status == statusId) {
+              results.add(lead);
+              processedIds.add(lead.id!);
+            }
+          }
+        }
+        // Process pending_subords for specific subordinate
+        if (tasks.pendingSubords != null &&
+            tasks.pendingSubords!.containsKey(subName)) {
+          for (var lead in tasks.pendingSubords![subName]!) {
+            if (lead.id != null &&
+                !processedIds.contains(lead.id) &&
+                lead.status == statusId) {
+              results.add(lead);
+              processedIds.add(lead.id!);
+            }
+          }
+        }
+      }
+    }
+
+    return results;
   }
 }

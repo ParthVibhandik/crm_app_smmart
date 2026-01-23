@@ -85,6 +85,8 @@ class LoginController extends GetxController {
       );
       checkAndGotoNextStep(loginModel);
     } else {
+      print("Login Error - Message: ${responseModel.message}");
+      print("Login Error - Response: ${responseModel.responseJson}");
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
     isSubmitLoading = false;

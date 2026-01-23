@@ -34,7 +34,7 @@ class UrlContainer {
   static const String ticketsUrl = 'tickets';
   static const String leadsUrl = 'leads';
   static const String kanbanLeadsUrl = 'kanban_leads';
-  static const String tasksUrl = 'tasks';
+  static const String tasksUrl = 'get-tasks';
   static const String paymentsUrl = 'payments';
   static const String itemsUrl = 'items';
   static const String notificationsUrl = 'notifications';

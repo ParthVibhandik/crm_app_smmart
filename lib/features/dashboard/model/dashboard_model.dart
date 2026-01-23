@@ -33,7 +33,7 @@ class DashboardModel {
     _menuItems = json['menu_items'] != null
         ? MenuItems.fromJson(json['menu_items'])
         : null;
-    
+
     // Logic for leads_tasks
     var leadsTasksJson = json['leads_tasks'];
     if (leadsTasksJson == null && json['data'] != null) {
@@ -43,11 +43,12 @@ class DashboardModel {
     if (leadsTasksJson != null) {
       // Try to parse as LeadsTasks object (lists of items)
       try {
-         // Only if it has specific keys we expect, otherwise simple map extraction might be preferred
-         // But LeadsTasks.fromJson is permissive
-         if (leadsTasksJson is Map) {
-             _leadsTasks = LeadsTasks.fromJson(leadsTasksJson as Map<String, dynamic>);
-         }
+        // Only if it has specific keys we expect, otherwise simple map extraction might be preferred
+        // But LeadsTasks.fromJson is permissive
+        if (leadsTasksJson is Map) {
+          _leadsTasks =
+              LeadsTasks.fromJson(leadsTasksJson as Map<String, dynamic>);
+        }
       } catch (e) {
         // ignore
       }
@@ -59,7 +60,8 @@ class DashboardModel {
         Set<String> processedIds = {};
 
         // Helper function to process lists with deduplication
-        void processList(dynamic list, Set<String> processedIdsRef, Map<String, int> countsRef) {
+        void processList(dynamic list, Set<String> processedIdsRef,
+            Map<String, int> countsRef) {
           if (list is List) {
             for (var item in list) {
               if (item is Map && item.containsKey('status')) {
@@ -82,34 +84,35 @@ class DashboardModel {
           processList(leadsTasksJson['today_self'], processedIds, statusCounts);
         }
         if (leadsTasksJson.containsKey('pending_self')) {
-          processList(leadsTasksJson['pending_self'], processedIds, statusCounts);
+          processList(
+              leadsTasksJson['pending_self'], processedIds, statusCounts);
         }
-        
+
         // Convert map to List<DataField>
         statusCounts.forEach((key, value) {
-           _leadsStatsFromTasks!.add(DataField(status: key, total: value.toString()));
+          _leadsStatsFromTasks!
+              .add(DataField(status: key, total: value.toString()));
         });
-
 
         // --- Subordinates (Team & Individual) Stats Logic ---
         _leadsStatsFromTasksSubordinates = [];
         _leadsStatsPerSubordinate = {};
-        
+
         Map<String, int> subStatusCountsTotal = {};
         Set<String> processedSubIdsTotal = {};
-        
+
         // Helper for subordinates maps (Staff Name -> List)
         void processSubordMap(dynamic mapData) {
           if (mapData is Map) {
             mapData.forEach((staffName, list) {
               // 1. Aggregate for Total "Team" View
               processList(list, processedSubIdsTotal, subStatusCountsTotal);
-              
+
               // 2. Aggregate for Individual View
               if (!_leadsStatsPerSubordinate!.containsKey(staffName)) {
                 _leadsStatsPerSubordinate![staffName] = [];
               }
-              
+
               // We need a temporary map for this specific staff/call to accumulate properly
               // But since we might hit 'today' and 'pending' separate calls for same staff,
               // we can't just overwrite.
@@ -125,13 +128,16 @@ class DashboardModel {
         void processSubordMapNew(dynamic mapData) {
           if (mapData is Map) {
             mapData.forEach((staffName, list) {
-               if (!perStaffCounts.containsKey(staffName)) perStaffCounts[staffName] = {};
-               if (!perStaffIds.containsKey(staffName)) perStaffIds[staffName] = {};
-               
-               processList(list, perStaffIds[staffName]!, perStaffCounts[staffName]!);
-               
-               // Also add to totals
-               processList(list, processedSubIdsTotal, subStatusCountsTotal);
+              if (!perStaffCounts.containsKey(staffName))
+                perStaffCounts[staffName] = {};
+              if (!perStaffIds.containsKey(staffName))
+                perStaffIds[staffName] = {};
+
+              processList(
+                  list, perStaffIds[staffName]!, perStaffCounts[staffName]!);
+
+              // Also add to totals
+              processList(list, processedSubIdsTotal, subStatusCountsTotal);
             });
           }
         }
@@ -145,21 +151,20 @@ class DashboardModel {
 
         // Convert totals
         subStatusCountsTotal.forEach((key, value) {
-           _leadsStatsFromTasksSubordinates!.add(DataField(status: key, total: value.toString()));
+          _leadsStatsFromTasksSubordinates!
+              .add(DataField(status: key, total: value.toString()));
         });
-        
+
         // Convert individuals
         perStaffCounts.forEach((staffName, counts) {
-           List<DataField> fields = [];
-           counts.forEach((key, value) {
-              fields.add(DataField(status: key, total: value.toString()));
-           });
-           _leadsStatsPerSubordinate![staffName] = fields;
+          List<DataField> fields = [];
+          counts.forEach((key, value) {
+            fields.add(DataField(status: key, total: value.toString()));
+          });
+          _leadsStatsPerSubordinate![staffName] = fields;
         });
         // Excluded tasks_subords/subordinates_tasks to avoid mixing Tasks with Lead Stats
         // and to prevent incorrectly counting Tasks as Leads.
-
-
       }
     }
 
@@ -177,19 +182,22 @@ class DashboardModel {
       if (tasksData['self_tasks'] != null) {
         _leadsTasks!.selfTasks = [];
         if (tasksData['self_tasks'] is List) {
-          tasksData['self_tasks'].forEach((v) => _leadsTasks!.selfTasks!.add(LeadTaskItem.fromJson(v)));
+          tasksData['self_tasks'].forEach(
+              (v) => _leadsTasks!.selfTasks!.add(LeadTaskItem.fromJson(v)));
         }
       }
-      
+
       // Check subordinates_tasks (or subordinate_tasks/subordinate_goals variants)
       // User said "subordinate_tasks", checking plural too just in case
-      var subTasks = tasksData['subordinate_tasks'] ?? tasksData['subordinates_tasks'];
-      
+      var subTasks =
+          tasksData['subordinate_tasks'] ?? tasksData['subordinates_tasks'];
+
       if (subTasks != null && subTasks is Map) {
         _leadsTasks!.subordinatesTasks = {};
         subTasks.forEach((key, value) {
           if (value is List) {
-            _leadsTasks!.subordinatesTasks![key] = value.map((v) => LeadTaskItem.fromJson(v)).toList();
+            _leadsTasks!.subordinatesTasks![key] =
+                value.map((v) => LeadTaskItem.fromJson(v)).toList();
           }
         });
       }
@@ -217,8 +225,10 @@ class DashboardModel {
   MenuItems? get menuItems => _menuItems;
   LeadsTasks? get leadsTasks => _leadsTasks;
   List<DataField>? get leadsStatsFromTasks => _leadsStatsFromTasks;
-  List<DataField>? get leadsStatsFromTasksSubordinates => _leadsStatsFromTasksSubordinates;
-  Map<String, List<DataField>>? get leadsStatsPerSubordinate => _leadsStatsPerSubordinate;
+  List<DataField>? get leadsStatsFromTasksSubordinates =>
+      _leadsStatsFromTasksSubordinates;
+  Map<String, List<DataField>>? get leadsStatsPerSubordinate =>
+      _leadsStatsPerSubordinate;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -242,11 +252,12 @@ class DashboardModel {
     if (_leadsTasks != null) {
       map['leads_tasks'] = _leadsTasks?.toJson();
     }
-    // Note: _leadsStatsFromTasks is derived from leads_tasks, so we don't strictly need to serialize it 
-    // back to a separate field if we preserve leads_tasks. 
+    // Note: _leadsStatsFromTasks is derived from leads_tasks, so we don't strictly need to serialize it
+    // back to a separate field if we preserve leads_tasks.
     // But for completeness if we want to inspect it:
     if (_leadsStatsFromTasks != null) {
-      map['leads_stats_map'] = _leadsStatsFromTasks!.map((v) => v.toJson()).toList();
+      map['leads_stats_map'] =
+          _leadsStatsFromTasks!.map((v) => v.toJson()).toList();
     }
     return map;
   }
@@ -275,13 +286,15 @@ class LeadsTasks {
     if (json['today_self'] != null) {
       todaySelf = [];
       if (json['today_self'] is List) {
-        json['today_self'].forEach((v) => todaySelf!.add(LeadTaskItem.fromJson(v)));
+        json['today_self']
+            .forEach((v) => todaySelf!.add(LeadTaskItem.fromJson(v)));
       }
     }
     if (json['pending_self'] != null) {
       pendingSelf = [];
       if (json['pending_self'] is List) {
-        json['pending_self'].forEach((v) => pendingSelf!.add(LeadTaskItem.fromJson(v)));
+        json['pending_self']
+            .forEach((v) => pendingSelf!.add(LeadTaskItem.fromJson(v)));
       }
     }
     // subord leads - dynamic keys (staff names)
@@ -289,7 +302,8 @@ class LeadsTasks {
       todaySubords = {};
       json['today_subords'].forEach((key, value) {
         if (value is List) {
-          todaySubords![key] = value.map((v) => LeadTaskItem.fromJson(v)).toList();
+          todaySubords![key] =
+              value.map((v) => LeadTaskItem.fromJson(v)).toList();
         }
       });
     }
@@ -297,7 +311,8 @@ class LeadsTasks {
       pendingSubords = {};
       json['pending_subords'].forEach((key, value) {
         if (value is List) {
-          pendingSubords![key] = value.map((v) => LeadTaskItem.fromJson(v)).toList();
+          pendingSubords![key] =
+              value.map((v) => LeadTaskItem.fromJson(v)).toList();
         }
       });
     }
@@ -307,29 +322,36 @@ class LeadsTasks {
     if (json['self_tasks'] != null) {
       selfTasks = [];
       if (json['self_tasks'] is List) {
-        json['self_tasks'].forEach((v) => selfTasks!.add(LeadTaskItem.fromJson(v)));
+        json['self_tasks']
+            .forEach((v) => selfTasks!.add(LeadTaskItem.fromJson(v)));
       }
-    } else if (json['tasks_self'] != null) { // Fallback check
-       selfTasks = [];
-       if (json['tasks_self'] is List) {
-         json['tasks_self'].forEach((v) => selfTasks!.add(LeadTaskItem.fromJson(v)));
-       }
+    } else if (json['tasks_self'] != null) {
+      // Fallback check
+      selfTasks = [];
+      if (json['tasks_self'] is List) {
+        json['tasks_self']
+            .forEach((v) => selfTasks!.add(LeadTaskItem.fromJson(v)));
+      }
     }
 
-    if (json['subordinates_tasks'] != null && json['subordinates_tasks'] is Map) {
+    if (json['subordinates_tasks'] != null &&
+        json['subordinates_tasks'] is Map) {
       subordinatesTasks = {};
       json['subordinates_tasks'].forEach((key, value) {
         if (value is List) {
-          subordinatesTasks![key] = value.map((v) => LeadTaskItem.fromJson(v)).toList();
+          subordinatesTasks![key] =
+              value.map((v) => LeadTaskItem.fromJson(v)).toList();
         }
       });
-    } else if (json['tasks_subords'] != null && json['tasks_subords'] is Map) { // Fallback
-       subordinatesTasks = {};
-       json['tasks_subords'].forEach((key, value) {
-         if (value is List) {
-           subordinatesTasks![key] = value.map((v) => LeadTaskItem.fromJson(v)).toList();
-         }
-       });
+    } else if (json['tasks_subords'] != null && json['tasks_subords'] is Map) {
+      // Fallback
+      subordinatesTasks = {};
+      json['tasks_subords'].forEach((key, value) {
+        if (value is List) {
+          subordinatesTasks![key] =
+              value.map((v) => LeadTaskItem.fromJson(v)).toList();
+        }
+      });
     }
   }
 
@@ -788,7 +810,7 @@ class Staff {
       return _profileImage!;
     }
     if (_profileImage!.contains('uploads/')) {
-       return '${UrlContainer.domainUrl}/$_profileImage';
+      return '${UrlContainer.domainUrl}/$_profileImage';
     }
     return '${UrlContainer.domainUrl}/uploads/staff_profile_images/$_staffId/$_profileImage';
   }
@@ -998,6 +1020,7 @@ class LeadTaskItem {
   String? description;
   String? country;
   String? assigned;
+  String? status; // Lead status ID
 
   LeadTaskItem({
     this.id,
@@ -1010,6 +1033,7 @@ class LeadTaskItem {
     this.description,
     this.country,
     this.assigned,
+    this.status,
   });
 
   LeadTaskItem.fromJson(Map<String, dynamic> json) {
@@ -1023,6 +1047,7 @@ class LeadTaskItem {
     description = json['description'];
     country = json['country'];
     assigned = json['assigned']?.toString();
+    status = json['status']?.toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -1036,7 +1061,7 @@ class LeadTaskItem {
     data['company_industry'] = companyIndustry;
     data['description'] = description;
     data['country'] = country;
+    data['status'] = status;
     return data;
   }
 }
-

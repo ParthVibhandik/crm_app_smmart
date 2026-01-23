@@ -4,6 +4,7 @@ import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/core/utils/color_resources.dart';
 import 'package:flutex_admin/features/dashboard/controller/dashboard_controller.dart';
 import 'package:flutex_admin/features/dashboard/model/dashboard_model.dart';
+import 'package:flutex_admin/core/route/route.dart';
 import 'package:get/get.dart';
 
 class LeadsTasksCard extends StatelessWidget {
@@ -238,60 +239,68 @@ class LeadsTasksCard extends StatelessWidget {
     }
 
     return Column(
-      children: items.map((item) => _buildListItem(item)).toList(),
+      children: items.map((item) => _buildListItem(controller, item)).toList(),
     );
   }
 
-  Widget _buildListItem(LeadTaskItem item) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 2,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+  Widget _buildListItem(DashboardController controller, LeadTaskItem item) {
+    return InkWell(
+      onTap: () {
+        // Only navigate for leads, not tasks
+        if (controller.selectedLeadsCategory == 'leads' && item.id != null) {
+          Get.toNamed(RouteHelper.leadDetailsScreen, arguments: item.id);
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.grey.shade200),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 2,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  item.name ?? item.subject ?? 'No Name',
+                  style: regularDefault.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            if (item.title != null && item.title!.isNotEmpty)
               Text(
-                item.name ?? item.subject ?? 'No Name',
-                style: regularDefault.copyWith(fontWeight: FontWeight.bold),
+                item.title!,
+                style: regularSmall.copyWith(color: Colors.black87),
               ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          if (item.title != null && item.title!.isNotEmpty)
-            Text(
-              item.title!,
-              style: regularSmall.copyWith(color: Colors.black87),
-            ),
-          if (item.company != null && item.company!.isNotEmpty)
-            Text(
-              item.company!,
-              style: regularSmall.copyWith(color: Colors.grey[600]),
-            ),
-          if (item.description != null && item.description!.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(
-              item.description!,
-              style: regularSmall.copyWith(color: Colors.grey[500]),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ]
-        ],
+            if (item.company != null && item.company!.isNotEmpty)
+              Text(
+                item.company!,
+                style: regularSmall.copyWith(color: Colors.grey[600]),
+              ),
+            if (item.description != null && item.description!.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                item.description!,
+                style: regularSmall.copyWith(color: Colors.grey[500]),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ]
+          ],
+        ),
       ),
     );
   }

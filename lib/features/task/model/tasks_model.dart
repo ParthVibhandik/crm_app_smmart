@@ -18,9 +18,18 @@ class TasksModel {
         _overview?.add(DataField.fromJson(v));
       });
     }
+
+    // Support both 'data' and 'self_tasks' keys
+    List<dynamic>? tasksList;
     if (json['data'] != null) {
+      tasksList = json['data'];
+    } else if (json['self_tasks'] != null) {
+      tasksList = json['self_tasks'];
+    }
+
+    if (tasksList != null) {
       _data = [];
-      json['data'].forEach((v) {
+      tasksList.forEach((v) {
         _data?.add(Task.fromJson(v));
       });
     }
