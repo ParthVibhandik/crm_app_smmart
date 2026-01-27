@@ -9,6 +9,7 @@ import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/task/model/task_details_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutex_admin/features/task/controller/task_controller.dart';
 
 class TaskInformation extends StatelessWidget {
   const TaskInformation({
@@ -88,10 +89,42 @@ class TaskInformation extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    TextIcon(
-                      text: Converter.taskStatusString(taskModel.status ?? ''),
-                      icon: Icons.check_circle_outline_rounded,
-                    ),
+                    GetBuilder<TaskController>(builder: (controller) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border:
+                              Border.all(color: Colors.grey.withValues(alpha: 0.5)),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: taskModel.status ?? '1',
+                            isDense: true,
+                            icon: const Icon(Icons.arrow_drop_down),
+                            items: controller.taskStatus.entries.map((entry) {
+                              return DropdownMenuItem<String>(
+                                value: entry.key,
+                                child: Text(
+                                  entry.value,
+                                  style: regularDefault.copyWith(
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (newValue) {
+                              if (newValue != null &&
+                                  newValue != taskModel.status) {
+                                controller.changeTaskStatus(
+                                    taskModel.id!, newValue);
+                              }
+                            },
+                          ),
+                        ),
+                      );
+                    }),
                     TextIcon(
                       text: DateConverter.formatValidityDate(
                           taskModel.dateAdded ?? ''),

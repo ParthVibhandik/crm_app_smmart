@@ -507,6 +507,8 @@ class Attachments {
     String? contactId,
     String? taskCommentId,
     String? dateAdded,
+    String? previewUrl,
+    String? downloadUrl,
   }) {
     _id = id;
     _relId = relId;
@@ -522,6 +524,8 @@ class Attachments {
     _contactId = contactId;
     _taskCommentId = taskCommentId;
     _dateAdded = dateAdded;
+    _previewUrl = previewUrl;
+    _downloadUrl = downloadUrl;
   }
 
   Attachments.fromJson(dynamic json) {
@@ -539,6 +543,8 @@ class Attachments {
     _contactId = json['contact_id'];
     _taskCommentId = json['task_comment_id'];
     _dateAdded = json['dateadded'];
+    _previewUrl = json['preview_url'];
+    _downloadUrl = json['download_url'];
   }
 
   String? _id;
@@ -555,6 +561,8 @@ class Attachments {
   String? _contactId;
   String? _taskCommentId;
   String? _dateAdded;
+  String? _previewUrl;
+  String? _downloadUrl;
 
   String? get id => _id;
   String? get relId => _relId;
@@ -570,6 +578,8 @@ class Attachments {
   String? get contactId => _contactId;
   String? get taskCommentId => _taskCommentId;
   String? get dateAdded => _dateAdded;
+  String? get previewUrl => _previewUrl;
+  String? get downloadUrl => _downloadUrl;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -587,6 +597,8 @@ class Attachments {
     map['contact_id'] = _contactId;
     map['task_comment_id'] = _taskCommentId;
     map['dateadded'] = _dateAdded;
+    map['preview_url'] = _previewUrl;
+    map['download_url'] = _downloadUrl;
     return map;
   }
 }

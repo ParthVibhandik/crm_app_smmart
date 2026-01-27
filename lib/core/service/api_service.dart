@@ -17,7 +17,7 @@ class ApiClient extends GetxService {
 
   Future<ResponseModel> request(
       String uri, String method, Map<String, dynamic>? params,
-      {bool passHeader = false}) async {
+      {bool passHeader = false, bool isJson = false}) async {
     Uri url = Uri.parse(uri);
     http.Response response;
 
@@ -25,11 +25,33 @@ class ApiClient extends GetxService {
       if (method == Method.postMethod) {
         if (passHeader) {
           initToken();
-          response = await http.post(url,
-              body: params,
-              headers: {'Accept': 'application/json', 'Authorization': token});
+          if (isJson) {
+            response = await http.post(url,
+                body: jsonEncode(params),
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json',
+                  'Authorization': token
+                });
+          } else {
+            response = await http.post(url,
+                body: params,
+                headers: {
+                  'Accept': 'application/json',
+                  'Authorization': token
+                });
+          }
         } else {
-          response = await http.post(url, body: params);
+          if (isJson) {
+            response = await http.post(url,
+                body: jsonEncode(params),
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
+                });
+          } else {
+            response = await http.post(url, body: params);
+          }
         }
       } else if (method == Method.putMethod) {
         initToken();

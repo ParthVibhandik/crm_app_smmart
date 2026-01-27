@@ -171,4 +171,19 @@ class TaskRepo {
     );
     return responseModel;
   }
+  Future<ResponseModel> updateTaskStatus(String taskId, String status) async {
+    String url = "${UrlContainer.baseUrl}update-task-status";
+    Map<String, dynamic> params = {
+      "taskid": taskId,
+      "status": status,
+    };
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.postMethod,
+      params,
+      passHeader: true,
+      isJson: true,
+    );
+    return responseModel;
+  }
 }

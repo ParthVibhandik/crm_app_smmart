@@ -388,6 +388,20 @@ class TaskController extends GetxController {
     }
   }
 
+  Future<void> changeTaskStatus(String taskId, String status) async {
+    isLoading = true;
+    update();
+    ResponseModel responseModel = await taskRepo.updateTaskStatus(taskId, status);
+    if (responseModel.status) {
+      await loadTaskDetails(taskId);
+      CustomSnackBar.success(successList: [responseModel.message.tr]);
+    } else {
+      isLoading = false;
+      update();
+      CustomSnackBar.error(errorList: [responseModel.message.tr]);
+    }
+  }
+
   void clearData() {
     isLoading = false;
     isSubmitLoading = false;

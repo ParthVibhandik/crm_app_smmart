@@ -39,7 +39,8 @@ class DashboardController extends GetxController {
     // 1. From Goals (subordinatesGoals) - Build ID to Name mapping
     if (homeModel.goals?.subordinatesGoals != null) {
       for (var goal in homeModel.goals!.subordinatesGoals!) {
-        if (goal.staffId != null) {
+        // Safe access to staffId
+        if (goal.staffId != null && goal.staffId!.isNotEmpty) {
           String name =
               "${goal.staffFirstname ?? ''} ${goal.staffLastname ?? ''}".trim();
           if (name.isEmpty) name = "Staff ${goal.staffId}";
@@ -105,7 +106,7 @@ class DashboardController extends GetxController {
         });
       }
 
-      // Scan all maps
+      // Scan all maps safely
       scanMap(tasks.todaySubords, true);
       scanMap(tasks.pendingSubords, true);
 
