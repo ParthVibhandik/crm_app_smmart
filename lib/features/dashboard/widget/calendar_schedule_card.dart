@@ -7,6 +7,7 @@ import 'package:flutex_admin/core/utils/color_resources.dart';
 import 'package:flutex_admin/features/dashboard/controller/dashboard_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutex_admin/common/components/divider/custom_divider.dart';
+import 'package:flutex_admin/features/dashboard/model/reminder_model.dart';
 
 class CalendarScheduleCard extends StatelessWidget {
   const CalendarScheduleCard({super.key});
@@ -84,24 +85,39 @@ class CalendarScheduleCard extends StatelessWidget {
                          ),
                          const SizedBox(height: 15),
                          const CustomDivider(),
-                         // Appointments
+                         // Reminders
                          Padding(
                            padding: const EdgeInsets.fromLTRB(8, 15, 8, 5),
-                           child: Align(alignment: Alignment.centerLeft, child: Text("Appointments", style: regularDefault.copyWith(fontWeight: FontWeight.bold))),
+                           child: Align(
+                               alignment: Alignment.centerLeft,
+                               child: Text("Reminders",
+                                   style: regularDefault.copyWith(
+                                       fontWeight: FontWeight.bold))),
                          ),
-                         if(controller.selectedDayAppointments.isEmpty)
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text("No appointments", style: regularSmall.copyWith(color: Colors.grey)),
-                            )
+                         if (controller.selectedDayReminders.isEmpty)
+                           Padding(
+                             padding: const EdgeInsets.all(8.0),
+                             child: Text("No reminders",
+                                 style: regularSmall.copyWith(
+                                     color: Colors.grey)),
+                           )
                          else
-                           ...controller.selectedDayAppointments.map((apt) => ListTile(
-                             leading: Icon(Icons.access_time, size: 20, color: Theme.of(context).primaryColor),
-                             title: Text(apt.title, style: regularDefault),
-                             subtitle: Text('${apt.time} - ${apt.client}'),
-                             contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                             dense: true,
-                           ))
+                           ...controller.selectedDayReminders.map((reminder) {
+                             return ListTile(
+                               leading: Icon(Icons.notifications,
+                                   size: 20,
+                                   color: Theme.of(context).primaryColor),
+                               title: Text(reminder.description ?? '-',
+                                   style: regularDefault),
+                               subtitle: Text(reminder.leadName ?? '-',
+                                   style: regularSmall.copyWith(color: Colors.grey)),
+                               contentPadding:
+                                   const EdgeInsets.symmetric(horizontal: 10),
+                               dense: true,
+                               onTap: () =>
+                                   controller.viewReminderDetails(reminder),
+                             );
+                           })
                        ],
                      ),
                  ] else 

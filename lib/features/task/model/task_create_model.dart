@@ -2,6 +2,7 @@ class TaskCreateModel {
   final String subject;
   final String startDate;
   final String relType;
+  final List<String>? assignedTo;
   final String? isPublic;
   final String? billable;
   final String? hourlyRate;
@@ -20,6 +21,7 @@ class TaskCreateModel {
     required this.subject,
     required this.startDate,
     required this.relType,
+    this.assignedTo,
     this.isPublic,
     this.billable,
     this.hourlyRate,

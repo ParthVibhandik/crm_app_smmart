@@ -13,6 +13,11 @@ class StaffsModel {
       json['data'].forEach((v) {
         _data?.add(Staff.fromJson(v));
       });
+    } else if (json['staff_list'] != null) {
+      _data = [];
+      json['staff_list'].forEach((v) {
+        _data?.add(Staff.fromJson(v));
+      });
     }
   }
 

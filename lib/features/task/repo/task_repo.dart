@@ -123,27 +123,33 @@ class TaskRepo {
     String? taskId,
     bool isUpdate = false,
   }) async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.tasksUrl}";
+    String url = "${UrlContainer.baseUrl}create-task";
 
     Map<String, dynamic> params = {
-      "name": taskModel.subject,
-      "startdate": taskModel.startDate,
-      "is_public": taskModel.isPublic,
-      "billable": taskModel.billable,
-      "hourly_rate": taskModel.hourlyRate,
-      "duedate": taskModel.dueDate,
-      "priority": taskModel.priority,
-      "repeat_every": '',
-      "rel_type": taskModel.relType,
-      "rel_id": taskModel.relId,
-      "tags": taskModel.tags,
+      "subject": taskModel.subject,
       "description": taskModel.description,
+      "assigned_to": taskModel.assignedTo,
+      "priority": int.tryParse(taskModel.priority ?? '1') ?? 1,
+      "startdate": taskModel.startDate,
+      "duedate": taskModel.dueDate,
     };
 
     ResponseModel responseModel = await apiClient.request(
       isUpdate ? '$url/id/$taskId' : url,
       isUpdate ? Method.putMethod : Method.postMethod,
       params,
+      passHeader: true,
+      isJson: true,
+    );
+    return responseModel;
+  }
+
+  Future<ResponseModel> getSubordinates() async {
+    String url = "${UrlContainer.baseUrl}get-subs";
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.getMethod,
+      null,
       passHeader: true,
     );
     return responseModel;

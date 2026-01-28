@@ -9,6 +9,8 @@ import 'package:flutex_admin/common/models/response_model.dart';
 import 'package:flutex_admin/features/dashboard/model/dashboard_model.dart';
 import 'package:flutex_admin/features/dashboard/model/dashboard_stats_model.dart';
 import 'package:flutex_admin/features/dashboard/repo/dashboard_repo.dart';
+import 'package:flutex_admin/features/dashboard/model/reminder_model.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class DashboardSubordinate {
@@ -146,7 +148,7 @@ class DashboardController extends GetxController {
 
   String? punchInTime;
   String? punchOutTime;
-  List<CalendarAppointment> selectedDayAppointments = [];
+  List<ReminderModel> selectedDayReminders = [];
 
   void onDaySelected(DateTime selected, DateTime focused) {
     if (!isSameDay(selectedDay, selected)) {
@@ -185,19 +187,34 @@ class DashboardController extends GetxController {
       } catch (e) {
         print("Error parsing attendance date: $e");
       }
+
+      if (responseModel.status) {
+        try {
+          Map<String, dynamic> responseData =
+              jsonDecode(responseModel.responseJson);
+          if (responseData.containsKey('reminders')) {
+            var remindersJson = responseData['reminders'];
+            if (remindersJson is List) {
+              selectedDayReminders = remindersJson
+                  .map((e) => ReminderModel.fromJson(e))
+                  .toList();
+            } else {
+              selectedDayReminders = [];
+            }
+          } else {
+            selectedDayReminders = [];
+          }
+        } catch (e) {
+          selectedDayReminders = [];
+        }
+      }
     } else {
+      selectedDayReminders = [];
       // Optional: Show error or just show empty
       // CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
 
     isAttendanceLoading = false;
-    // Mock appointments for the selected date
-    selectedDayAppointments = [
-      CalendarAppointment(
-          time: '10:00 AM', title: 'Meeting', client: 'Client A'),
-      CalendarAppointment(
-          time: '02:30 PM', title: 'Site Visit', client: 'Client B'),
-    ];
     update();
   }
 
@@ -547,5 +564,13 @@ class DashboardController extends GetxController {
     }
 
     return results;
+  }
+
+  void viewReminderDetails(ReminderModel reminder) {
+    if (reminder.relId != null) {
+      Get.toNamed(RouteHelper.leadDetailsScreen, arguments: reminder.relId);
+    } else {
+      CustomSnackBar.error(errorList: ["Lead ID missing"]);
+    }
   }
 }

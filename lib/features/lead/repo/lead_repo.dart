@@ -104,7 +104,7 @@ class LeadRepo {
     ReminderCreateModel reminderCreateModel,
   ) async {
     String url =
-        "${UrlContainer.baseUrl}${UrlContainer.leadsUrl}/reminders/$leadId";
+        "${UrlContainer.baseUrl}${UrlContainer.leadsUrl}/reminders/id/$leadId";
 
     Map<String, String> params = {
       "date": reminderCreateModel.date,
