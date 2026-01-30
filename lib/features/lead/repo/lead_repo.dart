@@ -170,7 +170,7 @@ class LeadRepo {
   }
 
   Future<ResponseModel> getStaff() async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.staffsUrl}";
+    String url = "${UrlContainer.baseUrl}${UrlContainer.leadsUrl}/staffs";
     ResponseModel responseModel = await apiClient.request(
       url,
       Method.getMethod,
