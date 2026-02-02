@@ -281,4 +281,26 @@ class AttendanceService {
       'code': response.data['code'] ?? response.statusCode,
     };
   }
+  Future<AttendanceStatus?> getAttendanceForDate(DateTime date) async {
+    try {
+      final dateStr = date.toString().split(' ')[0];
+      // Try GET request as POST might be returning 405
+      final response = await _dio.get(
+        '/flutex_admin_api/get-attendance-date', 
+        queryParameters: {'date': dateStr},
+      );
+      
+      print('Attendance for $dateStr: ${response.data}');
+
+      if (response.data['status'] == true) {
+         if (response.data.containsKey('data') && response.data['data'] is Map) {
+             return AttendanceStatus.fromJson(response.data['data']);
+         }
+         return AttendanceStatus.fromJson(response.data);
+      }
+    } catch (e) {
+      print('Error fetching attendance for $date: $e');
+    }
+    return null;
+  }
 }

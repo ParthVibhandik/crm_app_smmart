@@ -62,6 +62,7 @@ import 'package:flutex_admin/features/ticket/view/add_ticket_screen.dart';
 import 'package:flutex_admin/features/ticket/view/ticket_details_screen.dart';
 import 'package:flutex_admin/features/ticket/view/ticket_screen.dart';
 import 'package:flutex_admin/features/ticket/view/update_ticket_screen.dart';
+import 'package:flutex_admin/features/calendar/view/calendar_screen.dart';
 import 'package:get/get.dart';
 
 class RouteHelper {
@@ -129,6 +130,7 @@ class RouteHelper {
   static const String telecallingScreen = "/telecalling_screen";
   static const String dcrScreen = "/dcr_screen";
   static const String regularizationScreen = "/regularization_screen";
+  static const String calendarScreen = "/calendar_screen";
 
   List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => const SplashScreen()),
@@ -273,5 +275,6 @@ class RouteHelper {
       page: () => const RegularizationScreen(),
       binding: RegularizationBinding(),
     ),
+    GetPage(name: calendarScreen, page: () => const CalendarScreen()),
   ];
 }

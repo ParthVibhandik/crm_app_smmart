@@ -4,6 +4,7 @@ import 'package:flutex_admin/core/utils/url_container.dart';
 import 'package:flutex_admin/common/models/response_model.dart';
 import 'package:flutex_admin/features/lead/model/lead_create_model.dart';
 import 'package:flutex_admin/features/lead/model/reminder_create_model.dart';
+import 'dart:convert';
 
 class LeadRepo {
   ApiClient apiClient;
@@ -169,8 +170,41 @@ class LeadRepo {
     return responseModel;
   }
 
+  Future<ResponseModel> getLeadIndustries() async {
+    String url = "${UrlContainer.baseUrl}${UrlContainer.industriesUrl}";
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.getMethod,
+      null,
+      passHeader: true,
+    );
+    return responseModel;
+  }
+
+  Future<ResponseModel> getLeadDesignations() async {
+    String url = "${UrlContainer.baseUrl}${UrlContainer.designationsUrl}";
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.getMethod,
+      null,
+      passHeader: true,
+    );
+    return responseModel;
+  }
+
+  Future<ResponseModel> getLeadInterestedIn() async {
+    String url = "${UrlContainer.baseUrl}${UrlContainer.interestedInUrl}";
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.getMethod,
+      null,
+      passHeader: true,
+    );
+    return responseModel;
+  }
+
   Future<ResponseModel> getStaff() async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.staffsUrl}";
+    String url = "${UrlContainer.baseUrl}${UrlContainer.leadsUrl}/staffs";
     ResponseModel responseModel = await apiClient.request(
       url,
       Method.getMethod,
@@ -194,7 +228,7 @@ class LeadRepo {
       "assigned": leadModel.assigned,
       "tags": leadModel.tags,
       "lead_value": leadModel.value,
-      "title": leadModel.title,
+      "title": leadModel.designation ?? leadModel.title,
       "email": leadModel.email,
       "website": leadModel.website,
       "phonenumber": leadModel.phoneNumber,
@@ -204,13 +238,22 @@ class LeadRepo {
       "state": leadModel.state,
       "country": leadModel.country,
       "default_language": leadModel.defaultLanguage,
+      "company_industry": leadModel.companyIndustry,
+      "camp_name": leadModel.campaign,
+      "zip": leadModel.zip,
+      "alternate_phonenumber": leadModel.alternatePhoneNumber,
+      "interested_in[]": leadModel.interestedIn,
       "description": leadModel.description,
       "is_public": leadModel.isPublic,
     };
 
+    if (isUpdate) {
+      params['id'] = leadId;
+    }
+
     ResponseModel responseModel = await apiClient.request(
-      isUpdate ? '$url/id/$leadId' : url,
-      isUpdate ? Method.putMethod : Method.postMethod,
+      url,
+      Method.postMethod,
       params,
       passHeader: true,
     );

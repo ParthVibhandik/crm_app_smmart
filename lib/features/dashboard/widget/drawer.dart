@@ -215,6 +215,7 @@ class HomeDrawer extends StatelessWidget {
                       Get.toNamed(RouteHelper.regularizationScreen);
                     },
                   ),
+
                   homeModel.menuItems?.expenses ?? false
                       ? buildListTile(
                           leadingIcon: Icons.monetization_on_outlined,

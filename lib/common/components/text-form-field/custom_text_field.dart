@@ -93,7 +93,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       right: 15,
                       bottom: 5,
                     ),
-                    labelText: widget.labelText ?? '',
+                    labelText: widget.labelText,
                     labelStyle: regularDefault.copyWith(
                       color: Theme.of(context).hintColor,
                     ),
@@ -165,11 +165,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    LabelText(
-                      text: widget.labelText.toString(),
-                      isRequired: widget.isRequired,
-                    ),
-                    const SizedBox(height: Dimensions.textToTextSpace),
+                    if(widget.labelText != null) ...[
+                      LabelText(
+                        text: widget.labelText!,
+                        isRequired: widget.isRequired,
+                      ),
+                      const SizedBox(height: Dimensions.textToTextSpace),
+                    ],
                     TextFormField(
                       maxLines: widget.maxLines,
                       readOnly: widget.readOnly,
@@ -333,10 +335,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
                                   : widget.isCountryPicker
                                   ? Icons.arrow_drop_down_outlined
                                   : Icons.camera_alt_outlined,
-                              size: 25,
-                              color: ColorResources.getPrimaryColor(),
-                            ),
-                          )
+                                  size: 25,
+                                  color: ColorResources.getPrimaryColor(),
+                              ),
+                            )
                         : null
                   : null,
             ),

@@ -139,6 +139,14 @@ class LocalStrings {
   static const String logoutSureWarningMSg =
       "Are you sure you want to log out from your account?";
   static const String logoutSuccessMsg = "Sign Out Successfully";
+  
+  // Calendar
+  static const String calendar = "Calendar";
+  static const String noEventsFound = "No events found for this day";
+  static const String attendance = "Attendance";
+  static const String checkIn = "Check In";
+  static const String notCheckedIn = "Not Checked In";
+  static const String checkOut = "Check Out";
 
   // Download Process
   static const String fileDownloadAt = "File download at";
@@ -156,6 +164,8 @@ class LocalStrings {
   static const String edit = "Edit";
   static const String submit = "Submit";
   static const String update = "Update";
+  static const String select = "Select";
+  static const String done = "Done";
   static const String dataNotFound = "Data not found";
   static const String seeAll = "See All";
   static const String showMore = "Show More";

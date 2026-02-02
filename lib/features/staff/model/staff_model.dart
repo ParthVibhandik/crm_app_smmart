@@ -93,7 +93,7 @@ class Staff {
     _fullName = fullName;
   }
   Staff.fromJson(dynamic json) {
-    _id = json["id"];
+    _id = json["id"]?.toString() ?? json["staffid"]?.toString();
     _email = json["email"];
     _firstName = json["firstname"];
     _lastName = json["lastname"];
@@ -116,7 +116,7 @@ class Staff {
     _isNotStaff = json["is_not_staff"];
     _hourlyRate = json["hourly_rate"];
     _emailSignature = json["email_signature"];
-    _fullName = json["full_name"];
+    _fullName = json["full_name"] ?? '${json["firstname"] ?? ''} ${json["lastname"] ?? ''}'.trim();
   }
 
   String? _id;

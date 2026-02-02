@@ -18,6 +18,7 @@ class TelecallingController extends GetxController {
   TelecallingController({required this.telecallingRepo}) {
      _ensureInvoiceRepo();
      _loadInvoices();
+     loadAssignedLeads();
   }
   
   void _ensureInvoiceRepo() {
@@ -70,6 +71,42 @@ class TelecallingController extends GetxController {
   
   void setInvoiceId(String? id) {
     selectedInvoiceId = id;
+    update();
+  }
+
+  List<Lead> assignedLeads = [];
+  bool isLoadingAssignedLeads = false;
+
+  Future<void> loadAssignedLeads() async {
+    isLoadingAssignedLeads = true;
+    update();
+
+    try {
+      final responseModel = await telecallingRepo.getAssignedLeads();
+      if (responseModel.status) {
+        var decoded = jsonDecode(responseModel.responseJson);
+        List<dynamic> leadsList = [];
+        
+        if (decoded is Map<String, dynamic> && decoded.containsKey('data')) {
+          var dataObj = decoded['data'];
+          if (dataObj is Map<String, dynamic>) {
+             if (dataObj.containsKey('leads') && dataObj['leads'] is List) {
+               leadsList = dataObj['leads'];
+             }
+          } else if (dataObj is List) {
+            leadsList = dataObj;
+          }
+        } else if (decoded is List) {
+          leadsList = decoded;
+        }
+
+        assignedLeads = leadsList.map((item) => Lead.fromJson(item)).toList();
+      }
+    } catch (e) {
+      print('Error loading assigned leads: $e');
+    }
+
+    isLoadingAssignedLeads = false;
     update();
   }
 

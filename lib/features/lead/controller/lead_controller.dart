@@ -38,6 +38,9 @@ class LeadController extends GetxController {
   StatusesModel statusesModel = StatusesModel();
   SourcesModel sourcesModel = SourcesModel();
   StaffsModel staffsModel = StaffsModel();
+  SourcesModel industriesModel = SourcesModel();
+  SourcesModel designationsModel = SourcesModel();
+  SourcesModel interestedInModel = SourcesModel();
 
   void handleScroll() async {
     scrollController.addListener(() {
@@ -152,6 +155,27 @@ class LeadController extends GetxController {
     );
   }
 
+  Future<SourcesModel> loadIndustries() async {
+    ResponseModel responseModel = await leadRepo.getLeadIndustries();
+    return industriesModel = SourcesModel.fromJson(
+      jsonDecode(responseModel.responseJson),
+    );
+  }
+
+  Future<SourcesModel> loadDesignations() async {
+    ResponseModel responseModel = await leadRepo.getLeadDesignations();
+    return designationsModel = SourcesModel.fromJson(
+      jsonDecode(responseModel.responseJson),
+    );
+  }
+
+  Future<SourcesModel> loadInterestedIn() async {
+    ResponseModel responseModel = await leadRepo.getLeadInterestedIn();
+    return interestedInModel = SourcesModel.fromJson(
+      jsonDecode(responseModel.responseJson),
+    );
+  }
+
   Future<void> loadLeadUpdateData(leadId) async {
     ResponseModel responseModel = await leadRepo.getLeadDetails(leadId);
     if (responseModel.status) {
@@ -175,9 +199,19 @@ class LeadController extends GetxController {
       defaultLanguageController.text =
           leadDetailsModel.data?.defaultLanguage ?? '';
       descriptionController.text = leadDetailsModel.data?.description ?? '';
-      //customContactDateController.text = leadDetailsModel.data?.lastContact ?? '';
-      //contactedTodayController.text = leadDetailsModel.data?.lastContact ?? '';
       isPublicController.text = leadDetailsModel.data?.isPublic ?? '';
+      
+      companyIndustryController.text = leadDetailsModel.data?.companyIndustry ?? '';
+      campaignController.text = leadDetailsModel.data?.campaign ?? '';
+      designationController.text = leadDetailsModel.data?.designation ?? '';
+      zipController.text = leadDetailsModel.data?.zip ?? '';
+      alternatePhoneNumberController.text = leadDetailsModel.data?.alternatePhoneNumber ?? '';
+      interestedInController.text = leadDetailsModel.data?.interestedInId ?? '';
+      if (leadDetailsModel.data?.interestedInId != null && leadDetailsModel.data!.interestedInId!.isNotEmpty) {
+        selectedInterestedInIds = leadDetailsModel.data!.interestedInId!.split(',');
+      } else {
+        selectedInterestedInIds = [];
+      }
     } else {
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
@@ -203,6 +237,13 @@ class LeadController extends GetxController {
   TextEditingController defaultLanguageController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController isPublicController = TextEditingController();
+  
+  TextEditingController companyIndustryController = TextEditingController();
+  TextEditingController campaignController = TextEditingController();
+  TextEditingController designationController = TextEditingController();
+  TextEditingController zipController = TextEditingController();
+  TextEditingController alternatePhoneNumberController = TextEditingController();
+  TextEditingController interestedInController = TextEditingController();
 
   FocusNode nameFocusNode = FocusNode();
   FocusNode assignedFocusNode = FocusNode();
@@ -220,6 +261,12 @@ class LeadController extends GetxController {
   FocusNode defaultLanguageFocusNode = FocusNode();
   FocusNode descriptionFocusNode = FocusNode();
   FocusNode isPublicFocusNode = FocusNode();
+  
+  FocusNode campaignFocusNode = FocusNode();
+  FocusNode zipFocusNode = FocusNode();
+  FocusNode alternatePhoneNumberFocusNode = FocusNode();
+
+  List<String> selectedInterestedInIds = [];
 
   Future<void> submitLead({String? leadId, bool isUpdate = false}) async {
     String source = sourceController.text.toString();
@@ -240,6 +287,14 @@ class LeadController extends GetxController {
     String defaultLanguage = defaultLanguageController.text.toString();
     String description = descriptionController.text.toString();
     String isPublic = isPublicController.text.toString();
+    
+    String companyIndustry = companyIndustryController.text.toString();
+    String campaign = campaignController.text.toString();
+    String designation = designationController.text.toString();
+    String zip = zipController.text.toString();
+    String alternatePhoneNumber = alternatePhoneNumberController.text.toString();
+    // String interestedIn = interestedInController.text.toString();
+    String interestedIn = selectedInterestedInIds.join(',');
 
     if (source.isEmpty) {
       CustomSnackBar.error(errorList: [LocalStrings.pleaseSelectSource.tr]);
@@ -251,6 +306,14 @@ class LeadController extends GetxController {
     }
     if (name.isEmpty) {
       CustomSnackBar.error(errorList: [LocalStrings.enterName.tr]);
+      return;
+    }
+    if (companyIndustry.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please select company industry"]);
+      return;
+    }
+    if (interestedIn.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please select interested in"]);
       return;
     }
 
@@ -276,6 +339,12 @@ class LeadController extends GetxController {
       defaultLanguage: defaultLanguage,
       description: description,
       isPublic: isPublic,
+      companyIndustry: companyIndustry,
+      campaign: campaign,
+      designation: designation,
+      zip: zip,
+      alternatePhoneNumber: alternatePhoneNumber,
+      interestedIn: interestedIn,
     );
 
     ResponseModel responseModel = await leadRepo.createLead(
@@ -289,7 +358,7 @@ class LeadController extends GetxController {
       if (isUpdate) {
         await Get.find<LeadDetailsController>().loadLeadDetails(leadId);
       }
-      await loadLeads();
+      await initialData();
       CustomSnackBar.success(successList: [responseModel.message.tr]);
     } else {
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
@@ -346,5 +415,12 @@ class LeadController extends GetxController {
     defaultLanguageController.text = '';
     descriptionController.text = '';
     isPublicController.text = '';
+    companyIndustryController.text = '';
+    campaignController.text = '';
+    designationController.text = '';
+    zipController.text = '';
+    alternatePhoneNumberController.text = '';
+    interestedInController.text = '';
+    selectedInterestedInIds.clear();
   }
 }

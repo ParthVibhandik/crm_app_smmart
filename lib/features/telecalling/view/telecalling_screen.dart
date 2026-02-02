@@ -9,6 +9,7 @@ import 'package:flutex_admin/features/telecalling/controller/telecalling_control
 import 'package:flutex_admin/features/telecalling/repo/telecalling_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutex_admin/features/lead/model/lead_model.dart';
 
 class TelecallingScreen extends StatefulWidget {
   const TelecallingScreen({super.key});
@@ -41,56 +42,52 @@ class _TelecallingScreenState extends State<TelecallingScreen> {
                   style: regularDefault.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: Dimensions.space10),
-                Stack(
-                  children: [
-                    CustomTextField(
-                      controller: controller.searchController,
-                      hintText: "Search lead by name...",
-                      onChanged: (value) {
-                        controller.searchLeads(value);
-                      },
+                if (controller.isLoadingAssignedLeads)
+                  const Center(
+                      child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircularProgressIndicator(),
+                  ))
+                else if (controller.assignedLeads.isEmpty)
+                   Container(
+                     padding: const EdgeInsets.all(12),
+                     width: double.infinity,
+                     decoration: BoxDecoration(
+                       border: Border.all(color: Colors.grey.shade300),
+                       borderRadius: BorderRadius.circular(8),
+                     ),
+                     child: const Text("No assigned leads found."),
+                   )
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.shade300),
                     ),
-                    if (controller.searchResultLeads.isNotEmpty)
-                      Container(
-                        margin: const EdgeInsets.only(top: 50),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withValues(alpha: 0.3),
-                              spreadRadius: 1,
-                              blurRadius: 5,
-                            )
-                          ],
-                        ),
-                        constraints: const BoxConstraints(maxHeight: 200),
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: controller.searchResultLeads.length,
-                          itemBuilder: (context, index) {
-                            final lead = controller.searchResultLeads[index];
-                            return ListTile(
-                              title: Text(lead.name ?? ''),
-                              subtitle: Text(lead.company ?? ''),
-                              onTap: () {
-                                controller.selectLead(lead);
-                              },
-                            );
-                          },
-                        ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<Lead>(
+                        isExpanded: true,
+                        hint: const Text("Select Lead"),
+                        value: controller.selectedLead,
+                        items: controller.assignedLeads.map((Lead lead) {
+                          return DropdownMenuItem<Lead>(
+                            value: lead,
+                            child: Text(
+                              "${lead.name ?? 'Unknown'} ${lead.company != null ? '(${lead.company})' : ''}",
+                              overflow: TextOverflow.ellipsis,
+                              style: regularDefault,
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (Lead? newValue) {
+                          if (newValue != null) {
+                            controller.selectLead(newValue);
+                          }
+                        },
                       ),
-                  ],
-                ),
-                if (controller.selectedLead != null) ...[
-                  const SizedBox(height: Dimensions.space5),
-                  Chip(
-                    label: Text("Selected: ${controller.selectedLead!.name}"),
-                    onDeleted: () {
-                      controller.clearData();
-                    },
+                    ),
                   ),
-                ],
                 const SizedBox(height: Dimensions.space20),
                 Text(
                   "Duration (Minutes)",

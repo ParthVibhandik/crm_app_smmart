@@ -135,12 +135,27 @@ class LeadProfile extends StatelessWidget {
                     Text(leadModel.vat ?? '-'),
                   ],
                 ),
+                const SizedBox(height: Dimensions.space10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Company Industry", style: lightDefault),
+                    Text("Interested Product", style: lightDefault),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(leadModel.companyIndustry ?? '-'),
+                    Text(leadModel.interestedIn ?? '-'),
+                  ],
+                ),
                 const CustomDivider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(LocalStrings.phone.tr, style: lightDefault),
-                    Text(LocalStrings.website.tr, style: lightDefault),
+                    Text("Alt Phone", style: lightDefault),
                   ],
                 ),
                 Row(
@@ -152,6 +167,47 @@ class LeadProfile extends StatelessWidget {
                             UrlLauncherHelper.call(leadModel.phoneNumber),
                         child: Text(
                           leadModel.phoneNumber ?? '',
+                          overflow: TextOverflow.ellipsis,
+                          style: regularDefault.copyWith(
+                              color: ColorResources.primaryColor,
+                              decoration: TextDecoration.underline),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: Dimensions.space10),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => UrlLauncherHelper.call(
+                            leadModel.alternatePhoneNumber),
+                        child: Text(
+                          leadModel.alternatePhoneNumber ?? '-',
+                          textAlign: TextAlign.end,
+                          overflow: TextOverflow.ellipsis,
+                           style: regularDefault.copyWith(
+                              color: ColorResources.primaryColor,
+                              decoration: TextDecoration.underline),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: Dimensions.space10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(LocalStrings.email.tr, style: lightDefault),
+                    Text(LocalStrings.website.tr, style: lightDefault),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () =>
+                            UrlLauncherHelper.mail(leadModel.email),
+                        child: Text(
+                          leadModel.email ?? '',
                           overflow: TextOverflow.ellipsis,
                           style: regularDefault.copyWith(
                               color: ColorResources.primaryColor,

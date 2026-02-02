@@ -77,6 +77,11 @@ class LeadDetails {
     String? statusName,
     String? sourceName,
     String? publicUrl,
+    String? companyIndustry,
+    String? interestedIn,
+    String? alternatePhoneNumber,
+    String? campaign, // New
+    String? designation, // New
     List<Attachments>? attachments,
   }) {
     _id = id;
@@ -120,6 +125,11 @@ class LeadDetails {
     _statusName = statusName;
     _sourceName = sourceName;
     _publicUrl = publicUrl;
+    _companyIndustry = companyIndustry;
+    _interestedIn = interestedIn;
+    _alternatePhoneNumber = alternatePhoneNumber;
+    _campaign = campaign; // New
+    _designation = designation; // New
     _attachments = attachments;
   }
   LeadDetails.fromJson(dynamic json) {
@@ -165,6 +175,23 @@ class LeadDetails {
     _statusName = json['status_name'];
     _sourceName = json['source_name'];
     _publicUrl = json['public_url'];
+    _companyIndustry = json['company_industry']?.toString();
+    _alternatePhoneNumber = json['alternate_phonenumber'];
+    _campaign = json['camp_name']; // New
+    _designation = json['designation']; // New
+    
+    if (json['interested_products'] != null) {
+      try {
+        var list = (json['interested_products'] as List);
+        _interestedIn = list.map((e) => e['name'].toString()).join(', ');
+         if (list.isNotEmpty) {
+           _interestedInId = list.first['id'].toString();
+        }
+      } catch (e) {
+        _interestedIn = json['interested_products'].toString();
+      }
+    }
+
     if (json['attachments'] != null) {
       _attachments = [];
       json['attachments'].forEach((v) {
@@ -214,6 +241,12 @@ class LeadDetails {
   String? _statusName;
   String? _sourceName;
   String? _publicUrl;
+  String? _companyIndustry;
+  String? _interestedIn;
+  String? _interestedInId; // New
+  String? _alternatePhoneNumber;
+  String? _campaign; 
+  String? _designation; 
   List<Attachments>? _attachments;
 
   String? get id => _id;
@@ -257,6 +290,12 @@ class LeadDetails {
   String? get statusName => _statusName;
   String? get sourceName => _sourceName;
   String? get publicUrl => _publicUrl;
+  String? get companyIndustry => _companyIndustry;
+  String? get interestedIn => _interestedIn;
+  String? get interestedInId => _interestedInId; // New
+  String? get alternatePhoneNumber => _alternatePhoneNumber;
+  String? get campaign => _campaign; 
+  String? get designation => _designation; 
   List<Attachments>? get attachments => _attachments;
 
   Map<String, dynamic> toJson() {
@@ -302,6 +341,11 @@ class LeadDetails {
     map['status_name'] = _statusName;
     map['source_name'] = _sourceName;
     map['public_url'] = _publicUrl;
+    map['comp_industry'] = _companyIndustry;
+    map['interested_in'] = _interestedIn;
+    map['alt_phonenumber'] = _alternatePhoneNumber;
+    map['camp_name'] = _campaign; // New
+    map['designation'] = _designation; // New
     if (_attachments != null) {
       map['attachments'] = _attachments?.map((v) => v.toJson()).toList();
     }

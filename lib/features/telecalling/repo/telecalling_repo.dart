@@ -21,6 +21,20 @@ class TelecallingRepo {
     return responseModel;
   }
 
+  Future<ResponseModel> getAssignedLeads() async {
+    String url = "${UrlContainer.baseUrl}${UrlContainer.salesTrackerGetLeadsUrl}";
+    // Body should be empty map {}
+    Map<String, dynamic> params = {};
+
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.postMethod,
+      params,
+      passHeader: true,
+    );
+    return responseModel;
+  }
+
   Future<ResponseModel> recordTelecall({
     required String leadId,
     required String duration,

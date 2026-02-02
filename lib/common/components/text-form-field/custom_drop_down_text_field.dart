@@ -42,6 +42,16 @@ class CustomDropDownTextField extends StatefulWidget {
 class _CustomDropDownTextFieldState extends State<CustomDropDownTextField> {
   @override
   Widget build(BuildContext context) {
+    var validValue;
+    if (widget.selectedValue != '' &&
+        widget.selectedValue != null &&
+        widget.selectedValue != '0') {
+      if (widget.items != null &&
+          widget.items!
+              .any((element) => element.value == widget.selectedValue)) {
+        validValue = widget.selectedValue;
+      }
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -52,12 +62,7 @@ class _CustomDropDownTextFieldState extends State<CustomDropDownTextField> {
             ? const SizedBox(height: Dimensions.textToTextSpace)
             : const SizedBox(),
         DropdownButtonFormField(
-          initialValue:
-              (widget.selectedValue != '' &&
-                  widget.selectedValue != null &&
-                  widget.selectedValue != '0')
-              ? widget.selectedValue
-              : null,
+          initialValue: validValue,
           dropdownColor: widget.dropDownColor ?? Theme.of(context).cardColor,
           focusColor: widget.focusColor ?? Theme.of(context).cardColor,
           hint: Text(widget.hintText.toString()),
