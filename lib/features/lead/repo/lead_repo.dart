@@ -51,6 +51,7 @@ class LeadRepo {
       null,
       passHeader: true,
     );
+    print("DEBUG_LEAD_DETAILS: ${responseModel.responseJson}");
     return responseModel;
   }
 
@@ -239,17 +240,26 @@ class LeadRepo {
       "country": leadModel.country,
       "default_language": leadModel.defaultLanguage,
       "company_industry": leadModel.companyIndustry,
-      "camp_name": leadModel.campaign,
-      "zip": leadModel.zip,
-      "alternate_phonenumber": leadModel.alternatePhoneNumber,
-      "interested_in[]": leadModel.interestedIn,
       "description": leadModel.description,
       "is_public": leadModel.isPublic,
+      "designation": leadModel.designation,
     };
+
+    if (leadModel.interestedIn != null && leadModel.interestedIn!.isNotEmpty) {
+      int index = 0;
+      for (var item in leadModel.interestedIn!) {
+        if (item.isNotEmpty && item != "null") {
+           params["interested_in[$index]"] = item;
+           index++;
+        }
+      }
+    }
 
     if (isUpdate) {
       params['id'] = leadId;
     }
+
+    print('Create Lead Params: $params');
 
     ResponseModel responseModel = await apiClient.request(
       url,

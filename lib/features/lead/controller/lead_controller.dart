@@ -203,15 +203,21 @@ class LeadController extends GetxController {
       
       companyIndustryController.text = leadDetailsModel.data?.companyIndustry ?? '';
       campaignController.text = leadDetailsModel.data?.campaign ?? '';
-      designationController.text = leadDetailsModel.data?.designation ?? '';
+      designationController.text = leadDetailsModel.data?.designation ?? leadDetailsModel.data?.title ??  '';
       zipController.text = leadDetailsModel.data?.zip ?? '';
       alternatePhoneNumberController.text = leadDetailsModel.data?.alternatePhoneNumber ?? '';
-      interestedInController.text = leadDetailsModel.data?.interestedInId ?? '';
+      // Use names for display if available, otherwise just keep it empty to let UI update it later or use fallback
+      interestedInController.text = leadDetailsModel.data?.interestedIn ?? ''; 
+      
+      print("Update Data - Raw InterestedIn: ${leadDetailsModel.data?.interestedIn}");
+      print("Update Data - Raw InterestedInId: ${leadDetailsModel.data?.interestedInId}");
+
       if (leadDetailsModel.data?.interestedInId != null && leadDetailsModel.data!.interestedInId!.isNotEmpty) {
         selectedInterestedInIds = leadDetailsModel.data!.interestedInId!.split(',');
       } else {
         selectedInterestedInIds = [];
       }
+      print("Update Data - Parsed Ids: $selectedInterestedInIds");
     } else {
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
@@ -293,8 +299,7 @@ class LeadController extends GetxController {
     String designation = designationController.text.toString();
     String zip = zipController.text.toString();
     String alternatePhoneNumber = alternatePhoneNumberController.text.toString();
-    // String interestedIn = interestedInController.text.toString();
-    String interestedIn = selectedInterestedInIds.join(',');
+    // String interestedIn = selectedInterestedInIds.join(',');
 
     if (source.isEmpty) {
       CustomSnackBar.error(errorList: [LocalStrings.pleaseSelectSource.tr]);
@@ -312,7 +317,8 @@ class LeadController extends GetxController {
       CustomSnackBar.error(errorList: ["Please select company industry"]);
       return;
     }
-    if (interestedIn.isEmpty) {
+    if (selectedInterestedInIds.isEmpty) {
+      print("Validation Failed. Selected IDs: $selectedInterestedInIds");
       CustomSnackBar.error(errorList: ["Please select interested in"]);
       return;
     }
@@ -344,7 +350,7 @@ class LeadController extends GetxController {
       designation: designation,
       zip: zip,
       alternatePhoneNumber: alternatePhoneNumber,
-      interestedIn: interestedIn,
+      interestedIn: selectedInterestedInIds,
     );
 
     ResponseModel responseModel = await leadRepo.createLead(

@@ -49,7 +49,7 @@ class Source {
   }
 
   Source.fromJson(dynamic json) {
-    _id = json['id'].toString();
+    _id = json['id'] != null ? json['id'].toString() : null;
     _name = json['name'];
   }
   String? _id;

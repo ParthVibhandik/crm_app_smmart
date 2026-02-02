@@ -15,6 +15,7 @@ import 'package:flutex_admin/features/lead/controller/lead_controller.dart';
 import 'package:flutex_admin/features/lead/model/sources_model.dart';
 import 'package:flutex_admin/features/lead/model/statuses_model.dart';
 import 'package:flutex_admin/features/staff/model/staff_model.dart';
+import 'package:flutex_admin/common/components/custom_multi_select_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -222,7 +223,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                             selectedValue: controller.designationController.text,
                             items: controller.designationsModel.data!.map((value) {
                               return DropdownMenuItem(
-                                value: value.name, 
+                                value: value.id, 
                                 child: Text(value.name ?? '', style: regularDefault.copyWith(color: Colors.black)),
                               );
                             }).toList(),
@@ -326,99 +327,13 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                       future: interestedInMemoizer.runOnce(controller.loadInterestedIn),
                       builder: (context, list) {
                         if (list.data?.status ?? false) {
-                          // Initial sync if needed (mostly for edit/persist cases, harmless for add)
-                           if (controller.selectedInterestedInIds.isNotEmpty && controller.interestedInModel.data != null) {
-                               final selectedItems = controller.interestedInModel.data!
-                                    .where((element) => controller.selectedInterestedInIds.contains(element.id))
-                                    .toList();
-                               final newText = selectedItems.map((e) => e.name ?? '').join(', ');
-                               if (controller.interestedInController.text != newText) {
-                                     WidgetsBinding.instance.addPostFrameCallback((_) {
-                                         controller.interestedInController.text = newText;
-                                     });
-                               }
-                           }
-
-                          return GestureDetector(
-                            onTap: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                        return StatefulBuilder(
-                                            builder: (context, setState) {
-                                                return AlertDialog(
-                                                    title: Text(LocalStrings.select.tr, style: regularDefault.copyWith(fontSize: Dimensions.fontLarge)),
-                                                    contentPadding: const EdgeInsets.only(top: 10, bottom: 0, left: 0, right: 0),
-                                                    content: SingleChildScrollView(
-                                                        child: Column(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                            children: controller.interestedInModel.data!.map((item) {
-                                                                final isSelected = controller.selectedInterestedInIds.contains(item.id);
-                                                                return InkWell(
-                                                                    onTap: () {
-                                                                        setState(() {
-                                                                            if (isSelected) {
-                                                                                if(item.id != null) controller.selectedInterestedInIds.remove(item.id!);
-                                                                            } else {
-                                                                                if(item.id != null) controller.selectedInterestedInIds.add(item.id!);
-                                                                            }
-                                                                        });
-                                                                    },
-                                                                    child: Container(
-                                                                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                                                                      decoration: BoxDecoration(
-                                                                         border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.1))),
-                                                                      ),
-                                                                      child: Row(
-                                                                        children: [
-                                                                          Expanded(
-                                                                            child: Text(
-                                                                              item.name ?? '',
-                                                                               style: regularDefault.copyWith(
-                                                                                  color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyMedium!.color,
-                                                                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                                                                ),
-                                                                            ),
-                                                                          ),
-                                                                           if (isSelected)
-                                                                            Icon(Icons.check, color: Theme.of(context).primaryColor, size: 20),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                );
-                                                            }).toList(),
-                                                        ),
-                                                    ),
-                                                    actions: [
-                                                        TextButton(
-                                                            onPressed: () {
-                                                                final selectedItems = controller.interestedInModel.data!
-                                                                    .where((element) => controller.selectedInterestedInIds.contains(element.id))
-                                                                    .toList();
-                                                                controller.interestedInController.text = selectedItems
-                                                                    .map((e) => e.name ?? '')
-                                                                    .join(', ');
-                                                                Navigator.pop(context);
-                                                            },
-                                                            child: Text(LocalStrings.done.tr),
-                                                        )
-                                                    ],
-                                                );
-                                            }
-                                        );
-                                    }
-                                );
+                          return CustomMultiSelectDropDown(
+                            hintText: "Interested In",
+                            items: controller.interestedInModel.data ?? [],
+                            initialSelectedIds: controller.selectedInterestedInIds,
+                            onChanged: (List<String> selectedIds) {
+                              controller.selectedInterestedInIds = selectedIds;
                             },
-                            child: AbsorbPointer(
-                              child: CustomTextField(
-                                hintText: "Interested In",
-                                controller: controller.interestedInController,
-                                isShowSuffixIcon: true,
-                                isIcon: true,
-                                isCountryPicker: true, 
-                                onChanged: (value) {},
-                              ),
-                            ),
                           );
                         } else {
                            return const CustomLoader(isFullScreen: false);

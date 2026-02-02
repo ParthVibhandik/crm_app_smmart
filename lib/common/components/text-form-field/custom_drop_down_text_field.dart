@@ -62,7 +62,7 @@ class _CustomDropDownTextFieldState extends State<CustomDropDownTextField> {
             ? const SizedBox(height: Dimensions.textToTextSpace)
             : const SizedBox(),
         DropdownButtonFormField(
-          initialValue: validValue,
+          value: validValue,
           dropdownColor: widget.dropDownColor ?? Theme.of(context).cardColor,
           focusColor: widget.focusColor ?? Theme.of(context).cardColor,
           hint: Text(widget.hintText.toString()),

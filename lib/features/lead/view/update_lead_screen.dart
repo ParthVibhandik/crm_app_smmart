@@ -18,6 +18,7 @@ import 'package:flutex_admin/features/lead/model/sources_model.dart';
 import 'package:flutex_admin/features/lead/model/statuses_model.dart';
 import 'package:flutex_admin/features/lead/repo/lead_repo.dart';
 import 'package:flutex_admin/features/staff/model/staff_model.dart';
+import 'package:flutex_admin/common/components/custom_multi_select_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -247,7 +248,7 @@ class _UpdateTicketScreenState extends State<UpdateLeadScreen> {
                             },
                             items: controller.designationsModel.data!.map((value) {
                               return DropdownMenuItem(
-                                value: value.name, 
+                                value: value.id, 
                                 child: Text(value.name ?? '', style: regularDefault.copyWith(color: Colors.black)),
                               );
                             }).toList(),
@@ -347,23 +348,18 @@ class _UpdateTicketScreenState extends State<UpdateLeadScreen> {
                     onChanged: (value) {},
                   ),
                   // 20. Interested in* (dropdown)
+                  // 20. Interested in* (Multi-Select)
                    FutureBuilder(
                       future: interestedInMemoizer.runOnce(controller.loadInterestedIn),
                       builder: (context, list) {
                         if (list.data?.status ?? false) {
-                          return CustomDropDownTextField(
+                          return CustomMultiSelectDropDown(
                             hintText: "Interested In",
-                            needLabel: false,
-                            selectedValue: controller.interestedInController.text,
-                            onChanged: (value) {
-                              controller.interestedInController.text = value.toString();
+                            items: controller.interestedInModel.data ?? [],
+                            initialSelectedIds: controller.selectedInterestedInIds,
+                            onChanged: (List<String> selectedIds) {
+                              controller.selectedInterestedInIds = selectedIds;
                             },
-                            items: controller.interestedInModel.data!.map((value) {
-                              return DropdownMenuItem(
-                                value: value.id,
-                                child: Text(value.name ?? '', style: regularDefault.copyWith(color: Colors.black)),
-                              );
-                            }).toList(),
                           );
                         } else {
                            return const CustomLoader(isFullScreen: false);

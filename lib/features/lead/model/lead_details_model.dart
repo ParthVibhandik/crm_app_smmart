@@ -181,15 +181,20 @@ class LeadDetails {
     _designation = json['designation']; // New
     
     if (json['interested_products'] != null) {
-      try {
-        var list = (json['interested_products'] as List);
-        _interestedIn = list.map((e) => e['name'].toString()).join(', ');
-         if (list.isNotEmpty) {
-           _interestedInId = list.first['id'].toString();
-        }
-      } catch (e) {
+      if (json['interested_products'] is List) {
+         var list = (json['interested_products'] as List);
+         _interestedIn = list.map((e) => e['name'].toString()).join(', ');
+         _interestedInId = list.map((e) => e['id'].toString()).join(',');
+      } else {
+        // Handle case where it might be a string or other format
         _interestedIn = json['interested_products'].toString();
       }
+    } 
+    // Fallback or legacy support if interested_products is missing but interested_in matches
+    else if (json['interested_in'] != null) {
+        _interestedInId = json['interested_in'].toString();
+        // If we have IDs but no names, we might need to fetch them or just show IDs (suboptimal)
+        // Or maybe interested_in is the names? Let's assume IDs for now as that's usually the column name
     }
 
     if (json['attachments'] != null) {

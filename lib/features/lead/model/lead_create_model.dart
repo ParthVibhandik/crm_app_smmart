@@ -22,7 +22,7 @@ class LeadCreateModel {
   final String? description;
   final String? isPublic;
   final String? campaign;
-  final String? interestedIn;
+  final List<String>? interestedIn;
 
   LeadCreateModel({
     required this.source,
