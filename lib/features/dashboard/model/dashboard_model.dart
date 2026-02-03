@@ -476,6 +476,9 @@ class Goal {
     _notified = json['notified'];
     _addedFrom = json['added_from'];
     _type = json['type'];
+    _recurring = json['recurring'];
+    _typeKey = json['type_key'];
+    _typeValue = json['type_value'];
     _staffFirstname = json['staff_firstname'];
     _staffLastname = json['staff_lastname'];
   }
@@ -494,6 +497,9 @@ class Goal {
   String? _notified;
   String? _addedFrom;
   String? _type;
+  String? _recurring;
+  dynamic _typeKey;
+  String? _typeValue;
   String? _staffFirstname;
   String? _staffLastname;
 
@@ -511,6 +517,9 @@ class Goal {
   String? get notified => _notified;
   String? get addedFrom => _addedFrom;
   String? get type => _type;
+  String? get recurring => _recurring;
+  dynamic get typeKey => _typeKey;
+  String? get typeValue => _typeValue;
   String? get staffFirstname => _staffFirstname;
   String? get staffLastname => _staffLastname;
 

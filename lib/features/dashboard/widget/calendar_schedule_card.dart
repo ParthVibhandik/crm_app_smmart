@@ -71,9 +71,15 @@ class CalendarScheduleCard extends StatelessWidget {
                   eventLoader: controller.getEventsForDay,
                   calendarBuilders: CalendarBuilders(
                     markerBuilder: (context, date, events) {
-                      if (events.isEmpty) return const SizedBox();
-                      // Prioritize Reminder (Red) then Task (Orange)
+                      // Filter events to check if we should show a marker
+                      // We only want markers for Tasks (Orange) and Reminders (Red)
+                      // We explicitly ignore AttendanceStatus which is fetched on click
+                      bool hasTask = events.any((e) => e is Task);
                       bool hasReminder = events.any((e) => e is Reminder);
+
+                      if (!hasTask && !hasReminder) return const SizedBox();
+
+                      // Prioritize Reminder (Red) then Task (Orange)
                       return Positioned(
                         bottom: 1,
                         child: Container(
@@ -88,13 +94,27 @@ class CalendarScheduleCard extends StatelessWidget {
                     },
                   ),
                   calendarStyle: CalendarStyle(
+                    // Selection: Transparent circle with neutral border
                     selectedDecoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
+                      color: Colors.transparent,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black, 
+                        width: 1.5
+                      ),
+                    ),
+                    selectedTextStyle: TextStyle(
+                      color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    // Today: Subtle Grey circle
+                    todayDecoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.2), 
                       shape: BoxShape.circle,
                     ),
-                    todayDecoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.5),
-                      shape: BoxShape.circle,
+                    todayTextStyle: TextStyle(
+                      color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),

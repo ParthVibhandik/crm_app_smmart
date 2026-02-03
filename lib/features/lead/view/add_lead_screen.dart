@@ -63,6 +63,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                         if (sourceList.data?.status ?? false) {
                           return CustomDropDownTextField(
                             hintText: LocalStrings.selectSource.tr,
+                            isRequired: true,
                             needLabel: false,
                             onChanged: (value) {
                               controller.sourceController.text =
@@ -99,6 +100,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                         if (statusList.data?.status ?? false) {
                           return CustomDropDownTextField(
                             hintText: LocalStrings.selectStatus.tr,
+                            isRequired: true,
                             needLabel: false,
                             onChanged: (value) {
                               controller.statusController.text =
@@ -132,6 +134,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                         if (staffList.data?.status ?? false) {
                           return CustomDropDownTextField(
                             hintText: "Assigned",
+                            isRequired: true,
                             needLabel: false,
                             onChanged: (value) {
                               controller.assignedController.text =
@@ -162,7 +165,8 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                       }),
                   // 4. Name* (Existing)
                   CustomTextField(
-                    hintText: LocalStrings.name.tr,
+                    labelText: LocalStrings.name.tr,
+                    isRequired: true,
                     controller: controller.nameController,
                     focusNode: controller.nameFocusNode,
                     textInputType: TextInputType.text,
@@ -171,7 +175,8 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                   ),
                    // 5. Company name* (Existing)
                   CustomTextField(
-                    hintText: LocalStrings.company.tr,
+                    labelText: LocalStrings.company.tr,
+                    isRequired: true,
                     controller: controller.companyController,
                     focusNode: controller.companyFocusNode,
                     textInputType: TextInputType.text,
@@ -185,6 +190,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                         if (list.data?.status ?? false) {
                           return CustomDropDownTextField(
                             hintText: "Company Industry",
+                            isRequired: true,
                             needLabel: false,
                             onChanged: (value) {
                               controller.companyIndustryController.text = value.toString();
@@ -216,6 +222,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                         if (list.data?.status ?? false) {
                           return CustomDropDownTextField(
                             hintText: "Designation",
+                            isRequired: true,
                             needLabel: false,
                             onChanged: (value) {
                               controller.designationController.text = value.toString();
@@ -234,7 +241,8 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                       }),
                   // 9. Email Address* (Existing)
                   CustomTextField(
-                    hintText: LocalStrings.email.tr,
+                    labelText: LocalStrings.email.tr,
+                    isRequired: true,
                     controller: controller.emailController,
                     focusNode: controller.emailFocusNode,
                     textInputType: TextInputType.emailAddress,
@@ -263,11 +271,14 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                     focusNode: controller.zipFocusNode,
                     textInputType: TextInputType.number,
                     nextFocus: controller.addressFocusNode,
-                    onChanged: (value) {},
+                    onChanged: (value) {
+                      controller.fetchAddressFromPincode(value);
+                    },
                   ),
                   // 13. Address * (Existing)
                   CustomTextField(
-                    hintText: LocalStrings.address.tr,
+                    labelText: LocalStrings.address.tr,
+                    isRequired: true,
                     controller: controller.addressController,
                     focusNode: controller.addressFocusNode,
                     textInputType: TextInputType.text,
@@ -299,14 +310,15 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                   ),
                   // 17. Phone * (Existing)
                   CustomTextField(
-                    hintText: LocalStrings.phone.tr,
+                    labelText: LocalStrings.phone.tr,
+                    isRequired: true,
                     controller: controller.phoneNumberController,
                     focusNode: controller.phoneNumberFocusNode,
                     textInputType: TextInputType.phone,
                     nextFocus: controller.alternatePhoneNumberFocusNode,
                     onChanged: (value) {},
                   ),
-                   // 18. Alternate Phonenumber (NEW)
+                  // 18. Alternate Phonenumber (NEW)
                   CustomTextField(
                     hintText: "Alternate Phonenumber",
                     controller: controller.alternatePhoneNumberController,
@@ -329,6 +341,7 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                         if (list.data?.status ?? false) {
                           return CustomMultiSelectDropDown(
                             hintText: "Interested In",
+                            isRequired: true,
                             items: controller.interestedInModel.data ?? [],
                             initialSelectedIds: controller.selectedInterestedInIds,
                             onChanged: (List<String> selectedIds) {

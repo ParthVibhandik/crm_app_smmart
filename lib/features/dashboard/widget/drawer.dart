@@ -215,6 +215,14 @@ class HomeDrawer extends StatelessWidget {
                       Get.toNamed(RouteHelper.regularizationScreen);
                     },
                   ),
+                  buildListTile(
+                    leadingIcon: Icons.flag_outlined,
+                    title: "Goals",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Get.toNamed(RouteHelper.goalScreen);
+                    },
+                  ),
 
                   homeModel.menuItems?.expenses ?? false
                       ? buildListTile(

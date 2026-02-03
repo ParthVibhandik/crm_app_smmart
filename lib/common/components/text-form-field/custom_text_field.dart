@@ -93,10 +93,24 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       right: 15,
                       bottom: 5,
                     ),
-                    labelText: widget.labelText,
-                    labelStyle: regularDefault.copyWith(
-                      color: Theme.of(context).hintColor,
-                    ),
+                    label: widget.labelText != null
+                        ? Text.rich(
+                            TextSpan(
+                              text: widget.labelText!.tr,
+                              style: regularDefault.copyWith(
+                                color: Theme.of(context).hintColor,
+                              ),
+                              children: [
+                                if (widget.isRequired)
+                                  TextSpan(
+                                    text: ' *',
+                                    style: semiBoldDefault.copyWith(
+                                        color: ColorResources.colorRed),
+                                  )
+                              ],
+                            ),
+                          )
+                        : null,
                     hintText: widget.hintText ?? '',
                     hintStyle: regularDefault,
                     fillColor: widget.fillColor ?? Theme.of(context).cardColor,

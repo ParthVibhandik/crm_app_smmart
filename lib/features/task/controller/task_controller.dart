@@ -256,6 +256,7 @@ class TaskController extends GetxController {
       startDateController.text = taskDetailsModel.data?.startDate ?? '';
       dueDateController.text = taskDetailsModel.data?.dueDate ?? '';
       taskPriorityController.text = taskDetailsModel.data?.priority ?? '';
+      taskStatusController.text = taskDetailsModel.data?.status ?? '1'; // Default to 1 (Not Started)
       taskRelatedController.text = taskDetailsModel.data?.relType ?? '';
       relationIdController.text = taskDetailsModel.data?.relId ?? '';
       descriptionController.text = formatter.Converter.parseHtmlString(
@@ -272,7 +273,9 @@ class TaskController extends GetxController {
   TextEditingController rateController = TextEditingController();
   TextEditingController startDateController = TextEditingController();
   TextEditingController dueDateController = TextEditingController();
+
   TextEditingController taskPriorityController = TextEditingController();
+  TextEditingController taskStatusController = TextEditingController();
   TextEditingController repeatEveryController = TextEditingController();
   TextEditingController repeatEveryCustomController = TextEditingController();
   TextEditingController repeatTypeCustomController = TextEditingController();
@@ -302,7 +305,9 @@ class TaskController extends GetxController {
     String rate = rateController.text.toString();
     String startDate = startDateController.text.toString();
     String dueDate = dueDateController.text.toString();
+
     String priority = taskPriorityController.text.toString();
+    String status = taskStatusController.text.toString();
     String repeat = repeatEveryController.text.toString();
     String related = taskRelatedController.text.toString();
     String relId = relationIdController.text.toString();
@@ -340,6 +345,7 @@ class TaskController extends GetxController {
       startDate: startDate,
       dueDate: dueDate,
       priority: priority,
+      status: status,
       repeatEvery: repeat,
       relType: related,
       relId: relId,
@@ -437,6 +443,7 @@ class TaskController extends GetxController {
     startDateController.text = '';
     dueDateController.text = '';
     taskPriorityController.text = '';
+    taskStatusController.text = '';
     taskRelatedController.text = '';
     relationIdController.text = '';
     tagsController.text = '';

@@ -132,6 +132,7 @@ class TaskRepo {
       "priority": int.tryParse(taskModel.priority ?? '1') ?? 1,
       "startdate": taskModel.startDate,
       "duedate": taskModel.dueDate,
+      "status": int.tryParse(taskModel.status ?? '1') ?? 1,
     };
 
     ResponseModel responseModel = await apiClient.request(

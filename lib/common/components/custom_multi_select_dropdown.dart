@@ -11,6 +11,7 @@ class CustomMultiSelectDropDown extends StatefulWidget {
   final List<String> initialSelectedIds;
   final Function(List<String> selectedIds) onChanged;
   final bool isSearchable;
+  final bool isRequired;
 
   const CustomMultiSelectDropDown({
     Key? key,
@@ -19,6 +20,7 @@ class CustomMultiSelectDropDown extends StatefulWidget {
     this.initialSelectedIds = const [],
     required this.onChanged,
     this.isSearchable = false,
+    this.isRequired = false,
   }) : super(key: key);
 
   @override
@@ -111,14 +113,24 @@ class _CustomMultiSelectDropDownState extends State<CustomMultiSelectDropDown> {
         child: Row(
           children: [
             Expanded(
-              child: Text(
-                _displayText.isEmpty
-                    ? (widget.hintText ?? 'Select')
-                    : _displayText,
-                style: regularDefault.copyWith(
-                  color: _displayText.isEmpty
-                      ? ColorResources.getTextColor().withOpacity(0.6)
-                      : ColorResources.getTextColor(),
+              child: Text.rich(
+                TextSpan(
+                  text: _displayText.isEmpty
+                      ? (widget.hintText ?? 'Select')
+                      : _displayText,
+                  style: regularDefault.copyWith(
+                    color: _displayText.isEmpty
+                        ? ColorResources.getTextColor().withOpacity(0.6)
+                        : ColorResources.getTextColor(),
+                  ),
+                  children: [
+                    if (widget.isRequired && _displayText.isEmpty)
+                      TextSpan(
+                        text: ' *',
+                        style: semiBoldDefault.copyWith(
+                            color: ColorResources.colorRed),
+                      )
+                  ],
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

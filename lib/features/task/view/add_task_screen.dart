@@ -136,6 +136,26 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                         .toList(),
                   ),
                   const SizedBox(height: Dimensions.space15),
+                  CustomDropDownTextField(
+                    hintText: "Status",
+                    onChanged: (value) {
+                      controller.taskStatusController.text = value;
+                    },
+                    selectedValue: controller.taskStatusController.text.isEmpty
+                        ? '1'
+                        : controller.taskStatusController.text,
+                    items: controller.taskStatus.entries
+                        .map((MapEntry element) => DropdownMenuItem(
+                              value: element.key,
+                              child: Text(
+                                element.value,
+                                style: regularDefault.copyWith(
+                                    color: Colors.black),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                  const SizedBox(height: Dimensions.space15),
                   Row(
                     children: [
                       Expanded(

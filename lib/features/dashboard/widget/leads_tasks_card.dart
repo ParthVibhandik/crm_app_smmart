@@ -249,6 +249,8 @@ class LeadsTasksCard extends StatelessWidget {
         // Only navigate for leads, not tasks
         if (controller.selectedLeadsCategory == 'leads' && item.id != null) {
           Get.toNamed(RouteHelper.leadDetailsScreen, arguments: item.id);
+        } else if (controller.selectedLeadsCategory == 'tasks' && item.id != null) {
+          Get.toNamed(RouteHelper.taskDetailsScreen, arguments: item.id);
         }
       },
       child: Container(

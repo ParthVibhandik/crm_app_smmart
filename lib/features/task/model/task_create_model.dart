@@ -16,6 +16,7 @@ class TaskCreateModel {
   final String? relId;
   final String? tags;
   final String? description;
+  final String? status;
 
   TaskCreateModel({
     required this.subject,
@@ -35,5 +36,6 @@ class TaskCreateModel {
     this.relId,
     this.tags,
     this.description,
+    this.status,
   });
 }

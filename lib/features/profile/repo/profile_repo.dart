@@ -23,7 +23,7 @@ class ProfileRepo {
     return responseModel;
   }
 
-  Future<StatusModel> updateProfile(
+  Future<ResponseModel> updateProfile(
     ProfileUpdateModel profileUpdateModel,
   ) async {
     String url = "${UrlContainer.baseUrl}${UrlContainer.profileUrl}";
@@ -35,6 +35,8 @@ class ProfileRepo {
       "facebook": profileUpdateModel.facebook ?? '',
       "linkedin": profileUpdateModel.linkedin ?? '',
       "skype": profileUpdateModel.skype ?? '',
+      "staffid": profileUpdateModel.staffId ?? '',
+      "id": profileUpdateModel.staffId ?? '',
     };
 
     var request = http.MultipartRequest('POST', Uri.parse(url));
@@ -54,7 +56,19 @@ class ProfileRepo {
     http.StreamedResponse response = await request.send();
 
     String jsonResponse = await response.stream.bytesToString();
-    StatusModel responseModel = StatusModel.fromJson(jsonDecode(jsonResponse));
+    dynamic jsonEncoded = jsonDecode(jsonResponse);
+    
+    bool status = false;
+    String message = '';
+    
+    if(jsonEncoded != null && jsonEncoded is Map){
+       if (jsonEncoded['status'].toString() == 'true' || jsonEncoded['status'] == true) {
+         status = true;
+       }
+       message = jsonEncoded['message']?.toString() ?? '';
+    }
+
+    ResponseModel responseModel = ResponseModel(status, message, jsonResponse);
 
     if (kDebugMode) {
       print(response.statusCode);

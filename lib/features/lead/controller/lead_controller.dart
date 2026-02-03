@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutex_admin/common/components/snack_bar/show_custom_snackbar.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
 import 'package:flutex_admin/common/models/response_model.dart';
@@ -284,7 +285,7 @@ class LeadController extends GetxController {
     String title = titleController.text.toString();
     String email = emailController.text.toString();
     String website = websiteController.text.toString();
-    String phoneNumber = phoneNumberController.text.toString();
+    String phoneNumber = phoneNumberController.text.toString().replaceAll(RegExp(r'\D'), '');
     String company = companyController.text.toString();
     String address = addressController.text.toString();
     String city = cityController.text.toString();
@@ -298,7 +299,7 @@ class LeadController extends GetxController {
     String campaign = campaignController.text.toString();
     String designation = designationController.text.toString();
     String zip = zipController.text.toString();
-    String alternatePhoneNumber = alternatePhoneNumberController.text.toString();
+    String alternatePhoneNumber = alternatePhoneNumberController.text.toString().replaceAll(RegExp(r'\D'), '');
     // String interestedIn = selectedInterestedInIds.join(',');
 
     if (source.isEmpty) {
@@ -309,13 +310,59 @@ class LeadController extends GetxController {
       CustomSnackBar.error(errorList: [LocalStrings.enterStatus.tr]);
       return;
     }
+    if (assigned.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please select assigned staff"]);
+      return;
+    }
     if (name.isEmpty) {
       CustomSnackBar.error(errorList: [LocalStrings.enterName.tr]);
+      return;
+    }
+    if (company.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please enter company name"]);
       return;
     }
     if (companyIndustry.isEmpty) {
       CustomSnackBar.error(errorList: ["Please select company industry"]);
       return;
+    }
+    if (designation.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please select designation"]);
+      return;
+    }
+    if (email.isEmpty) {
+      CustomSnackBar.error(errorList: [LocalStrings.enterEmail.tr]);
+      return;
+    }
+    if (!GetUtils.isEmail(email)) {
+      CustomSnackBar.error(errorList: ["Please enter a valid email address"]);
+      return;
+    }
+    if (address.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please enter address"]);
+      return;
+    }
+    if (phoneNumber.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please enter phone number"]);
+      return;
+    }
+    if (phoneNumber.length < 10) {
+      CustomSnackBar.error(errorList: ["Phone number must be at least 10 digits"]);
+      return;
+    }
+    if (phoneNumber.length > 15) {
+      CustomSnackBar.error(errorList: ["Phone number cannot be more than 15 digits"]);
+      return;
+    }
+    if (alternatePhoneNumber.isNotEmpty) {
+      if (alternatePhoneNumber.length < 10) {
+        CustomSnackBar.error(errorList: ["Alternate phone number must be at least 10 digits"]);
+        return;
+      }
+      if (alternatePhoneNumber.length > 15) {
+        CustomSnackBar.error(errorList: ["Alternate phone number cannot be more than 15 digits"]);
+        return;
+      }
     }
     if (selectedInterestedInIds.isEmpty) {
       print("Validation Failed. Selected IDs: $selectedInterestedInIds");
@@ -397,6 +444,37 @@ class LeadController extends GetxController {
       searchController.clear();
       keysearch = "";
       initialData();
+    }
+  }
+
+  Future<void> fetchAddressFromPincode(String pincode) async {
+    if (pincode.length != 6) return;
+
+    try {
+      final response = await http.get(Uri.parse('https://api.postalpincode.in/pincode/$pincode'));
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        if (data.isNotEmpty && data[0]['Status'] == 'Success') {
+          final postOffice = data[0]['PostOffice'][0];
+          
+          cityController.text = postOffice['District'] ?? postOffice['Block'] ?? '';
+          stateController.text = postOffice['State'] ?? '';
+          countryController.text = postOffice['Country'] ?? '';
+          
+          if (countryController.text.toLowerCase() == 'india') {
+            String code = "+91 ";
+            if (!phoneNumberController.text.trim().startsWith('+91')) {
+                 phoneNumberController.text = code + phoneNumberController.text;
+            }
+             if (alternatePhoneNumberController.text.isNotEmpty && !alternatePhoneNumberController.text.trim().startsWith('+91')) {
+                 alternatePhoneNumberController.text = code + alternatePhoneNumberController.text;
+             }
+          }
+          update();
+        }
+      }
+    } catch (e) {
+      print('Error fetching pincode: $e');
     }
   }
 

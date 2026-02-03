@@ -63,6 +63,8 @@ import 'package:flutex_admin/features/ticket/view/ticket_details_screen.dart';
 import 'package:flutex_admin/features/ticket/view/ticket_screen.dart';
 import 'package:flutex_admin/features/ticket/view/update_ticket_screen.dart';
 import 'package:flutex_admin/features/calendar/view/calendar_screen.dart';
+import 'package:flutex_admin/features/goal/view/goal_screen.dart';
+import 'package:flutex_admin/features/goal/view/add_goal_screen.dart';
 import 'package:get/get.dart';
 
 class RouteHelper {
@@ -131,6 +133,8 @@ class RouteHelper {
   static const String dcrScreen = "/dcr_screen";
   static const String regularizationScreen = "/regularization_screen";
   static const String calendarScreen = "/calendar_screen";
+  static const String goalScreen = "/goal_screen";
+  static const String addGoalScreen = "/add_goal_screen";
 
   List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => const SplashScreen()),
@@ -276,5 +280,7 @@ class RouteHelper {
       binding: RegularizationBinding(),
     ),
     GetPage(name: calendarScreen, page: () => const CalendarScreen()),
+    GetPage(name: goalScreen, page: () => const GoalScreen()),
+    GetPage(name: addGoalScreen, page: () => const AddGoalScreen()),
   ];
 }
