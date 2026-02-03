@@ -150,7 +150,17 @@ class TaskController extends GetxController {
     );
     tasksModel = TasksModel.fromJson(jsonDecode(responseModel.responseJson));
     if (responseModel.status) {
-      tasks.addAll(tasksModel.data ?? []);
+      if(tasksModel.selfTasks != null || tasksModel.subordinatesTasks != null){
+         // New structure, clear legacy tasks list to avoid confusion if we use it, 
+         // or we can just rely on tasksModel in view
+         tasks.clear(); 
+         if(tasksModel.selfTasks != null) tasks.addAll(tasksModel.selfTasks!);
+         // We don't add subordinates tasks to the main flat list to keep them separate in UI
+      } else {
+        // Legacy structure
+        tasks.addAll(tasksModel.data ?? []);
+      }
+
       if ((tasksModel.data?.length ?? 0) < int.parse(UrlContainer.limit)) {
         hasMoreData = false;
       }
