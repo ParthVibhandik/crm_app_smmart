@@ -17,7 +17,7 @@ class ApiClient extends GetxService {
 
   Future<ResponseModel> request(
       String uri, String method, Map<String, dynamic>? params,
-      {bool passHeader = false}) async {
+      {bool passHeader = false, bool isJson = false}) async {
     Uri url = Uri.parse(uri);
     http.Response response;
 
@@ -25,11 +25,33 @@ class ApiClient extends GetxService {
       if (method == Method.postMethod) {
         if (passHeader) {
           initToken();
-          response = await http.post(url,
-              body: params,
-              headers: {'Accept': 'application/json', 'Authorization': token});
+          if (isJson) {
+            response = await http.post(url,
+                body: jsonEncode(params),
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json',
+                  'Authorization': token
+                });
+          } else {
+            response = await http.post(url,
+                body: params,
+                headers: {
+                  'Accept': 'application/json',
+                  'Authorization': token
+                });
+          }
         } else {
-          response = await http.post(url, body: params);
+          if (isJson) {
+            response = await http.post(url,
+                body: jsonEncode(params),
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
+                });
+          } else {
+            response = await http.post(url, body: params);
+          }
         }
       } else if (method == Method.putMethod) {
         initToken();
@@ -61,33 +83,60 @@ class ApiClient extends GetxService {
         print('====> token: $token');
       }
 
-      StatusModel model = StatusModel.fromJson(jsonDecode(response.body));
+      // Handle non-200 status codes before attempting JSON parsing
+      if (response.statusCode == 500) {
+        return ResponseModel(false, LocalStrings.serverError.tr, response.body);
+      } else if (response.statusCode == 404) {
+        try {
+          StatusModel model = StatusModel.fromJson(jsonDecode(response.body));
+          return ResponseModel(false, model.message!.tr, response.body);
+        } catch (e) {
+          return ResponseModel(
+              false, LocalStrings.somethingWentWrong.tr, response.body);
+        }
+      } else if (response.statusCode == 401) {
+        try {
+          StatusModel model = StatusModel.fromJson(jsonDecode(response.body));
+          sharedPreferences.setBool(
+              SharedPreferenceHelper.rememberMeKey, false);
+          Get.offAllNamed(RouteHelper.loginScreen);
+          return ResponseModel(false, model.message!.tr, response.body);
+        } catch (e) {
+          sharedPreferences.setBool(
+              SharedPreferenceHelper.rememberMeKey, false);
+          Get.offAllNamed(RouteHelper.loginScreen);
+          return ResponseModel(
+              false, LocalStrings.somethingWentWrong.tr, response.body);
+        }
+      }
 
+      // Try to parse JSON response for 200 status
       if (response.statusCode == 200) {
         try {
-          if (!model.status!) {
-            sharedPreferences.setBool(
-                SharedPreferenceHelper.rememberMeKey, false);
-            sharedPreferences.remove(SharedPreferenceHelper.token);
-            Get.offAllNamed(RouteHelper.loginScreen);
+          final decoded = jsonDecode(response.body);
+          // Some endpoints return {status: bool, message: ...}
+          if (decoded is Map && decoded['status'] is bool) {
+            StatusModel model = StatusModel.fromJson(decoded);
+            // If backend says unauthenticated, log out
+            if (model.status == false) {
+              sharedPreferences.setBool(
+                  SharedPreferenceHelper.rememberMeKey, false);
+              sharedPreferences.remove(SharedPreferenceHelper.token);
+              Get.offAllNamed(RouteHelper.loginScreen);
+            }
+            return ResponseModel(true, model.message?.tr ?? '', response.body);
           }
-        } catch (e) {
-          e.toString();
-        }
 
-        return ResponseModel(true, model.message!.tr, response.body);
-      } else if (response.statusCode == 401) {
-        sharedPreferences.setBool(SharedPreferenceHelper.rememberMeKey, false);
-        Get.offAllNamed(RouteHelper.loginScreen);
-        return ResponseModel(false, model.message!.tr, response.body);
-      } else if (response.statusCode == 404) {
-        return ResponseModel(false, model.message!.tr, response.body);
-      } else if (response.statusCode == 500) {
-        return ResponseModel(
-            false, model.message?.tr ?? LocalStrings.serverError.tr, '');
+          // Fallback: when status is not a bool (e.g., numeric task status like "5")
+          return ResponseModel(true, '', response.body);
+        } catch (e) {
+          // If parsing fails, still return success with raw body
+          return ResponseModel(true, '', response.body);
+        }
       } else {
+        // Should not reach here because non-200 handled above, keep safe fallback
         return ResponseModel(
-            false, model.message?.tr ?? LocalStrings.somethingWentWrong.tr, '');
+            false, LocalStrings.somethingWentWrong.tr, response.body);
       }
     } on SocketException {
       return ResponseModel(false, LocalStrings.somethingWentWrong.tr, '');
@@ -106,7 +155,14 @@ class ApiClient extends GetxService {
     if (sharedPreferences.containsKey(SharedPreferenceHelper.accessTokenKey)) {
       String? t =
           sharedPreferences.getString(SharedPreferenceHelper.accessTokenKey);
-      token = t ?? '';
+      // Ensure the token has the "Bearer " prefix if it's not already there.
+      // Some backends require "Bearer <token>", others just "<token>".
+      // Given the 401, trying standard Bearer format is a strong potential fix.
+      if (t != null && t.isNotEmpty) {
+        token = t.startsWith('Bearer ') ? t : 'Bearer $t';
+      } else {
+        token = '';
+      }
     } else {
       token = '';
     }

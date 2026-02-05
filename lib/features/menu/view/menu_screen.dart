@@ -75,18 +75,15 @@ class MenuScreen extends StatelessWidget {
                             );
                             SharedPreferences pref =
                                 apiClient.sharedPreferences;
-                            String language =
-                                pref.getString(
+                            String language = pref.getString(
                                   SharedPreferenceHelper.languageListKey,
                                 ) ??
                                 '';
-                            String countryCode =
-                                pref.getString(
+                            String countryCode = pref.getString(
                                   SharedPreferenceHelper.countryCode,
                                 ) ??
                                 'US';
-                            String languageCode =
-                                pref.getString(
+                            String languageCode = pref.getString(
                                   SharedPreferenceHelper.languageCode,
                                 ) ??
                                 'en';

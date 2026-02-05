@@ -8,6 +8,7 @@ class ProfileUpdateModel {
   final String? phoneNumber;
   final String? skype;
   final File? image;
+  final String? staffId;
 
   ProfileUpdateModel({
     required this.firstName,
@@ -17,5 +18,6 @@ class ProfileUpdateModel {
     this.phoneNumber,
     this.skype,
     this.image,
+    this.staffId,
   });
 }

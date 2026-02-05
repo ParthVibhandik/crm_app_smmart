@@ -107,11 +107,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   child: CircleImageWidget(
                                     isProfile: true,
-                                    imagePath:
-                                        controller
-                                            .profileModel
-                                            .data
-                                            ?.profileImage ??
+                                    imagePath: controller
+                                            .profileModel.data?.profileImage ??
                                         '',
                                     height: 90,
                                     width: 90,
@@ -119,12 +116,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 20),
-                                Text(
-                                  '${controller.profileModel.data?.firstName ?? ''} ${controller.profileModel.data?.lastName ?? ''}',
-                                  style: regularExtraLarge.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).textTheme.bodyMedium!.color,
+                                Expanded(
+                                  child: Text(
+                                    '${controller.profileModel.data?.firstName ?? ''} ${controller.profileModel.data?.lastName ?? ''}',
+                                    style: regularExtraLarge.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium!.color,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],
@@ -145,9 +146,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         controller.profileModel.data?.email),
                                     child: CardColumn(
                                       header: LocalStrings.email.tr,
-                                      body: controller
-                                              .profileModel.data?.email ??
-                                          '',
+                                      body:
+                                          controller.profileModel.data?.email ??
+                                              '',
                                     ),
                                   ),
                                 ),
@@ -166,7 +167,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Expanded(
                                   child: InkWell(
                                     onTap: () => UrlLauncherHelper.call(
-                                        controller.profileModel.data?.phoneNumber),
+                                        controller
+                                            .profileModel.data?.phoneNumber),
                                     child: CardColumn(
                                       header: LocalStrings.phone.tr,
                                       body: controller

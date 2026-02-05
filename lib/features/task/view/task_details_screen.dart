@@ -76,44 +76,51 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         builder: (controller) {
           return controller.isLoading
               ? const CustomLoader()
-              : RefreshIndicator(
-                  onRefresh: () async {
-                    await controller.loadTaskDetails(widget.id);
-                  },
-                  child: ContainedTabBarView(
-                    tabBarProperties: TabBarProperties(
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        unselectedLabelColor: ColorResources.blueGreyColor,
-                        labelColor:
-                            Theme.of(context).textTheme.bodyLarge!.color,
-                        labelStyle: regularDefault,
-                        indicatorColor: ColorResources.secondaryColor,
-                        labelPadding: const EdgeInsets.symmetric(
-                            vertical: Dimensions.space15)),
-                    tabs: [
-                      Text(
-                        LocalStrings.taskDetails.tr,
+              : controller.taskDetailsModel.data == null
+                  ? Center(
+                      child: Text(
+                        'Unable to load task details',
+                        style: regularDefault.copyWith(color: Colors.grey),
                       ),
-                      Text(
-                        LocalStrings.comments.tr,
+                    )
+                  : RefreshIndicator(
+                      onRefresh: () async {
+                        await controller.loadTaskDetails(widget.id);
+                      },
+                      child: ContainedTabBarView(
+                        tabBarProperties: TabBarProperties(
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            unselectedLabelColor: ColorResources.blueGreyColor,
+                            labelColor:
+                                Theme.of(context).textTheme.bodyLarge!.color,
+                            labelStyle: regularDefault,
+                            indicatorColor: ColorResources.secondaryColor,
+                            labelPadding: const EdgeInsets.symmetric(
+                                vertical: Dimensions.space15)),
+                        tabs: [
+                          Text(
+                            LocalStrings.taskDetails.tr,
+                          ),
+                          Text(
+                            LocalStrings.comments.tr,
+                          ),
+                          Text(
+                            LocalStrings.attachments.tr,
+                          ),
+                        ],
+                        views: [
+                          TaskInformation(
+                            taskModel: controller.taskDetailsModel.data!,
+                          ),
+                          TaskComments(
+                            taskModel: controller.taskDetailsModel.data!,
+                          ),
+                          TaskAttachments(
+                            taskModel: controller.taskDetailsModel.data!,
+                          ),
+                        ],
                       ),
-                      Text(
-                        LocalStrings.attachments.tr,
-                      ),
-                    ],
-                    views: [
-                      TaskInformation(
-                        taskModel: controller.taskDetailsModel.data!,
-                      ),
-                      TaskComments(
-                        taskModel: controller.taskDetailsModel.data!,
-                      ),
-                      TaskAttachments(
-                        taskModel: controller.taskDetailsModel.data!,
-                      ),
-                    ],
-                  ),
-                );
+                    );
         },
       ),
     );

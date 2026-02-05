@@ -193,7 +193,9 @@ class _InvoicesScreenState extends State<InvoicesScreen> {
                               separatorBuilder: (context, index) =>
                                   const SizedBox(height: Dimensions.space10),
                               itemCount: controller.invoicesModel.data!.length)
-                          : const NoDataWidget(),
+                          : NoDataWidget(
+                              text: controller.invoicesModel.message ??
+                                  LocalStrings.noDataFound),
                     ],
                   ),
                 ),

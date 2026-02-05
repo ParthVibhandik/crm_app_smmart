@@ -12,6 +12,8 @@ class TextIcon extends StatelessWidget {
   final double iconSize;
   final double space;
   final MainAxisAlignment alignment;
+  final int maxLines;
+
   const TextIcon({
     super.key,
     required this.text,
@@ -21,24 +23,34 @@ class TextIcon extends StatelessWidget {
     this.iconSize = 14,
     this.space = Dimensions.space5,
     this.alignment = MainAxisAlignment.start,
+    this.maxLines = 1, // 👈 default single line
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      spacing: space,
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: alignment,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           icon,
           size: iconSize,
           color: iconColor,
         ),
-        Text(
-          text.tr,
-          overflow: TextOverflow.ellipsis,
-          style: textStyle ??
-              lightDefault.copyWith(color: ColorResources.blueGreyColor),
+        SizedBox(width: space),
+        Flexible(
+          fit: FlexFit.loose,
+          child: Text(
+            text.tr,
+            maxLines: maxLines,
+            overflow: TextOverflow.ellipsis,
+            softWrap: true,
+            style: textStyle ??
+                lightDefault.copyWith(
+                  color: ColorResources.blueGreyColor,
+                ),
+          ),
         ),
       ],
     );

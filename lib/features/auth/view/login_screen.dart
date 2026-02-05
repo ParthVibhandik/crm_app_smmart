@@ -67,9 +67,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           bottom: 30.0,
                         ),
                         child: Center(
-                          child: Image.asset(
-                            MyImages.smmartLogo,
-                            height: 60,
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Image.asset(
+                              MyImages.smmartLogo,
+                              height: 70,
+                              width: 250,
+                            ),
                           ),
                         ),
                       ),

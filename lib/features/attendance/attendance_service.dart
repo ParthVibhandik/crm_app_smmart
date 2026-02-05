@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,28 +8,34 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'attendance_status.dart';
 import 'biometric_service.dart';
 import 'camera_service.dart';
+import 'pending_attendance.dart';
 
 class AttendanceService {
   final Dio _dio;
   final BiometricService _biometric = BiometricService();
   final CameraService _camera = CameraService();
 
+  // Backend verify endpoint (expects attendance_id query param)
+  static const String _verifyGpsEndpoint =
+      '/flutex_admin_api/attendance/verify';
+
   AttendanceService(String token)
-    : _dio = Dio(
-        BaseOptions(
-          baseUrl: 'https://smmartcrm.in',
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Accept': 'application/json',
-          },
-        ),
-      );
+      : _dio = Dio(
+          BaseOptions(
+            baseUrl: 'https://smmartcrm.in',
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Accept': 'application/json',
+            },
+          ),
+        );
 
   /// ==============================
   /// TODAY STATUS
   /// ==============================
   Future<AttendanceStatus> getTodayStatus() async {
     final response = await _dio.get('/flutex_admin_api/attendance/today');
+    print(response.data);
 
     if (response.data['status'] != true) {
       throw Exception(response.data['message'] ?? 'Failed');
@@ -46,6 +53,10 @@ class AttendanceService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('attendance_id', attendanceId.toString());
       await prefs.setString('token', token);
+    } else {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('attendance_id');
+      await prefs.remove('token');
     }
 
     return AttendanceStatus.fromJson(response.data);
@@ -81,7 +92,7 @@ class AttendanceService {
   /// ==============================
   /// PUNCH IN
   /// ==============================
-  Future<void> punchIn() async {
+  Future<void> punchIn(BuildContext context) async {
     // 1️⃣ Biometric
     final biometricAvailable = await _biometric.isBiometricAvailable();
     if (biometricAvailable) {
@@ -94,7 +105,10 @@ class AttendanceService {
     }
 
     // 2️⃣ Selfie
-    final XFile? photo = await _camera.takeSelfie(maxWidth: 600);
+    final XFile? photo = await _camera.takeSelfie(
+      context: context,
+      imageQuality: 80,
+    );
 
     if (photo == null) {
       throw Exception('Selfie is required to punch in');
@@ -118,6 +132,8 @@ class AttendanceService {
       '/flutex_admin_api/attendance/punch-in',
       data: formData,
     );
+
+    print(response.data);
 
     if (response.data['status'] != true) {
       throw Exception(response.data['message'] ?? 'Punch-in failed');
@@ -150,7 +166,28 @@ class AttendanceService {
   /// ==============================
   /// PUNCH OUT
   /// ==============================
-  Future<void> punchOut() async {
+  Future<bool> _verifyGpsOffEvents() async {
+    final prefs = await SharedPreferences.getInstance();
+    final attendanceId = prefs.getString('attendance_id');
+    if (attendanceId == null || attendanceId.isEmpty) return false;
+
+    try {
+      final response = await _dio.get(
+        _verifyGpsEndpoint,
+        queryParameters: {'attendance_id': attendanceId},
+      );
+      print('GPS Off Verification Response: ${response.data}');
+      if (response.data is Map && response.data['status'] == true) {
+        return response.data['gps_closed_exists'] == true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  /// Exposed helper so UI can decide whether to collect a GPS-off reason.
+  Future<bool> requiresGpsOffReason() => _verifyGpsOffEvents();
+
+  Future<void> punchOut({String? gpsOffReason}) async {
     // 1️⃣ Biometric
     final biometricAvailable = await _biometric.isBiometricAvailable();
     if (biometricAvailable) {
@@ -162,19 +199,28 @@ class AttendanceService {
       }
     }
 
-    // 2️⃣ Location (single fetch)
+    // 2️⃣ Check if backend saw GPS-off events today; enforce reason if needed
+    final requiresReason = await _verifyGpsOffEvents();
+    if (requiresReason && (gpsOffReason == null || gpsOffReason.isEmpty)) {
+      throw Exception('Please provide reason for GPS off before punch-out.');
+    }
+
+    // 3️⃣ Location (single fetch)
     final Position position = await _getCurrentLocation();
 
-    // 3️⃣ API
+    // 4️⃣ API
     final FormData formData = FormData.fromMap({
       'latitude': position.latitude.toString(),
       'longitude': position.longitude.toString(),
+      'gps_off_reason': gpsOffReason ?? '',
     });
 
     final response = await _dio.post(
       '/flutex_admin_api/attendance/punch-out',
       data: formData,
     );
+
+    print(response.data);
 
     if (response.data['status'] != true) {
       throw Exception(response.data['message'] ?? 'Punch-out failed');
@@ -189,5 +235,72 @@ class AttendanceService {
 
     final service = FlutterBackgroundService();
     service.invoke('stop');
+  }
+
+  /// ==============================
+  /// GET PENDING ATTENDANCES
+  /// ==============================
+  Future<List<PendingAttendance>> getPendingAttendances() async {
+    final response = await _dio.get(
+      '/flutex_admin_api/attendance/get_all_pending_attendances',
+    );
+
+    if (response.data['status'] != true) {
+      throw Exception(
+          response.data['message'] ?? 'Failed to fetch pending attendances');
+    }
+
+    final List<dynamic> attendancesList = response.data['attendances'] ?? [];
+    return attendancesList
+        .map((json) => PendingAttendance.fromJson(json))
+        .toList();
+  }
+
+  /// ==============================
+  /// REGULARIZE ATTENDANCE
+  /// ==============================
+  Future<Map<String, dynamic>> regularizeAttendance({
+    required String attendanceId,
+    required String punchedOutTime,
+    required String reason,
+  }) async {
+    final FormData formData = FormData.fromMap({
+      'attendance_id': attendanceId,
+      'punched_out_time': punchedOutTime,
+      'reason': reason,
+    });
+
+    final response = await _dio.post(
+      '/flutex_admin_api/attendance/regularize',
+      data: formData,
+    );
+
+    return {
+      'success': response.data['status'] == true,
+      'message': response.data['message'] ?? 'Unknown error',
+      'code': response.data['code'] ?? response.statusCode,
+    };
+  }
+  Future<AttendanceStatus?> getAttendanceForDate(DateTime date) async {
+    try {
+      final dateStr = date.toString().split(' ')[0];
+      // Try GET request as POST might be returning 405
+      final response = await _dio.get(
+        '/flutex_admin_api/get-attendance-date', 
+        queryParameters: {'date': dateStr},
+      );
+      
+      print('Attendance for $dateStr: ${response.data}');
+
+      if (response.data['status'] == true) {
+         if (response.data.containsKey('data') && response.data['data'] is Map) {
+             return AttendanceStatus.fromJson(response.data['data']);
+         }
+         return AttendanceStatus.fromJson(response.data);
+      }
+    } catch (e) {
+      print('Error fetching attendance for $date: $e');
+    }
+    return null;
   }
 }

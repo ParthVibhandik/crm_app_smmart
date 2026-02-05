@@ -44,10 +44,8 @@ class LeadCard extends StatelessWidget {
                   children: [
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          width: MediaQuery.sizeOf(context).width / 1.5,
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -67,34 +65,54 @@ class LeadCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Row(
-                              children: [
-                                if (lead.phoneNumber != null &&
-                                    lead.phoneNumber!.isNotEmpty)
-                                  IconButton(
-                                    onPressed: () =>
-                                        UrlLauncherHelper.call(lead.phoneNumber),
-                                    icon: const Icon(Icons.call,
-                                        size: 20,
-                                        color: ColorResources.primaryColor),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
+                        const SizedBox(width: Dimensions.space10),
+                        Flexible(
+                          fit: FlexFit.loose,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (lead.phoneNumber != null &&
+                                      lead.phoneNumber!.isNotEmpty)
+                                    IconButton(
+                                      onPressed: () => UrlLauncherHelper.call(
+                                          lead.phoneNumber),
+                                      icon: const Icon(Icons.call,
+                                          size: 20,
+                                          color: ColorResources.primaryColor),
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(),
+                                    ),
+                                  const SizedBox(width: Dimensions.space10),
+                                  ConstrainedBox(
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 120),
+                                    child: Text(
+                                      lead.leadValue ?? '-',
+                                      style: regularDefault,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.right,
+                                    ),
                                   ),
-                                const SizedBox(width: Dimensions.space10),
-                                Text(
-                                  lead.leadValue ?? '-',
-                                  style: regularDefault,
+                                ],
+                              ),
+                              ConstrainedBox(
+                                constraints:
+                                    const BoxConstraints(maxWidth: 160),
+                                child: Text(
+                                  lead.sourceName ?? '-',
+                                  style: lightSmall,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  textAlign: TextAlign.right,
                                 ),
-                              ],
-                            ),
-                            Text(
-                              lead.sourceName ?? '-',
-                              style: lightSmall,
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

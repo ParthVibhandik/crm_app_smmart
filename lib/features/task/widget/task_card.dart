@@ -65,23 +65,29 @@ class TaskCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            Converter.taskPriorityString(task.priority ?? ''),
-                            style: regularDefault.copyWith(
-                              color: ColorResources.taskStatusColor(
-                                task.priority ?? '',
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              Converter.taskPriorityString(task.priority ?? ''),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: regularDefault.copyWith(
+                                color: ColorResources.taskStatusColor(
+                                  task.priority ?? '',
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: Dimensions.space3),
-                          Text(
-                            task.relType?.capitalizeFirst ?? '-',
-                            style: lightSmall,
-                          ),
-                        ],
+                            const SizedBox(height: Dimensions.space3),
+                            Text(
+                              task.relType?.capitalizeFirst ?? '-',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: lightSmall,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

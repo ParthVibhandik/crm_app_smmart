@@ -10,9 +10,27 @@ class TaskDetailsModel {
   }
 
   TaskDetailsModel.fromJson(dynamic json) {
-    _status = json['status'];
-    _message = json['message'];
-    _data = json['data'] != null ? TaskDetails.fromJson(json['data']) : null;
+    // Check if response has the task data wrapped in 'data' key or directly
+    if (json['data'] != null && json['data'] is Map) {
+      // Old format: {status: true, message: "...", data: {...}}
+      var statusValue = json['status'];
+      _status =
+          (statusValue == true || statusValue == 'true' || statusValue == true);
+      _message = json['message']?.toString();
+      _data = TaskDetails.fromJson(json['data']);
+    } else if (json['id'] != null) {
+      // New format: task data directly in root {id: "4", name: "...", status: "5", ...}
+      // Here "status" is the task status (string like "5"), not API success status (bool)
+      _status = true; // API returned task successfully
+      _message = null;
+      _data = TaskDetails.fromJson(json);
+    } else {
+      // Error response
+      var statusValue = json['status'];
+      _status = (statusValue == true || statusValue == 'true');
+      _message = json['message']?.toString();
+      _data = null;
+    }
   }
 
   bool? _status;
@@ -489,6 +507,8 @@ class Attachments {
     String? contactId,
     String? taskCommentId,
     String? dateAdded,
+    String? previewUrl,
+    String? downloadUrl,
   }) {
     _id = id;
     _relId = relId;
@@ -504,6 +524,8 @@ class Attachments {
     _contactId = contactId;
     _taskCommentId = taskCommentId;
     _dateAdded = dateAdded;
+    _previewUrl = previewUrl;
+    _downloadUrl = downloadUrl;
   }
 
   Attachments.fromJson(dynamic json) {
@@ -521,6 +543,8 @@ class Attachments {
     _contactId = json['contact_id'];
     _taskCommentId = json['task_comment_id'];
     _dateAdded = json['dateadded'];
+    _previewUrl = json['preview_url'];
+    _downloadUrl = json['download_url'];
   }
 
   String? _id;
@@ -537,6 +561,8 @@ class Attachments {
   String? _contactId;
   String? _taskCommentId;
   String? _dateAdded;
+  String? _previewUrl;
+  String? _downloadUrl;
 
   String? get id => _id;
   String? get relId => _relId;
@@ -552,6 +578,8 @@ class Attachments {
   String? get contactId => _contactId;
   String? get taskCommentId => _taskCommentId;
   String? get dateAdded => _dateAdded;
+  String? get previewUrl => _previewUrl;
+  String? get downloadUrl => _downloadUrl;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -569,6 +597,8 @@ class Attachments {
     map['contact_id'] = _contactId;
     map['task_comment_id'] = _taskCommentId;
     map['dateadded'] = _dateAdded;
+    map['preview_url'] = _previewUrl;
+    map['download_url'] = _downloadUrl;
     return map;
   }
 }

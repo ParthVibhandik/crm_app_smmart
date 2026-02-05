@@ -24,40 +24,55 @@ class ProfileWidget extends StatefulWidget {
 }
 
 class _ProfileWidgetState extends State<ProfileWidget> {
-  XFile? imageFile;
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      child: Center(
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            !widget.isEdit ? buildDefaultImage() : buildImage(),
-            widget.isEdit
-                ? Positioned(
-                    bottom: 0,
-                    right: -4,
-                    child: GestureDetector(
-                      onTap: () {
-                        _openGallery(context);
-                      },
-                      child: buildEditIconMethod(
-                        Theme.of(context).primaryColor,
+    return GetBuilder<ProfileController>(
+      builder: (controller) {
+        return SizedBox(
+          child: Center(
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                !widget.isEdit ? buildDefaultImage() : buildImage(controller),
+                if (controller.isImageUploading)
+                  Positioned.fill(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black45,
+                      ),
+                      child: const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
                       ),
                     ),
-                  )
-                : const SizedBox(),
-          ],
-        ),
-      ),
+                  ),
+                widget.isEdit
+                    ? Positioned(
+                        bottom: 0,
+                        right: -4,
+                        child: GestureDetector(
+                          onTap: () {
+                            _openGallery(context);
+                          },
+                          child: buildEditIconMethod(
+                            Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      )
+                    : const SizedBox(),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget buildImage() {
+  Widget buildImage(ProfileController controller) {
     final Object image;
 
-    if (imageFile != null) {
-      image = FileImage(File(imageFile!.path));
+    if (controller.imageFile != null) {
+      image = FileImage(controller.imageFile!);
     } else if (widget.imagePath.contains('http')) {
       image = NetworkImage(widget.imagePath);
     } else {
@@ -65,6 +80,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     }
 
     bool isAsset = widget.imagePath.contains('http') == true ? false : true;
+    // If we have a local file, it's definitely not an asset in the sense of 'default profile image'
+    if (controller.imageFile != null) isAsset = false;
 
     return Container(
       decoration: BoxDecoration(
@@ -77,7 +94,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       child: ClipOval(
         child: Material(
           color: Theme.of(context).cardColor,
-          child: imageFile != null
+          child: controller.imageFile != null
               ? Ink.image(
                   image: image as ImageProvider,
                   fit: BoxFit.cover,
@@ -112,18 +129,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   }
 
   Widget buildEditIconMethod(Color color) => buildCircle(
-    child: buildCircle(
-      child: Icon(
-        widget.isEdit ? Icons.add_a_photo : Icons.edit,
+        child: buildCircle(
+          child: Icon(
+            widget.isEdit ? Icons.add_a_photo : Icons.edit,
+            color: Theme.of(context).cardColor,
+            size: 20,
+          ),
+          all: 8,
+          color: color,
+        ),
+        all: 3,
         color: Theme.of(context).cardColor,
-        size: 20,
-      ),
-      all: 8,
-      color: color,
-    ),
-    all: 3,
-    color: Theme.of(context).cardColor,
-  );
+      );
 
   Widget buildCircle({
     required Widget child,
@@ -145,11 +162,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       type: FileType.custom,
       allowedExtensions: ['png', 'jpg', 'jpeg'],
     );
-    setState(() {
-      Get.find<ProfileController>().imageFile = File(
-        result!.files.single.path!,
+    if (result != null && result.files.single.path != null) {
+      Get.find<ProfileController>().uploadProfileImage(
+        File(result.files.single.path!),
       );
-      imageFile = XFile(result.files.single.path!);
-    });
+    }
   }
 }

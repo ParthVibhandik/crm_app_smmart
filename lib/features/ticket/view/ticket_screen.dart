@@ -193,7 +193,9 @@ class _TicketsScreenState extends State<TicketsScreen> {
                               separatorBuilder: (context, index) =>
                                   const SizedBox(height: Dimensions.space10),
                               itemCount: controller.ticketsModel.data!.length)
-                          : const NoDataWidget(),
+                          : NoDataWidget(
+                              text: controller.ticketsModel.message ??
+                                  LocalStrings.noDataFound),
                     ],
                   ),
                 ),

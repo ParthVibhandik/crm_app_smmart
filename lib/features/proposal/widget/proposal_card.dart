@@ -15,83 +15,105 @@ class ProposalCard extends StatelessWidget {
     required this.index,
     required this.proposalModel,
   });
+
   final int index;
   final ProposalsModel proposalModel;
 
   @override
   Widget build(BuildContext context) {
+    final proposal = proposalModel.data![index];
+
     return GestureDetector(
       onTap: () {
-        Get.toNamed(RouteHelper.proposalDetailsScreen,
-            arguments: proposalModel.data![index].id!);
+        Get.toNamed(
+          RouteHelper.proposalDetailsScreen,
+          arguments: proposal.id!,
+        );
       },
       child: Card(
         margin: EdgeInsets.zero,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(5),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              border: Border(
-                left: BorderSide(
-                  width: 5.0,
-                  color: ColorResources.proposalStatusColor(
-                      proposalModel.data![index].status!),
-                ),
+        clipBehavior: Clip.antiAlias,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            border: Border(
+              left: BorderSide(
+                width: 5,
+                color: ColorResources.proposalStatusColor(proposal.status!),
               ),
             ),
-            child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(Dimensions.space15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// -------------------- TOP ROW --------------------
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    /// LEFT (TITLE)
+                    Expanded(
+                      child: Text(
+                        proposal.subject ?? '',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ),
+
+                    const SizedBox(width: Dimensions.space10),
+
+                    /// RIGHT (AMOUNT + STATUS)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        SizedBox(
-                          width: MediaQuery.sizeOf(context).width / 2,
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 120),
                           child: Text(
-                            proposalModel.data![index].subject ?? '',
+                            '${proposal.total} ${proposal.currencyName}',
+                            maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
+                            textAlign: TextAlign.end,
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '${proposalModel.data![index].total} ${proposalModel.data![index].currencyName}',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                            const SizedBox(height: Dimensions.space5),
-                            Text(
-                              Converter.proposalStatusString(
-                                  proposalModel.data![index].status ?? ''),
-                              style: lightDefault.copyWith(
-                                  color: ColorResources.proposalStatusColor(
-                                      proposalModel.data![index].status!)),
-                            ),
-                          ],
+                        const SizedBox(height: Dimensions.space5),
+                        Text(
+                          Converter.proposalStatusString(proposal.status ?? ''),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: lightDefault.copyWith(
+                            color: ColorResources.proposalStatusColor(
+                                proposal.status!),
+                          ),
                         ),
                       ],
                     ),
-                    const CustomDivider(space: Dimensions.space8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextIcon(
-                          text: proposalModel.data![index].proposalTo ?? '',
-                          icon: Icons.account_box_rounded,
-                        ),
-                        TextIcon(
-                          text: proposalModel.data![index].date ?? '',
-                          icon: Icons.calendar_month,
-                        ),
-                      ],
-                    )
                   ],
-                )),
+                ),
+
+                const CustomDivider(space: Dimensions.space8),
+
+                /// -------------------- BOTTOM ROW --------------------
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextIcon(
+                        text: proposal.proposalTo ?? '',
+                        icon: Icons.account_box_rounded,
+                        maxLines: 1,
+                      ),
+                    ),
+                    const SizedBox(width: Dimensions.space10),
+                    TextIcon(
+                      text: proposal.date ?? '',
+                      icon: Icons.calendar_month,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

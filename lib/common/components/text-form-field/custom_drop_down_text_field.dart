@@ -17,6 +17,7 @@ class CustomDropDownTextField extends StatefulWidget {
   final double radius;
   final bool needLabel;
   final FormFieldValidator? validator;
+  final bool isRequired;
 
   const CustomDropDownTextField({
     super.key,
@@ -32,6 +33,7 @@ class CustomDropDownTextField extends StatefulWidget {
     this.radius = Dimensions.defaultRadius,
     this.needLabel = false,
     this.validator,
+    this.isRequired = false,
   });
 
   @override
@@ -42,25 +44,48 @@ class CustomDropDownTextField extends StatefulWidget {
 class _CustomDropDownTextFieldState extends State<CustomDropDownTextField> {
   @override
   Widget build(BuildContext context) {
+    var validValue;
+    if (widget.selectedValue != '' &&
+        widget.selectedValue != null &&
+        widget.selectedValue != '0') {
+      if (widget.items != null &&
+          widget.items!
+              .any((element) => element.value == widget.selectedValue)) {
+        validValue = widget.selectedValue;
+      }
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         widget.needLabel
-            ? LabelText(text: widget.labelText.toString())
+            ? LabelText(
+                text: widget.labelText.toString(),
+                isRequired: widget.isRequired,
+              )
             : const SizedBox(),
         widget.needLabel
             ? const SizedBox(height: Dimensions.textToTextSpace)
             : const SizedBox(),
         DropdownButtonFormField(
-          initialValue:
-              (widget.selectedValue != '' &&
-                  widget.selectedValue != null &&
-                  widget.selectedValue != '0')
-              ? widget.selectedValue
-              : null,
+          value: validValue,
           dropdownColor: widget.dropDownColor ?? Theme.of(context).cardColor,
           focusColor: widget.focusColor ?? Theme.of(context).cardColor,
-          hint: Text(widget.hintText.toString()),
+          hint: Text.rich(
+            TextSpan(
+              text: widget.hintText.toString(),
+              style: regularDefault.copyWith(
+                color: Theme.of(context).textTheme.bodyMedium!.color?.withOpacity(0.6),
+              ),
+              children: [
+                if (widget.isRequired)
+                  TextSpan(
+                    text: ' *',
+                    style: semiBoldDefault.copyWith(
+                        color: ColorResources.colorRed),
+                  )
+              ],
+            ),
+          ),
           style: regularDefault,
           //alignment: Alignment.centerLeft,
           decoration: InputDecoration(

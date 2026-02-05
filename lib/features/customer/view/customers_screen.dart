@@ -269,7 +269,9 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                       controller.customersModel.data!.length,
                                 ),
                               )
-                            : const NoDataWidget(),
+                            : NoDataWidget(
+                                text: controller.customersModel.message ??
+                                    LocalStrings.noDataFound),
                       ],
                     ),
                   ),

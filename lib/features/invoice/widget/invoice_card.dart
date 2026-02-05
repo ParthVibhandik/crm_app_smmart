@@ -74,13 +74,17 @@ class InvoiceCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        TextIcon(
-                          text: invoiceModel.data![index].clientName ?? '',
-                          icon: Icons.business_center_outlined,
+                        Flexible(
+                          child: TextIcon(
+                            text: invoiceModel.data![index].clientName ?? '',
+                            icon: Icons.business_center_outlined,
+                          ),
                         ),
-                        TextIcon(
-                          text: invoiceModel.data![index].date ?? '',
-                          icon: Icons.calendar_month,
+                        Flexible(
+                          child: TextIcon(
+                            text: invoiceModel.data![index].date ?? '',
+                            icon: Icons.calendar_month,
+                          ),
                         ),
                       ],
                     )

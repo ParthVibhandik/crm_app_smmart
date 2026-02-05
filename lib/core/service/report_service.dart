@@ -26,7 +26,9 @@ class ReportService {
                 child: pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   children: [
-                    pw.Text('CRM Performance Report', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+                    pw.Text('CRM Performance Report',
+                        style: pw.TextStyle(
+                            fontSize: 24, fontWeight: pw.FontWeight.bold)),
                     pw.Text(DateFormat('yyyy-MM-dd').format(DateTime.now())),
                   ],
                 ),

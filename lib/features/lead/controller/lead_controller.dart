@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutex_admin/common/components/snack_bar/show_custom_snackbar.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
 import 'package:flutex_admin/common/models/response_model.dart';
@@ -38,6 +39,9 @@ class LeadController extends GetxController {
   StatusesModel statusesModel = StatusesModel();
   SourcesModel sourcesModel = SourcesModel();
   StaffsModel staffsModel = StaffsModel();
+  SourcesModel industriesModel = SourcesModel();
+  SourcesModel designationsModel = SourcesModel();
+  SourcesModel interestedInModel = SourcesModel();
 
   void handleScroll() async {
     scrollController.addListener(() {
@@ -90,15 +94,30 @@ class LeadController extends GetxController {
       source: source,
       status: status,
     );
-    leadsModel = LeadsModel.fromJson(jsonDecode(responseModel.responseJson));
-    if (responseModel.status) {
-      leads.addAll(leadsModel.data ?? []);
-      if ((leadsModel.data?.length ?? 0) < int.parse(UrlContainer.limit)) {
+    final raw = responseModel.responseJson;
+
+    if (raw.isEmpty) {
+      hasMoreData = false;
+      isLoading = false;
+      update();
+      return;
+    }
+
+    try {
+      leadsModel = LeadsModel.fromJson(jsonDecode(raw));
+      if (responseModel.status) {
+        leads.addAll(leadsModel.data ?? []);
+        if ((leadsModel.data?.length ?? 0) < int.parse(UrlContainer.limit)) {
+          hasMoreData = false;
+        }
+      } else {
         hasMoreData = false;
       }
-    } else {
+    } catch (e) {
       hasMoreData = false;
+      CustomSnackBar.error(errorList: [LocalStrings.somethingWentWrong.tr]);
     }
+
     isLoading = false;
     update();
   }
@@ -137,6 +156,27 @@ class LeadController extends GetxController {
     );
   }
 
+  Future<SourcesModel> loadIndustries() async {
+    ResponseModel responseModel = await leadRepo.getLeadIndustries();
+    return industriesModel = SourcesModel.fromJson(
+      jsonDecode(responseModel.responseJson),
+    );
+  }
+
+  Future<SourcesModel> loadDesignations() async {
+    ResponseModel responseModel = await leadRepo.getLeadDesignations();
+    return designationsModel = SourcesModel.fromJson(
+      jsonDecode(responseModel.responseJson),
+    );
+  }
+
+  Future<SourcesModel> loadInterestedIn() async {
+    ResponseModel responseModel = await leadRepo.getLeadInterestedIn();
+    return interestedInModel = SourcesModel.fromJson(
+      jsonDecode(responseModel.responseJson),
+    );
+  }
+
   Future<void> loadLeadUpdateData(leadId) async {
     ResponseModel responseModel = await leadRepo.getLeadDetails(leadId);
     if (responseModel.status) {
@@ -160,9 +200,25 @@ class LeadController extends GetxController {
       defaultLanguageController.text =
           leadDetailsModel.data?.defaultLanguage ?? '';
       descriptionController.text = leadDetailsModel.data?.description ?? '';
-      //customContactDateController.text = leadDetailsModel.data?.lastContact ?? '';
-      //contactedTodayController.text = leadDetailsModel.data?.lastContact ?? '';
       isPublicController.text = leadDetailsModel.data?.isPublic ?? '';
+      
+      companyIndustryController.text = leadDetailsModel.data?.companyIndustry ?? '';
+      campaignController.text = leadDetailsModel.data?.campaign ?? '';
+      designationController.text = leadDetailsModel.data?.designation ?? leadDetailsModel.data?.title ??  '';
+      zipController.text = leadDetailsModel.data?.zip ?? '';
+      alternatePhoneNumberController.text = leadDetailsModel.data?.alternatePhoneNumber ?? '';
+      // Use names for display if available, otherwise just keep it empty to let UI update it later or use fallback
+      interestedInController.text = leadDetailsModel.data?.interestedIn ?? ''; 
+      
+      print("Update Data - Raw InterestedIn: ${leadDetailsModel.data?.interestedIn}");
+      print("Update Data - Raw InterestedInId: ${leadDetailsModel.data?.interestedInId}");
+
+      if (leadDetailsModel.data?.interestedInId != null && leadDetailsModel.data!.interestedInId!.isNotEmpty) {
+        selectedInterestedInIds = leadDetailsModel.data!.interestedInId!.split(',');
+      } else {
+        selectedInterestedInIds = [];
+      }
+      print("Update Data - Parsed Ids: $selectedInterestedInIds");
     } else {
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
@@ -188,6 +244,13 @@ class LeadController extends GetxController {
   TextEditingController defaultLanguageController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController isPublicController = TextEditingController();
+  
+  TextEditingController companyIndustryController = TextEditingController();
+  TextEditingController campaignController = TextEditingController();
+  TextEditingController designationController = TextEditingController();
+  TextEditingController zipController = TextEditingController();
+  TextEditingController alternatePhoneNumberController = TextEditingController();
+  TextEditingController interestedInController = TextEditingController();
 
   FocusNode nameFocusNode = FocusNode();
   FocusNode assignedFocusNode = FocusNode();
@@ -205,6 +268,12 @@ class LeadController extends GetxController {
   FocusNode defaultLanguageFocusNode = FocusNode();
   FocusNode descriptionFocusNode = FocusNode();
   FocusNode isPublicFocusNode = FocusNode();
+  
+  FocusNode campaignFocusNode = FocusNode();
+  FocusNode zipFocusNode = FocusNode();
+  FocusNode alternatePhoneNumberFocusNode = FocusNode();
+
+  List<String> selectedInterestedInIds = [];
 
   Future<void> submitLead({String? leadId, bool isUpdate = false}) async {
     String source = sourceController.text.toString();
@@ -216,7 +285,7 @@ class LeadController extends GetxController {
     String title = titleController.text.toString();
     String email = emailController.text.toString();
     String website = websiteController.text.toString();
-    String phoneNumber = phoneNumberController.text.toString();
+    String phoneNumber = phoneNumberController.text.toString().replaceAll(RegExp(r'\D'), '');
     String company = companyController.text.toString();
     String address = addressController.text.toString();
     String city = cityController.text.toString();
@@ -225,6 +294,13 @@ class LeadController extends GetxController {
     String defaultLanguage = defaultLanguageController.text.toString();
     String description = descriptionController.text.toString();
     String isPublic = isPublicController.text.toString();
+    
+    String companyIndustry = companyIndustryController.text.toString();
+    String campaign = campaignController.text.toString();
+    String designation = designationController.text.toString();
+    String zip = zipController.text.toString();
+    String alternatePhoneNumber = alternatePhoneNumberController.text.toString().replaceAll(RegExp(r'\D'), '');
+    // String interestedIn = selectedInterestedInIds.join(',');
 
     if (source.isEmpty) {
       CustomSnackBar.error(errorList: [LocalStrings.pleaseSelectSource.tr]);
@@ -234,8 +310,63 @@ class LeadController extends GetxController {
       CustomSnackBar.error(errorList: [LocalStrings.enterStatus.tr]);
       return;
     }
+    if (assigned.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please select assigned staff"]);
+      return;
+    }
     if (name.isEmpty) {
       CustomSnackBar.error(errorList: [LocalStrings.enterName.tr]);
+      return;
+    }
+    if (company.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please enter company name"]);
+      return;
+    }
+    if (companyIndustry.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please select company industry"]);
+      return;
+    }
+    if (designation.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please select designation"]);
+      return;
+    }
+    if (email.isEmpty) {
+      CustomSnackBar.error(errorList: [LocalStrings.enterEmail.tr]);
+      return;
+    }
+    if (!GetUtils.isEmail(email)) {
+      CustomSnackBar.error(errorList: ["Please enter a valid email address"]);
+      return;
+    }
+    if (address.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please enter address"]);
+      return;
+    }
+    if (phoneNumber.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please enter phone number"]);
+      return;
+    }
+    if (phoneNumber.length < 10) {
+      CustomSnackBar.error(errorList: ["Phone number must be at least 10 digits"]);
+      return;
+    }
+    if (phoneNumber.length > 15) {
+      CustomSnackBar.error(errorList: ["Phone number cannot be more than 15 digits"]);
+      return;
+    }
+    if (alternatePhoneNumber.isNotEmpty) {
+      if (alternatePhoneNumber.length < 10) {
+        CustomSnackBar.error(errorList: ["Alternate phone number must be at least 10 digits"]);
+        return;
+      }
+      if (alternatePhoneNumber.length > 15) {
+        CustomSnackBar.error(errorList: ["Alternate phone number cannot be more than 15 digits"]);
+        return;
+      }
+    }
+    if (selectedInterestedInIds.isEmpty) {
+      print("Validation Failed. Selected IDs: $selectedInterestedInIds");
+      CustomSnackBar.error(errorList: ["Please select interested in"]);
       return;
     }
 
@@ -261,6 +392,12 @@ class LeadController extends GetxController {
       defaultLanguage: defaultLanguage,
       description: description,
       isPublic: isPublic,
+      companyIndustry: companyIndustry,
+      campaign: campaign,
+      designation: designation,
+      zip: zip,
+      alternatePhoneNumber: alternatePhoneNumber,
+      interestedIn: selectedInterestedInIds,
     );
 
     ResponseModel responseModel = await leadRepo.createLead(
@@ -274,7 +411,7 @@ class LeadController extends GetxController {
       if (isUpdate) {
         await Get.find<LeadDetailsController>().loadLeadDetails(leadId);
       }
-      await loadLeads();
+      await initialData();
       CustomSnackBar.success(successList: [responseModel.message.tr]);
     } else {
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
@@ -310,6 +447,37 @@ class LeadController extends GetxController {
     }
   }
 
+  Future<void> fetchAddressFromPincode(String pincode) async {
+    if (pincode.length != 6) return;
+
+    try {
+      final response = await http.get(Uri.parse('https://api.postalpincode.in/pincode/$pincode'));
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        if (data.isNotEmpty && data[0]['Status'] == 'Success') {
+          final postOffice = data[0]['PostOffice'][0];
+          
+          cityController.text = postOffice['District'] ?? postOffice['Block'] ?? '';
+          stateController.text = postOffice['State'] ?? '';
+          countryController.text = postOffice['Country'] ?? '';
+          
+          if (countryController.text.toLowerCase() == 'india') {
+            String code = "+91 ";
+            if (!phoneNumberController.text.trim().startsWith('+91')) {
+                 phoneNumberController.text = code + phoneNumberController.text;
+            }
+             if (alternatePhoneNumberController.text.isNotEmpty && !alternatePhoneNumberController.text.trim().startsWith('+91')) {
+                 alternatePhoneNumberController.text = code + alternatePhoneNumberController.text;
+             }
+          }
+          update();
+        }
+      }
+    } catch (e) {
+      print('Error fetching pincode: $e');
+    }
+  }
+
   void clearData() {
     isLoading = false;
     isSubmitLoading = false;
@@ -331,5 +499,12 @@ class LeadController extends GetxController {
     defaultLanguageController.text = '';
     descriptionController.text = '';
     isPublicController.text = '';
+    companyIndustryController.text = '';
+    campaignController.text = '';
+    designationController.text = '';
+    zipController.text = '';
+    alternatePhoneNumberController.text = '';
+    interestedInController.text = '';
+    selectedInterestedInIds.clear();
   }
 }

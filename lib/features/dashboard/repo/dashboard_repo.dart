@@ -20,4 +20,15 @@ class DashboardRepo {
         await apiClient.request(url, Method.getMethod, null, passHeader: true);
     return responseModel;
   }
+
+  Future<ResponseModel> getAttendanceDate(String date) async {
+    String url = "${UrlContainer.baseUrl}${UrlContainer.getAttendanceDateUrl}?date=$date";
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.getMethod,
+      null,
+      passHeader: true,
+    );
+    return responseModel;
+  }
 }

@@ -18,7 +18,7 @@ class TaskComments extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(Dimensions.space15),
-      child: taskModel.comments!.isNotEmpty
+      child: (taskModel.comments != null && taskModel.comments!.isNotEmpty)
           ? ListView.separated(
               itemBuilder: (context, index) {
                 return Container(

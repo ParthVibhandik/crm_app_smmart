@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:multi_dropdown/multi_dropdown.dart';
 import 'dart:convert';
 import 'package:flutex_admin/common/components/snack_bar/show_custom_snackbar.dart';
 import 'package:flutex_admin/core/helper/string_format_helper.dart'
@@ -18,6 +19,7 @@ import 'package:flutex_admin/features/task/model/task_details_model.dart';
 import 'package:flutex_admin/features/task/model/tasks_model.dart';
 import 'package:flutex_admin/features/task/repo/task_repo.dart';
 import 'package:flutex_admin/features/ticket/model/ticket_model.dart';
+import 'package:flutex_admin/features/staff/model/staff_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -48,6 +50,7 @@ class TaskController extends GetxController {
   ContractsModel contractsModel = ContractsModel();
   LeadsModel leadsModel = LeadsModel();
   TicketsModel ticketsModel = TicketsModel();
+  StaffsModel subordinatesModel = StaffsModel();
 
   final Map<String, String> taskPriority = {
     '1': LocalStrings.priorityLow.tr,
@@ -147,7 +150,17 @@ class TaskController extends GetxController {
     );
     tasksModel = TasksModel.fromJson(jsonDecode(responseModel.responseJson));
     if (responseModel.status) {
-      tasks.addAll(tasksModel.data ?? []);
+      if(tasksModel.selfTasks != null || tasksModel.subordinatesTasks != null){
+         // New structure, clear legacy tasks list to avoid confusion if we use it, 
+         // or we can just rely on tasksModel in view
+         tasks.clear(); 
+         if(tasksModel.selfTasks != null) tasks.addAll(tasksModel.selfTasks!);
+         // We don't add subordinates tasks to the main flat list to keep them separate in UI
+      } else {
+        // Legacy structure
+        tasks.addAll(tasksModel.data ?? []);
+      }
+
       if ((tasksModel.data?.length ?? 0) < int.parse(UrlContainer.limit)) {
         hasMoreData = false;
       }
@@ -161,10 +174,14 @@ class TaskController extends GetxController {
   Future<void> loadTaskDetails(taskId) async {
     ResponseModel responseModel = await taskRepo.getTaskDetails(taskId);
     if (responseModel.status) {
+      print("Task Details Response: ${responseModel.responseJson}");
       taskDetailsModel = TaskDetailsModel.fromJson(
         jsonDecode(responseModel.responseJson),
       );
+      print("Task Details Data: ${taskDetailsModel.data}");
+      print("Task Name: ${taskDetailsModel.data?.name}");
     } else {
+      print("Task Details Error: ${responseModel.message}");
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
 
@@ -231,6 +248,13 @@ class TaskController extends GetxController {
     );
   }
 
+  Future<StaffsModel> loadSubordinates() async {
+    ResponseModel responseModel = await taskRepo.getSubordinates();
+    return subordinatesModel = StaffsModel.fromJson(
+      jsonDecode(responseModel.responseJson),
+    );
+  }
+
   Future<void> loadTaskUpdateData(taskId) async {
     ResponseModel responseModel = await taskRepo.getTaskDetails(taskId);
     if (responseModel.status) {
@@ -242,6 +266,7 @@ class TaskController extends GetxController {
       startDateController.text = taskDetailsModel.data?.startDate ?? '';
       dueDateController.text = taskDetailsModel.data?.dueDate ?? '';
       taskPriorityController.text = taskDetailsModel.data?.priority ?? '';
+      taskStatusController.text = taskDetailsModel.data?.status ?? '1'; // Default to 1 (Not Started)
       taskRelatedController.text = taskDetailsModel.data?.relType ?? '';
       relationIdController.text = taskDetailsModel.data?.relId ?? '';
       descriptionController.text = formatter.Converter.parseHtmlString(
@@ -258,7 +283,9 @@ class TaskController extends GetxController {
   TextEditingController rateController = TextEditingController();
   TextEditingController startDateController = TextEditingController();
   TextEditingController dueDateController = TextEditingController();
+
   TextEditingController taskPriorityController = TextEditingController();
+  TextEditingController taskStatusController = TextEditingController();
   TextEditingController repeatEveryController = TextEditingController();
   TextEditingController repeatEveryCustomController = TextEditingController();
   TextEditingController repeatTypeCustomController = TextEditingController();
@@ -279,25 +306,41 @@ class TaskController extends GetxController {
   FocusNode repeatTypeCustomFocusNode = FocusNode();
   FocusNode tagsFocusNode = FocusNode();
   FocusNode descriptionFocusNode = FocusNode();
+  FocusNode assignedToFocusNode = FocusNode();
+
+  MultiSelectController<Object> assignedToController = MultiSelectController();
 
   Future<void> submitTask({String? taskId, bool isUpdate = false}) async {
     String subject = subjectController.text.toString();
     String rate = rateController.text.toString();
     String startDate = startDateController.text.toString();
     String dueDate = dueDateController.text.toString();
+
     String priority = taskPriorityController.text.toString();
+    String status = taskStatusController.text.toString();
     String repeat = repeatEveryController.text.toString();
     String related = taskRelatedController.text.toString();
     String relId = relationIdController.text.toString();
     String tags = tagsController.text.toString();
+    List<String> assignedTo = assignedToController.selectedItems
+        .map((e) => e.value.toString())
+        .toList();
     String description = descriptionController.text.toString();
 
     if (subject.isEmpty) {
       CustomSnackBar.error(errorList: [LocalStrings.enterSubject.tr]);
       return;
     }
+    if (assignedTo.isEmpty) {
+      CustomSnackBar.error(errorList: ["Please select assignee"]);
+      return;
+    }
     if (startDate.isEmpty) {
       CustomSnackBar.error(errorList: [LocalStrings.enterStartDate.tr]);
+      return;
+    }
+    if (dueDate.isEmpty) {
+      CustomSnackBar.error(errorList: [LocalStrings.enterDueDate.tr]);
       return;
     }
 
@@ -312,11 +355,13 @@ class TaskController extends GetxController {
       startDate: startDate,
       dueDate: dueDate,
       priority: priority,
+      status: status,
       repeatEvery: repeat,
       relType: related,
       relId: relId,
       tags: tags,
       description: description,
+      assignedTo: assignedTo,
     );
 
     ResponseModel responseModel = await taskRepo.createTask(
@@ -384,6 +429,20 @@ class TaskController extends GetxController {
     }
   }
 
+  Future<void> changeTaskStatus(String taskId, String status) async {
+    isLoading = true;
+    update();
+    ResponseModel responseModel = await taskRepo.updateTaskStatus(taskId, status);
+    if (responseModel.status) {
+      await loadTaskDetails(taskId);
+      CustomSnackBar.success(successList: [responseModel.message.tr]);
+    } else {
+      isLoading = false;
+      update();
+      CustomSnackBar.error(errorList: [responseModel.message.tr]);
+    }
+  }
+
   void clearData() {
     isLoading = false;
     isSubmitLoading = false;
@@ -394,10 +453,13 @@ class TaskController extends GetxController {
     startDateController.text = '';
     dueDateController.text = '';
     taskPriorityController.text = '';
+    taskStatusController.text = '';
     taskRelatedController.text = '';
     relationIdController.text = '';
     tagsController.text = '';
+    tagsController.text = '';
     descriptionController.text = '';
+    assignedToController.clearAll();
     repeatTypeCustomController.text = '';
     repeatEveryCustomController.text = '';
     repeatEveryController.text = '';

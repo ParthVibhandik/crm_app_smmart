@@ -8,6 +8,8 @@ import 'package:flutex_admin/core/helper/shared_preference_helper.dart';
 import 'package:flutex_admin/core/route/route.dart';
 import 'package:flutex_admin/common/models/response_model.dart';
 import 'package:flutex_admin/common/components/snack_bar/show_custom_snackbar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutex_admin/core/service/notification_service.dart';
 
 class LoginController extends GetxController {
   AuthRepo loginRepo;
@@ -47,6 +49,18 @@ class LoginController extends GetxController {
     );
     String? token = responseModel.data?.accessToken.toString() ?? '';
     print('Access Token: $token');
+
+    // Send FCM token to backend
+    FirebaseMessaging.instance.getToken().then((fcmToken) {
+      if (fcmToken != null) {
+        debugPrint('====> FCM token acquired (masked): '
+            '${fcmToken.length > 12 ? '${fcmToken.substring(0, 6)}...${fcmToken.substring(fcmToken.length - 4)}' : fcmToken}');
+        NotificationService.sendTokenToBackend(fcmToken);
+      } else {
+        debugPrint('====> FCM token is null; skipping send');
+      }
+    });
+
     Get.offAndToNamed(RouteHelper.dashboardScreen);
 
     if (remember) {
@@ -71,6 +85,8 @@ class LoginController extends GetxController {
       );
       checkAndGotoNextStep(loginModel);
     } else {
+      print("Login Error - Message: ${responseModel.message}");
+      print("Login Error - Response: ${responseModel.responseJson}");
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }
     isSubmitLoading = false;

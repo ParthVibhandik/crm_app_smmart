@@ -18,6 +18,7 @@ import 'package:flutex_admin/features/lead/model/sources_model.dart';
 import 'package:flutex_admin/features/lead/model/statuses_model.dart';
 import 'package:flutex_admin/features/lead/repo/lead_repo.dart';
 import 'package:flutex_admin/features/staff/model/staff_model.dart';
+import 'package:flutex_admin/common/components/custom_multi_select_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,6 +34,9 @@ class _UpdateTicketScreenState extends State<UpdateLeadScreen> {
   final AsyncMemoizer<SourcesModel> sourcesMemoizer = AsyncMemoizer();
   final AsyncMemoizer<StatusesModel> statusesMemoizer = AsyncMemoizer();
   final AsyncMemoizer<StaffsModel> assigneeMemoizer = AsyncMemoizer();
+  final AsyncMemoizer<SourcesModel> industriesMemoizer = AsyncMemoizer();
+  final AsyncMemoizer<SourcesModel> designationsMemoizer = AsyncMemoizer();
+  final AsyncMemoizer<SourcesModel> interestedInMemoizer = AsyncMemoizer();
   @override
   void initState() {
     Get.put(ApiClient(sharedPreferences: Get.find()));
@@ -76,207 +80,300 @@ class _UpdateTicketScreenState extends State<UpdateLeadScreen> {
                       child: Column(
                         spacing: Dimensions.space15,
                         children: [
-                          FutureBuilder(
-                              future: sourcesMemoizer
-                                  .runOnce(controller.loadLeadSources),
-                              builder: (context, sourceList) {
-                                if (sourceList.data?.status ?? false) {
-                                  return CustomDropDownTextField(
-                                    hintText: LocalStrings.selectSource.tr,
-                                    selectedValue:
-                                        controller.sourceController.text,
-                                    onChanged: (value) {
-                                      controller.sourceController.text =
-                                          value.toString();
-                                    },
-                                    items: controller.sourcesModel.data!
-                                        .map((Source value) {
-                                      return DropdownMenuItem(
-                                        value: value.id,
-                                        child: Text(
-                                          value.name?.tr ?? '',
-                                          style: regularDefault.copyWith(
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium!
-                                                  .color),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  );
-                                } else if (sourceList.data?.status == false) {
-                                  return CustomDropDownWithTextField(
-                                      selectedValue:
-                                          LocalStrings.noSourceFound.tr,
-                                      list: [LocalStrings.noSourceFound.tr]);
-                                } else {
-                                  return const CustomLoader(
-                                      isFullScreen: false);
-                                }
-                              }),
-                          FutureBuilder(
-                              future: statusesMemoizer
-                                  .runOnce(controller.loadLeadStatuses),
-                              builder: (context, statusList) {
-                                if (statusList.data?.status ?? false) {
-                                  return CustomDropDownTextField(
-                                    hintText: LocalStrings.selectStatus.tr,
-                                    selectedValue:
-                                        controller.statusController.text,
-                                    onChanged: (value) {
-                                      controller.statusController.text =
-                                          value.toString();
-                                    },
-                                    items: controller.statusesModel.data!
-                                        .map((Status value) {
-                                      return DropdownMenuItem(
-                                        value: value.id,
-                                        child: Text(
-                                          value.name?.tr ?? '',
-                                          style: regularDefault.copyWith(
-                                              color: Converter.hexStringToColor(
-                                                  value.color ?? '')),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  );
-                                } else if (statusList.data?.status == false) {
-                                  return CustomDropDownWithTextField(
-                                      selectedValue:
-                                          LocalStrings.noStatusFound.tr,
-                                      list: [LocalStrings.noStatusFound.tr]);
-                                } else {
-                                  return const CustomLoader(
-                                      isFullScreen: false);
-                                }
-                              }),
-                          FutureBuilder(
-                              future: assigneeMemoizer
-                                  .runOnce(controller.loadStaff),
-                              builder: (context, staffList) {
-                                if (staffList.data?.status ?? false) {
-                                  return CustomDropDownTextField(
-                                    hintText: LocalStrings.selectStaff.tr,
-                                    onChanged: (value) {
-                                      controller.assignedController.text =
-                                          value.toString();
-                                    },
-                                    selectedValue:
-                                        controller.assignedController.text,
-                                    items: controller.staffsModel.data!
-                                        .map((value) {
-                                      return DropdownMenuItem(
-                                        value: value.id,
-                                        child: Text(
-                                          value.fullName ?? '-',
-                                          style: regularDefault.copyWith(
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium!
-                                                  .color),
-                                        ),
-                                      );
-                                    }).toList(),
-                                  );
-                                } else if (staffList.data?.status == false) {
-                                  return CustomDropDownWithTextField(
-                                      selectedValue:
-                                          LocalStrings.noStaffFound.tr,
-                                      list: [LocalStrings.noStaffFound.tr]);
-                                } else {
-                                  return const CustomLoader(
-                                      isFullScreen: false);
-                                }
-                              }),
-                          CustomTextField(
-                            labelText: LocalStrings.name.tr,
-                            controller: controller.nameController,
-                            focusNode: controller.nameFocusNode,
-                            textInputType: TextInputType.text,
-                            nextFocus: controller.valueFocusNode,
+                  // 1. Source*
+                  FutureBuilder(
+                      future:
+                          sourcesMemoizer.runOnce(controller.loadLeadSources),
+                      builder: (context, sourceList) {
+                        if (sourceList.data?.status ?? false) {
+                          return CustomDropDownTextField(
+                            hintText: LocalStrings.selectSource.tr,
+                            needLabel: false,
+                            selectedValue: controller.sourceController.text,
                             onChanged: (value) {
-                              return;
+                              controller.sourceController.text =
+                                  value.toString();
                             },
-                          ),
-                          CustomTextField(
-                            labelText: LocalStrings.position.tr,
-                            controller: controller.titleController,
-                            focusNode: controller.titleFocusNode,
-                            textInputType: TextInputType.text,
-                            nextFocus: controller.emailFocusNode,
+                            items: controller.sourcesModel.data!.map((value) {
+                              return DropdownMenuItem(
+                                value: value.id,
+                                child: Text(
+                                  value.name?.tr ?? '',
+                                  style: regularDefault.copyWith(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .color),
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        } else if (sourceList.data?.status == false) {
+                          return CustomDropDownWithTextField(
+                              selectedValue: LocalStrings.noSourceFound.tr,
+                              list: [LocalStrings.noSourceFound.tr]);
+                        } else {
+                          return const CustomLoader(isFullScreen: false);
+                        }
+                      }),
+                  // 2. Status*
+                  FutureBuilder(
+                      future:
+                          statusesMemoizer.runOnce(controller.loadLeadStatuses),
+                      builder: (context, statusList) {
+                        if (statusList.data?.status ?? false) {
+                          return CustomDropDownTextField(
+                            hintText: LocalStrings.selectStatus.tr,
+                            needLabel: false,
+                            selectedValue: controller.statusController.text,
                             onChanged: (value) {
-                              return;
+                              controller.statusController.text =
+                                  value.toString();
                             },
-                          ),
-                          CustomTextField(
-                            labelText: LocalStrings.email.tr,
-                            controller: controller.emailController,
-                            focusNode: controller.emailFocusNode,
-                            textInputType: TextInputType.text,
-                            nextFocus: controller.websiteFocusNode,
+                            items: controller.statusesModel.data!.map((value) {
+                              return DropdownMenuItem(
+                                value: value.id,
+                                child: Text(
+                                  value.name?.tr ?? '',
+                                  style: regularDefault.copyWith(
+                                      color: Converter.hexStringToColor(
+                                          value.color ?? '')),
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        } else if (statusList.data?.status == false) {
+                          return CustomDropDownWithTextField(
+                              selectedValue: LocalStrings.noStatusFound.tr,
+                              list: [LocalStrings.noStatusFound.tr]);
+                        } else {
+                          return const CustomLoader(isFullScreen: false);
+                        }
+                      }),
+                  // 3. Assigned*
+                  FutureBuilder(
+                      future: assigneeMemoizer.runOnce(controller.loadStaff),
+                      builder: (context, staffList) {
+                        if (staffList.data?.status ?? false) {
+                          return CustomDropDownTextField(
+                            hintText: "Assigned",
+                            needLabel: false,
+                            selectedValue: controller.assignedController.text,
                             onChanged: (value) {
-                              return;
+                              controller.assignedController.text =
+                                  value.toString();
                             },
-                          ),
-                          CustomTextField(
-                            labelText: LocalStrings.website.tr,
-                            controller: controller.websiteController,
-                            focusNode: controller.websiteFocusNode,
-                            textInputType: TextInputType.text,
-                            nextFocus: controller.phoneNumberFocusNode,
+                            items: controller.staffsModel.data!.map((value) {
+                              return DropdownMenuItem(
+                                value: value.id,
+                                child: Text(
+                                  value.fullName ?? '-',
+                                  style: regularDefault.copyWith(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .color),
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        } else if (staffList.data?.status == false) {
+                          return CustomDropDownWithTextField(
+                              selectedValue: LocalStrings.noStaffFound.tr,
+                              list: [LocalStrings.noStaffFound.tr]);
+                        } else {
+                          return const CustomLoader(isFullScreen: false);
+                        }
+                      }),
+                  // 4. Name*
+                  CustomTextField(
+                    hintText: LocalStrings.name.tr,
+                    controller: controller.nameController,
+                    focusNode: controller.nameFocusNode,
+                    textInputType: TextInputType.text,
+                    nextFocus: controller.companyFocusNode,
+                    onChanged: (value) {},
+                  ),
+                   // 5. Company name*
+                  CustomTextField(
+                    hintText: LocalStrings.company.tr,
+                    controller: controller.companyController,
+                    focusNode: controller.companyFocusNode,
+                    textInputType: TextInputType.text,
+                    nextFocus: controller.campaignFocusNode,
+                    onChanged: (value) {},
+                  ),
+                  // 6. Company Industry* (dropdown)
+                   FutureBuilder(
+                      future: industriesMemoizer.runOnce(controller.loadIndustries),
+                      builder: (context, list) {
+                        if (list.data?.status ?? false) {
+                          return CustomDropDownTextField(
+                            hintText: "Company Industry",
+                            needLabel: false,
+                            selectedValue: controller.companyIndustryController.text,
                             onChanged: (value) {
-                              return;
+                              controller.companyIndustryController.text = value.toString();
                             },
-                          ),
-                          CustomTextField(
-                            labelText: LocalStrings.phone.tr,
-                            controller: controller.phoneNumberController,
-                            focusNode: controller.phoneNumberFocusNode,
-                            textInputType: TextInputType.number,
-                            nextFocus: controller.companyFocusNode,
+                            items: controller.industriesModel.data!.map((value) {
+                              return DropdownMenuItem(
+                                value: value.name,
+                                child: Text(value.name ?? '', style: regularDefault.copyWith(color: Colors.black)),
+                              );
+                            }).toList(),
+                          );
+                        } else {
+                           return const CustomLoader(isFullScreen: false);
+                        }
+                      }),
+                   // 7. Campaign Name
+                  CustomTextField(
+                    hintText: "Campaign Name",
+                    controller: controller.campaignController,
+                    focusNode: controller.campaignFocusNode,
+                    textInputType: TextInputType.text,
+                    onChanged: (value) {},
+                  ),
+                   // 8. Designation (dropdown)
+                   FutureBuilder(
+                      future: designationsMemoizer.runOnce(controller.loadDesignations),
+                      builder: (context, list) {
+                        if (list.data?.status ?? false) {
+                          return CustomDropDownTextField(
+                            hintText: "Designation",
+                            needLabel: false,
+                            selectedValue: controller.designationController.text,
                             onChanged: (value) {
-                              return;
+                              controller.designationController.text = value.toString();
                             },
-                          ),
-                          CustomTextField(
-                            labelText: LocalStrings.company.tr,
-                            controller: controller.companyController,
-                            focusNode: controller.companyFocusNode,
-                            textInputType: TextInputType.text,
-                            nextFocus: controller.addressFocusNode,
-                            onChanged: (value) {
-                              return;
+                            items: controller.designationsModel.data!.map((value) {
+                              return DropdownMenuItem(
+                                value: value.id, 
+                                child: Text(value.name ?? '', style: regularDefault.copyWith(color: Colors.black)),
+                              );
+                            }).toList(),
+                          );
+                        } else {
+                           return const CustomLoader(isFullScreen: false);
+                        }
+                      }),
+                  // 9. Email Address*
+                  CustomTextField(
+                    hintText: LocalStrings.email.tr,
+                    controller: controller.emailController,
+                    focusNode: controller.emailFocusNode,
+                    textInputType: TextInputType.emailAddress,
+                    nextFocus: controller.websiteFocusNode,
+                    onChanged: (value) {},
+                  ),
+                  // 10. Website
+                  CustomTextField(
+                    hintText: LocalStrings.website.tr,
+                    controller: controller.websiteController,
+                    focusNode: controller.websiteFocusNode,
+                    textInputType: TextInputType.url,
+                    onChanged: (value) {},
+                  ),
+                  // 11. Lead value
+                  CustomAmountTextField(
+                    controller: controller.valueController,
+                    hintText: LocalStrings.leadValue.tr,
+                    currency: '\$',
+                    onChanged: (value) {},
+                  ),
+                  // 12. Zip Code
+                   CustomTextField(
+                    hintText: "Zip Code",
+                    controller: controller.zipController,
+                    focusNode: controller.zipFocusNode,
+                    textInputType: TextInputType.number,
+                    nextFocus: controller.addressFocusNode,
+                    onChanged: (value) {},
+                  ),
+                  // 13. Address *
+                  CustomTextField(
+                    hintText: LocalStrings.address.tr,
+                    controller: controller.addressController,
+                    focusNode: controller.addressFocusNode,
+                    textInputType: TextInputType.text,
+                    onChanged: (value) {},
+                  ),
+                  // 14. City
+                  CustomTextField(
+                    hintText: "City",
+                    controller: controller.cityController,
+                    focusNode: controller.cityFocusNode,
+                    textInputType: TextInputType.text,
+                    onChanged: (value) {},
+                  ),
+                  // 15. State
+                   CustomTextField(
+                    hintText: "State",
+                    controller: controller.stateController,
+                    focusNode: controller.stateFocusNode,
+                    textInputType: TextInputType.text,
+                    onChanged: (value) {},
+                  ),
+                   // 16. Country
+                   CustomTextField(
+                    hintText: "Country",
+                    controller: controller.countryController,
+                    focusNode: controller.countryFocusNode,
+                    textInputType: TextInputType.text,
+                    onChanged: (value) {},
+                  ),
+                  // 17. Phone *
+                  CustomTextField(
+                    hintText: LocalStrings.phone.tr,
+                    controller: controller.phoneNumberController,
+                    focusNode: controller.phoneNumberFocusNode,
+                    textInputType: TextInputType.phone,
+                    nextFocus: controller.alternatePhoneNumberFocusNode,
+                    onChanged: (value) {},
+                  ),
+                   // 18. Alternate Phonenumber
+                  CustomTextField(
+                    hintText: "Alternate Phonenumber",
+                    controller: controller.alternatePhoneNumberController,
+                    focusNode: controller.alternatePhoneNumberFocusNode,
+                    textInputType: TextInputType.phone,
+                    onChanged: (value) {},
+                  ),
+                  // 19. Description
+                   CustomTextField(
+                    hintText: "Description",
+                    controller: controller.descriptionController,
+                    focusNode: controller.descriptionFocusNode,
+                    textInputType: TextInputType.multiline,
+                    onChanged: (value) {},
+                  ),
+                  // 20. Interested in* (dropdown)
+                  // 20. Interested in* (Multi-Select)
+                   FutureBuilder(
+                      future: interestedInMemoizer.runOnce(controller.loadInterestedIn),
+                      builder: (context, list) {
+                        if (list.data?.status ?? false) {
+                          return CustomMultiSelectDropDown(
+                            hintText: "Interested In",
+                            items: controller.interestedInModel.data ?? [],
+                            initialSelectedIds: controller.selectedInterestedInIds,
+                            onChanged: (List<String> selectedIds) {
+                              controller.selectedInterestedInIds = selectedIds;
                             },
-                          ),
-                          CustomTextField(
-                            labelText: LocalStrings.address.tr,
-                            controller: controller.addressController,
-                            focusNode: controller.addressFocusNode,
-                            textInputType: TextInputType.text,
-                            onChanged: (value) {
-                              return;
-                            },
-                          ),
-                          CustomAmountTextField(
-                            controller: controller.valueController,
-                            hintText: LocalStrings.leadValue.tr,
-                            currency: '\$',
-                            onChanged: (value) {
-                              return;
-                            },
-                          ),
-                          const SizedBox(height: Dimensions.space5),
-                          controller.isLoading
-                              ? const SizedBox.shrink()
-                              : controller.isSubmitLoading
-                                  ? const RoundedLoadingBtn()
-                                  : RoundedButton(
-                                      text: LocalStrings.update.tr,
-                                      press: () {
-                                        controller.submitLead(
-                                            leadId: widget.id, isUpdate: true);
-                                      },
-                                    ),
+                          );
+                        } else {
+                           return const CustomLoader(isFullScreen: false);
+                        }
+                      }),
+                  const SizedBox(height: Dimensions.space5),
+                  controller.isSubmitLoading
+                      ? const RoundedLoadingBtn()
+                      : RoundedButton(
+                          text: LocalStrings.update.tr,
+                          press: () {
+                            controller.submitLead(leadId: widget.id, isUpdate: true);
+                          },
+                        ),
                         ],
                       ),
                     ),

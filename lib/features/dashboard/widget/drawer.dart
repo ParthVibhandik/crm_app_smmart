@@ -191,6 +191,39 @@ class HomeDrawer extends StatelessWidget {
                           },
                         )
                       : const SizedBox.shrink(),
+                  buildListTile(
+                    leadingIcon: Icons.map_outlined,
+                    title: "Sales Trip Tracker",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Get.toNamed(RouteHelper.salesTrackerScreen);
+                    },
+                  ),
+                  buildListTile(
+                    leadingIcon: Icons.call_outlined,
+                    title: "Telecalling",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Get.toNamed(RouteHelper.telecallingScreen);
+                    },
+                  ),
+                  buildListTile(
+                    leadingIcon: Icons.edit_calendar_outlined,
+                    title: "Regularize Attendance",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Get.toNamed(RouteHelper.regularizationScreen);
+                    },
+                  ),
+                  buildListTile(
+                    leadingIcon: Icons.flag_outlined,
+                    title: "Goals",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Get.toNamed(RouteHelper.goalScreen);
+                    },
+                  ),
+
                   homeModel.menuItems?.expenses ?? false
                       ? buildListTile(
                           leadingIcon: Icons.monetization_on_outlined,

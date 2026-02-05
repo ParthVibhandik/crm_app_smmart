@@ -6,44 +6,55 @@ import 'package:flutter/material.dart';
 
 class TableItem extends StatelessWidget {
   const TableItem({super.key, required this.item, this.currency});
+
   final Item item;
   final String? currency;
 
   @override
   Widget build(BuildContext context) {
+    final double rate = double.tryParse(item.rate ?? '0') ?? 0;
+    final double qty = double.tryParse(item.qty ?? '0') ?? 0;
+    final double total = rate * qty;
+
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: MediaQuery.sizeOf(context).width / 1.5,
-              child: Text(
+        /// ---------------- LEFT SIDE (DESCRIPTION + RATE) ----------------
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
                 item.description ?? '',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: regularDefault,
               ),
-            ),
-            Text(
-              '${currency ?? ''}${item.rate} x ${item.qty?.replaceAll('.00', '')} ${item.unit}',
-              style: regularDefault.copyWith(
-                color: ColorResources.blueGreyColor,
+              const SizedBox(height: Dimensions.space5),
+              Text(
+                '${currency ?? ''}${item.rate} × ${item.qty?.replaceAll('.00', '')} ${item.unit ?? ''}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: regularDefault.copyWith(
+                  color: ColorResources.blueGreyColor,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        const SizedBox(height: Dimensions.space5),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '${currency ?? ''}${double.parse(item.rate ?? '0') * double.parse(item.qty ?? '0')}',
-              style: regularLarge,
-            ),
-          ],
+
+        const SizedBox(width: Dimensions.space10),
+
+        /// ---------------- RIGHT SIDE (TOTAL PRICE) ----------------
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 110),
+          child: Text(
+            '${currency ?? ''}${total.toStringAsFixed(2)}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
+            style: regularLarge,
+          ),
         ),
       ],
     );

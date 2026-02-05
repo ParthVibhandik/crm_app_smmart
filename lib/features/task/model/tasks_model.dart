@@ -2,11 +2,15 @@ class TasksModel {
   TasksModel({
     List<DataField>? overview,
     List<Task>? data,
+    List<Task>? selfTasks,
+    Map<String, List<Task>>? subordinatesTasks,
   }) {
     _status = status;
     _message = message;
     _overview = overview;
     _data = data;
+    _selfTasks = selfTasks;
+    _subordinatesTasks = subordinatesTasks;
   }
 
   TasksModel.fromJson(dynamic json) {
@@ -18,10 +22,31 @@ class TasksModel {
         _overview?.add(DataField.fromJson(v));
       });
     }
-    if (json['data'] != null) {
-      _data = [];
+
+    if (json['self_tasks'] != null) {
+      _selfTasks = [];
+      json['self_tasks'].forEach((v) {
+        _selfTasks?.add(Task.fromJson(v));
+      });
+      // specific assignment for backward compatibility if needed, using self_tasks as main data source
+      _data = _selfTasks;
+    } else if (json['data'] != null) {
+       _data = [];
       json['data'].forEach((v) {
         _data?.add(Task.fromJson(v));
+      });
+    }
+
+    if (json['subordinates_tasks'] != null && json['subordinates_tasks'] is Map) {
+      _subordinatesTasks = {};
+      json['subordinates_tasks'].forEach((key, value) {
+        List<Task> tasks = [];
+         if (value is List) {
+           value.forEach((v) {
+             tasks.add(Task.fromJson(v));
+           });
+         }
+        _subordinatesTasks?[key] = tasks;
       });
     }
   }
@@ -30,11 +55,15 @@ class TasksModel {
   String? _message;
   List<DataField>? _overview;
   List<Task>? _data;
+  List<Task>? _selfTasks;
+  Map<String, List<Task>>? _subordinatesTasks;
 
   bool? get status => _status;
   String? get message => _message;
   List<DataField>? get overview => _overview;
   List<Task>? get data => _data;
+  List<Task>? get selfTasks => _selfTasks;
+  Map<String, List<Task>>? get subordinatesTasks => _subordinatesTasks;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -45,6 +74,12 @@ class TasksModel {
     }
     if (_data != null) {
       map['data'] = _data?.map((v) => v.toJson()).toList();
+    }
+     if (_selfTasks != null) {
+      map['self_tasks'] = _selfTasks?.map((v) => v.toJson()).toList();
+    }
+    if (_subordinatesTasks != null) {
+      // map subordinates map logic if needed for serialization, usually not needed for request
     }
     return map;
   }

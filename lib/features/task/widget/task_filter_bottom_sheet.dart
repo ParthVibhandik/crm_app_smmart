@@ -84,24 +84,28 @@ class _TaskFilterBottomSheetState extends State<TaskFilterBottomSheet> {
                 : Row(
                     spacing: Dimensions.space10,
                     children: [
-                      RoundedButton(
-                        text: LocalStrings.submit.tr,
-                        width: 0.6,
-                        press: () {
-                          Get.back();
-                          controller.initialData();
-                        },
+                      Flexible(
+                        flex: 2,
+                        child: RoundedButton(
+                          text: LocalStrings.submit.tr,
+                          press: () {
+                            Get.back();
+                            controller.initialData();
+                          },
+                        ),
                       ),
-                      RoundedButton(
-                        text: LocalStrings.clear.tr,
-                        width: 0.3,
-                        color: ColorResources.colorRed,
-                        press: () {
-                          Get.back();
-                          controller.priority = null;
-                          controller.status = null;
-                          controller.initialData();
-                        },
+                      Flexible(
+                        flex: 1,
+                        child: RoundedButton(
+                          text: LocalStrings.clear.tr,
+                          color: ColorResources.colorRed,
+                          press: () {
+                            Get.back();
+                            controller.priority = null;
+                            controller.status = null;
+                            controller.initialData();
+                          },
+                        ),
                       ),
                     ],
                   ),

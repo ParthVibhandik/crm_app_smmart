@@ -6,9 +6,14 @@ class DateConverter {
   }
 
   static String formatValidityDate(String dateString) {
-    var inputDate = DateFormat('yyyy-MM-dd hh:mm:ss').parse(dateString);
-    var outputFormat = DateFormat('dd MMM yyyy').format(inputDate);
-    return outputFormat;
+    if (dateString.isEmpty) return '';
+    try {
+      var inputDate = DateFormat('yyyy-MM-dd hh:mm:ss').parse(dateString);
+      var outputFormat = DateFormat('dd MMM yyyy').format(inputDate);
+      return outputFormat;
+    } catch (e) {
+      return dateString;
+    }
   }
 
   static DateTime convertStringToDatetime(String dateTime) {

@@ -1,4 +1,5 @@
 class UrlContainer {
+  // Use this for production:
   static const String domainUrl = 'https://smmartcrm.in';
   static const String baseUrl = '$domainUrl/flutex_admin_api/';
   static const String downloadUrl = '$domainUrl/download/file';
@@ -14,12 +15,14 @@ class UrlContainer {
   // Authentication
   static const String loginUrl = 'auth/login';
   static const String tokenUrl = 'auth/firebase-token';
+  static const String fcmTokenUrl = 'push-notifications/save-fcm-token';
   static const String logoutUrl = 'auth/logout';
   static const String forgotPasswordUrl = 'auth/forgot-password';
 
   // Pages
   static const String overviewUrl = 'overview';
   static const String dashboardUrl = 'dashboard';
+  static const String getAttendanceDateUrl = 'get-attendance-date';
   static const String profileUrl = 'profile';
   static const String customersUrl = 'customers';
   static const String contactsUrl = 'contacts';
@@ -31,7 +34,7 @@ class UrlContainer {
   static const String ticketsUrl = 'tickets';
   static const String leadsUrl = 'leads';
   static const String kanbanLeadsUrl = 'kanban_leads';
-  static const String tasksUrl = 'tasks';
+  static const String tasksUrl = 'get-tasks';
   static const String paymentsUrl = 'payments';
   static const String itemsUrl = 'items';
   static const String notificationsUrl = 'notifications';
@@ -39,6 +42,24 @@ class UrlContainer {
   static const String expensesUrl = 'expenses';
   static const String miscellaneousUrl = 'miscellaneous';
   static const String privacyPolicyUrl = 'miscellaneous/privacy';
+  static const String industriesUrl = 'miscellaneous/industries';
+  static const String designationsUrl = 'miscellaneous/designations';
+  static const String interestedInUrl = 'miscellaneous/interested_in';
+  static const String telecallUrl = 'telecall';
+  static const String dcrUrl = 'calls/daily-call-report';
+
+  // Sales Tracker
+  static const String salesTrackerGetLeadsUrl = 'sales-tracker/get-leads';
+  static const String salesTrackerSearchLeadUrl = 'sales-tracker/search-lead';
+  static const String salesTrackerStartTripUrl = 'sales-tracker/start-trip';
+  static const String salesTrackerGetActiveTripUrl =
+      'sales-tracker/get-active-trip';
+  static const String salesTrackerReachedUrl = 'sales-tracker/reached';
+  static const String salesTrackerUpdateAddressUrl =
+      'sales-tracker/update-address';
+  static const String salesTrackerCallStartUrl = 'sales-tracker/call-start';
+  static const String salesTrackerEndTripUrl = 'sales-tracker/end-trip';
+  static const String salesTrackerGetStatusUrl = 'sales-tracker/get-status';
 
   // Download URLs
   static const String leadAttachmentUrl = '$downloadUrl/lead_attachment';

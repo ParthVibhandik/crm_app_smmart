@@ -20,11 +20,17 @@ import 'package:flutex_admin/features/dashboard/widget/drawer.dart';
 import 'package:flutex_admin/features/dashboard/widget/home_estimates_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/home_invoices_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/home_proposals_card.dart';
+import 'package:flutex_admin/features/dashboard/widget/leads_tasks_card.dart';
+import 'package:flutex_admin/features/dashboard/widget/lead_journey_card.dart';
+import 'package:flutex_admin/features/dashboard/widget/goals_card.dart';
+import 'package:flutex_admin/features/dashboard/widget/calendar_schedule_card.dart';
 import 'package:flutex_admin/features/attendance/attendance_screen.dart';
 import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -57,7 +63,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           return Scaffold(
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             appBar: AppBar(
-              toolbarHeight: 50,
+              toolbarHeight: 60,
               leading: Builder(
                 builder: (context) {
                   return IconButton(
@@ -76,20 +82,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 },
               ),
               centerTitle: true,
-              title: CachedNetworkImage(
-                imageUrl: controller.homeModel.overview?.perfexLogo ?? '',
-                fit: BoxFit.cover,
-                height: 30,
-                errorWidget: (ctx, object, trx) {
-                  return Image.asset(
-                    MyImages.appLogoWhite,
-                    fit: BoxFit.cover,
-                    height: 30,
-                  );
-                },
-                placeholder: (ctx, trx) {
-                  return Image.asset(MyImages.appLogo);
-                },
+              title: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Image.asset(
+                  MyImages.appLogo,
+                  height: 32,
+                  fit: BoxFit.contain,
+                ),
               ),
               actions: [
                 ActionButtonIconWidget(
@@ -123,11 +127,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   backgroundColor: ColorResources.blueGreyColor,
                                   radius: 32,
                                   child: CircleImageWidget(
-                                    imagePath:
-                                        controller
-                                            .homeModel
-                                            .staff
-                                            ?.profileImage ??
+                                    imagePath: controller
+                                            .homeModel.staff?.profileImage ??
                                         '',
                                     isAsset: false,
                                     isProfile: true,
@@ -232,208 +233,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                           const SizedBox(height: Dimensions.space15),
 
-                          /// DASHBOARD STATS
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              DashboardCard(
-                                currentValue:
-                                    controller
-                                        .homeModel
-                                        .overview
-                                        ?.invoicesAwaitingPaymentTotal ??
-                                    '0',
-                                totalValue:
-                                    controller
-                                        .homeModel
-                                        .overview
-                                        ?.totalInvoices ??
-                                    '0',
-                                percent:
-                                    controller
-                                        .homeModel
-                                        .overview
-                                        ?.invoicesAwaitingPaymentPercent ??
-                                    '0',
-                                icon: Icons.attach_money_rounded,
-                                title: LocalStrings.invoicesAwaitingPayment.tr,
-                              ),
-                              DashboardCard(
-                                currentValue:
-                                    controller
-                                        .homeModel
-                                        .overview
-                                        ?.leadsConvertedTotal ??
-                                    '0',
-                                totalValue:
-                                    controller.homeModel.overview?.totalLeads ??
-                                    '0',
-                                percent:
-                                    controller
-                                        .homeModel
-                                        .overview
-                                        ?.leadsConvertedPercent ??
-                                    '0',
-                                icon: Icons.move_up_rounded,
-                                title: LocalStrings.convertedLeads.tr,
-                              ),
-                            ],
-                          ),
-
-                          Row(
-                            children: [
-                              DashboardCard(
-                                currentValue:
-                                    controller
-                                        .homeModel
-                                        .overview
-                                        ?.notFinishedTasksTotal ??
-                                    '0',
-                                totalValue:
-                                    controller.homeModel.overview?.totalTasks ??
-                                    '0',
-                                percent:
-                                    controller
-                                        .homeModel
-                                        .overview
-                                        ?.notFinishedTasksPercent ??
-                                    '0',
-                                icon: Icons.task_outlined,
-                                title: LocalStrings.notCompleted.tr,
-                              ),
-                              DashboardCard(
-                                currentValue:
-                                    controller
-                                        .homeModel
-                                        .overview
-                                        ?.projectsInProgressTotal ??
-                                    '0',
-                                totalValue:
-                                    controller
-                                        .homeModel
-                                        .overview
-                                        ?.totalProjects ??
-                                    '0',
-                                percent:
-                                    controller
-                                        .homeModel
-                                        .overview
-                                        ?.inProgressProjectsPercent ??
-                                    '0',
-                                icon: Icons.dashboard_customize_rounded,
-                                title: LocalStrings.projectsInProgress.tr,
-                              ),
-                            ],
-                          ),
-
-                          /// CAROUSEL (INVOICES / ESTIMATES / PROPOSALS)
-                          if ((controller.homeModel.menuItems?.invoices ??
-                                  false) ||
-                              (controller.homeModel.menuItems?.estimates ??
-                                  false) ||
-                              (controller.homeModel.menuItems?.proposals ??
-                                  false))
-                            Stack(
-                              children: [
-                                CarouselSlider(
-                                  options: CarouselOptions(
-                                    height: 440.0,
-                                    viewportFraction: 1,
-                                    onPageChanged: (index, i) {
-                                      controller.currentPageIndex = index;
-                                      controller.update();
-                                    },
-                                  ),
-                                  items: [
-                                    if (controller
-                                            .homeModel
-                                            .menuItems
-                                            ?.invoices ??
-                                        false)
-                                      HomeInvoicesCard(
-                                        invoices:
-                                            controller.homeModel.data?.invoices,
-                                      ),
-                                    if (controller
-                                            .homeModel
-                                            .menuItems
-                                            ?.estimates ??
-                                        false)
-                                      HomeEstimatesCard(
-                                        estimates: controller
-                                            .homeModel
-                                            .data
-                                            ?.estimates,
-                                      ),
-                                    if (controller
-                                            .homeModel
-                                            .menuItems
-                                            ?.proposals ??
-                                        false)
-                                      HomeProposalsCard(
-                                        proposals: controller
-                                            .homeModel
-                                            .data
-                                            ?.proposals,
-                                      ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
+                          /// NEW WIDGETS SECTION
+                          GoalsCard(controller: controller),
                           const SizedBox(height: Dimensions.space15),
 
-                          /// PROJECT STATS
-                          if (controller.homeModel.menuItems?.projects ?? false)
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: Dimensions.space15,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.menu_open_rounded,
-                                        size: 20,
-                                        color: Theme.of(context).primaryColor,
-                                      ),
-                                      const SizedBox(width: Dimensions.space10),
-                                      Text(
-                                        LocalStrings.projectStatistics.tr,
-                                        style: regularLarge.copyWith(
-                                          color: Theme.of(context).primaryColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const CustomDivider(
-                                  space: Dimensions.space5,
-                                  padding: Dimensions.space15,
-                                ),
-                                SfCircularChart(
-                                  tooltipBehavior: TooltipBehavior(
-                                    enable: true,
-                                  ),
-                                  legend: const Legend(
-                                    isVisible: true,
-                                    position: LegendPosition.bottom,
-                                    textStyle: lightDefault,
-                                  ),
-                                  series: <CircularSeries>[
-                                    DoughnutSeries<DataField, String>(
-                                      dataSource:
-                                          controller.homeModel.data?.projects,
-                                      xValueMapper: (DataField data, _) =>
-                                          data.status?.tr ?? '',
-                                      yValueMapper: (DataField data, _) =>
-                                          int.parse(data.total ?? '0'),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                          LeadsTasksCard(controller: controller),
+                          const SizedBox(height: Dimensions.space15),
+
+                          LeadJourneyCard(controller: controller),
+                          const SizedBox(height: Dimensions.space15),
+
+                          const CalendarScheduleCard(),
+                          const SizedBox(height: Dimensions.space20),
                         ],
                       ),
                     ),
@@ -444,4 +255,3 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
-

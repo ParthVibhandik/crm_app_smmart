@@ -12,12 +12,30 @@ import 'package:flutex_admin/core/route/route.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/service/di_services.dart' as services;
 import 'features/attendance/attendance_tracking_service.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 AndroidNotificationChannel? channel;
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  debugPrint('BG notification: ${message.notification?.title}');
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint('====> Dotenv Load Error: ${e.toString()}');
+  }
   await initTrackingService();
   try {
     await NotificationService.initialize(flutterLocalNotificationsPlugin);

@@ -45,6 +45,11 @@ import 'package:flutex_admin/features/proposal/view/add_proposal_screen.dart';
 import 'package:flutex_admin/features/proposal/view/proposal_details_screen.dart';
 import 'package:flutex_admin/features/proposal/view/proposal_screen.dart';
 import 'package:flutex_admin/features/proposal/view/update_proposal_screen.dart';
+import 'package:flutex_admin/features/sales_tracker/view/sales_tracker_screen.dart';
+import 'package:flutex_admin/features/telecalling/view/telecalling_screen.dart';
+import 'package:flutex_admin/features/dcr/view/dcr_screen.dart';
+import 'package:flutex_admin/features/attendance/view/regularization_screen.dart';
+import 'package:flutex_admin/features/attendance/controller/regularization_binding.dart';
 import 'package:flutex_admin/features/splash/view/splash_screen.dart';
 import 'package:flutex_admin/features/staff/view/add_staff_screen.dart';
 import 'package:flutex_admin/features/staff/view/staff_details_screen.dart';
@@ -57,6 +62,9 @@ import 'package:flutex_admin/features/ticket/view/add_ticket_screen.dart';
 import 'package:flutex_admin/features/ticket/view/ticket_details_screen.dart';
 import 'package:flutex_admin/features/ticket/view/ticket_screen.dart';
 import 'package:flutex_admin/features/ticket/view/update_ticket_screen.dart';
+import 'package:flutex_admin/features/calendar/view/calendar_screen.dart';
+import 'package:flutex_admin/features/goal/view/goal_screen.dart';
+import 'package:flutex_admin/features/goal/view/add_goal_screen.dart';
 import 'package:get/get.dart';
 
 class RouteHelper {
@@ -120,6 +128,13 @@ class RouteHelper {
   static const String profileScreen = "/profile_screen";
   static const String editProfileScreen = "/edit_profile_screen";
   static const String privacyScreen = "/privacy_screen";
+  static const String salesTrackerScreen = "/sales_tracker_screen";
+  static const String telecallingScreen = "/telecalling_screen";
+  static const String dcrScreen = "/dcr_screen";
+  static const String regularizationScreen = "/regularization_screen";
+  static const String calendarScreen = "/calendar_screen";
+  static const String goalScreen = "/goal_screen";
+  static const String addGoalScreen = "/add_goal_screen";
 
   List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => const SplashScreen()),
@@ -256,5 +271,16 @@ class RouteHelper {
     GetPage(name: editProfileScreen, page: () => const EditProfileScreen()),
     GetPage(name: settingsScreen, page: () => const MenuScreen()),
     GetPage(name: privacyScreen, page: () => const PrivacyPolicyScreen()),
+    GetPage(name: salesTrackerScreen, page: () => const SalesTrackerScreen()),
+    GetPage(name: telecallingScreen, page: () => const TelecallingScreen()),
+    GetPage(name: dcrScreen, page: () => const DCRScreen()),
+    GetPage(
+      name: regularizationScreen,
+      page: () => const RegularizationScreen(),
+      binding: RegularizationBinding(),
+    ),
+    GetPage(name: calendarScreen, page: () => const CalendarScreen()),
+    GetPage(name: goalScreen, page: () => const GoalScreen()),
+    GetPage(name: addGoalScreen, page: () => const AddGoalScreen()),
   ];
 }

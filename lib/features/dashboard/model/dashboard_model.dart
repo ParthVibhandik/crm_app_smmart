@@ -4,22 +4,28 @@ class DashboardModel {
   DashboardModel({
     bool? status,
     String? message,
+    Goals? goals,
     Overview? overview,
     Data? data,
     Staff? staff,
     MenuItems? menuItems,
+    LeadsTasks? leadsTasks,
   }) {
     _status = status;
     _message = message;
+    _goals = goals;
     _overview = overview;
     _data = data;
     _staff = staff;
     _menuItems = menuItems;
+    _leadsTasks = leadsTasks;
+    _leadsStatsFromTasks = null;
   }
 
   DashboardModel.fromJson(dynamic json) {
     _status = json['status'];
     _message = json['message'];
+    _goals = json['goals'] != null ? Goals.fromJson(json['goals']) : null;
     _overview =
         json['overview'] != null ? Overview.fromJson(json['overview']) : null;
     _data = json['data'] != null ? Data.fromJson(json['data']) : null;
@@ -27,20 +33,202 @@ class DashboardModel {
     _menuItems = json['menu_items'] != null
         ? MenuItems.fromJson(json['menu_items'])
         : null;
+
+    // Logic for leads_tasks
+    var leadsTasksJson = json['leads_tasks'];
+    if (leadsTasksJson == null && json['data'] != null) {
+      leadsTasksJson = json['data']['leads_tasks'];
+    }
+
+    if (leadsTasksJson != null) {
+      // Try to parse as LeadsTasks object (lists of items)
+      try {
+        // Only if it has specific keys we expect, otherwise simple map extraction might be preferred
+        // But LeadsTasks.fromJson is permissive
+        if (leadsTasksJson is Map) {
+          _leadsTasks =
+              LeadsTasks.fromJson(leadsTasksJson as Map<String, dynamic>);
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      // ALSO try to parse stats from the lists inside leads_tasks
+      if (leadsTasksJson is Map) {
+        _leadsStatsFromTasks = [];
+        Map<String, int> statusCounts = {};
+        Set<String> processedIds = {};
+
+        // Helper function to process lists with deduplication
+        void processList(dynamic list, Set<String> processedIdsRef,
+            Map<String, int> countsRef) {
+          if (list is List) {
+            for (var item in list) {
+              if (item is Map && item.containsKey('status')) {
+                String id = item['id']?.toString() ?? '';
+                // Deduplicate by ID if present
+                if (id.isNotEmpty) {
+                  if (processedIdsRef.contains(id)) continue;
+                  processedIdsRef.add(id);
+                }
+
+                String status = item['status'].toString();
+                countsRef[status] = (countsRef[status] ?? 0) + 1;
+              }
+            }
+          }
+        }
+
+        // Process known lists for SELF
+        if (leadsTasksJson.containsKey('today_self')) {
+          processList(leadsTasksJson['today_self'], processedIds, statusCounts);
+        }
+        if (leadsTasksJson.containsKey('pending_self')) {
+          processList(
+              leadsTasksJson['pending_self'], processedIds, statusCounts);
+        }
+
+        // Convert map to List<DataField>
+        statusCounts.forEach((key, value) {
+          _leadsStatsFromTasks!
+              .add(DataField(status: key, total: value.toString()));
+        });
+
+        // --- Subordinates (Team & Individual) Stats Logic ---
+        _leadsStatsFromTasksSubordinates = [];
+        _leadsStatsPerSubordinate = {};
+
+        Map<String, int> subStatusCountsTotal = {};
+        Set<String> processedSubIdsTotal = {};
+
+        // Helper for subordinates maps (Staff Name -> List)
+        void processSubordMap(dynamic mapData) {
+          if (mapData is Map) {
+            mapData.forEach((staffName, list) {
+              // 1. Aggregate for Total "Team" View
+              processList(list, processedSubIdsTotal, subStatusCountsTotal);
+
+              // 2. Aggregate for Individual View
+              if (!_leadsStatsPerSubordinate!.containsKey(staffName)) {
+                _leadsStatsPerSubordinate![staffName] = [];
+              }
+
+              // We need a temporary map for this specific staff/call to accumulate properly
+              // But since we might hit 'today' and 'pending' separate calls for same staff,
+              // we can't just overwrite.
+              // We need to parse list first, then ADD to the existing stats or build a Map<String, int> for each staff first.
+            });
+          }
+        }
+
+        // Better approach: First build Map<StaffName, Map<Status, Count>>
+        Map<String, Map<String, int>> perStaffCounts = {};
+        Map<String, Set<String>> perStaffIds = {};
+
+        void processSubordMapNew(dynamic mapData) {
+          if (mapData is Map) {
+            mapData.forEach((staffName, list) {
+              if (!perStaffCounts.containsKey(staffName))
+                perStaffCounts[staffName] = {};
+              if (!perStaffIds.containsKey(staffName))
+                perStaffIds[staffName] = {};
+
+              processList(
+                  list, perStaffIds[staffName]!, perStaffCounts[staffName]!);
+
+              // Also add to totals
+              processList(list, processedSubIdsTotal, subStatusCountsTotal);
+            });
+          }
+        }
+
+        if (leadsTasksJson.containsKey('today_subords')) {
+          processSubordMapNew(leadsTasksJson['today_subords']);
+        }
+        if (leadsTasksJson.containsKey('pending_subords')) {
+          processSubordMapNew(leadsTasksJson['pending_subords']);
+        }
+
+        // Convert totals
+        subStatusCountsTotal.forEach((key, value) {
+          _leadsStatsFromTasksSubordinates!
+              .add(DataField(status: key, total: value.toString()));
+        });
+
+        // Convert individuals
+        perStaffCounts.forEach((staffName, counts) {
+          List<DataField> fields = [];
+          counts.forEach((key, value) {
+            fields.add(DataField(status: key, total: value.toString()));
+          });
+          _leadsStatsPerSubordinate![staffName] = fields;
+        });
+        // Excluded tasks_subords/subordinates_tasks to avoid mixing Tasks with Lead Stats
+        // and to prevent incorrectly counting Tasks as Leads.
+      }
+    }
+
+    // Capture tasks from separate 'tasks' key if present
+    var tasksData = json['tasks'];
+    if (tasksData == null && json['data'] != null) {
+      tasksData = json['data']['tasks'];
+    }
+
+    if (tasksData != null) {
+      // Ensure _leadsTasks is initialized
+      _leadsTasks ??= LeadsTasks();
+
+      // Check self_tasks
+      if (tasksData['self_tasks'] != null) {
+        _leadsTasks!.selfTasks = [];
+        if (tasksData['self_tasks'] is List) {
+          tasksData['self_tasks'].forEach(
+              (v) => _leadsTasks!.selfTasks!.add(LeadTaskItem.fromJson(v)));
+        }
+      }
+
+      // Check subordinates_tasks (or subordinate_tasks/subordinate_goals variants)
+      // User said "subordinate_tasks", checking plural too just in case
+      var subTasks =
+          tasksData['subordinate_tasks'] ?? tasksData['subordinates_tasks'];
+
+      if (subTasks != null && subTasks is Map) {
+        _leadsTasks!.subordinatesTasks = {};
+        subTasks.forEach((key, value) {
+          if (value is List) {
+            _leadsTasks!.subordinatesTasks![key] =
+                value.map((v) => LeadTaskItem.fromJson(v)).toList();
+          }
+        });
+      }
+    }
   }
   bool? _status;
   String? _message;
+  Goals? _goals;
   Overview? _overview;
   Data? _data;
   Staff? _staff;
   MenuItems? _menuItems;
+  LeadsTasks? _leadsTasks;
+  List<DataField>? _leadsStatsFromTasks;
+
+  List<DataField>? _leadsStatsFromTasksSubordinates;
+  Map<String, List<DataField>>? _leadsStatsPerSubordinate;
 
   bool? get status => _status;
   String? get message => _message;
+  Goals? get goals => _goals;
   Overview? get overview => _overview;
   Data? get data => _data;
   Staff? get staff => _staff;
   MenuItems? get menuItems => _menuItems;
+  LeadsTasks? get leadsTasks => _leadsTasks;
+  List<DataField>? get leadsStatsFromTasks => _leadsStatsFromTasks;
+  List<DataField>? get leadsStatsFromTasksSubordinates =>
+      _leadsStatsFromTasksSubordinates;
+  Map<String, List<DataField>>? get leadsStatsPerSubordinate =>
+      _leadsStatsPerSubordinate;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -58,6 +246,301 @@ class DashboardModel {
     if (_menuItems != null) {
       map['menu_items'] = _menuItems?.toJson();
     }
+    if (_goals != null) {
+      map['goals'] = _goals?.toJson();
+    }
+    if (_leadsTasks != null) {
+      map['leads_tasks'] = _leadsTasks?.toJson();
+    }
+    // Note: _leadsStatsFromTasks is derived from leads_tasks, so we don't strictly need to serialize it
+    // back to a separate field if we preserve leads_tasks.
+    // But for completeness if we want to inspect it:
+    if (_leadsStatsFromTasks != null) {
+      map['leads_stats_map'] =
+          _leadsStatsFromTasks!.map((v) => v.toJson()).toList();
+    }
+    return map;
+  }
+}
+
+class LeadsTasks {
+  List<LeadTaskItem>? todaySelf;
+  List<LeadTaskItem>? pendingSelf;
+  Map<String, List<LeadTaskItem>>? todaySubords;
+  Map<String, List<LeadTaskItem>>? pendingSubords;
+  // Tasks
+  List<LeadTaskItem>? selfTasks;
+  Map<String, List<LeadTaskItem>>? subordinatesTasks;
+
+  LeadsTasks({
+    this.todaySelf,
+    this.pendingSelf,
+    this.todaySubords,
+    this.pendingSubords,
+    this.selfTasks,
+    this.subordinatesTasks,
+  });
+
+  LeadsTasks.fromJson(Map<String, dynamic> json) {
+    // leads
+    if (json['today_self'] != null) {
+      todaySelf = [];
+      if (json['today_self'] is List) {
+        json['today_self']
+            .forEach((v) => todaySelf!.add(LeadTaskItem.fromJson(v)));
+      }
+    }
+    if (json['pending_self'] != null) {
+      pendingSelf = [];
+      if (json['pending_self'] is List) {
+        json['pending_self']
+            .forEach((v) => pendingSelf!.add(LeadTaskItem.fromJson(v)));
+      }
+    }
+    // subord leads - dynamic keys (staff names)
+    if (json['today_subords'] != null && json['today_subords'] is Map) {
+      todaySubords = {};
+      json['today_subords'].forEach((key, value) {
+        if (value is List) {
+          todaySubords![key] =
+              value.map((v) => LeadTaskItem.fromJson(v)).toList();
+        }
+      });
+    }
+    if (json['pending_subords'] != null && json['pending_subords'] is Map) {
+      pendingSubords = {};
+      json['pending_subords'].forEach((key, value) {
+        if (value is List) {
+          pendingSubords![key] =
+              value.map((v) => LeadTaskItem.fromJson(v)).toList();
+        }
+      });
+    }
+
+    // tasks
+    // Check for "self_tasks" OR "tasks_self" or similar variants if strictly not found
+    if (json['self_tasks'] != null) {
+      selfTasks = [];
+      if (json['self_tasks'] is List) {
+        json['self_tasks']
+            .forEach((v) => selfTasks!.add(LeadTaskItem.fromJson(v)));
+      }
+    } else if (json['tasks_self'] != null) {
+      // Fallback check
+      selfTasks = [];
+      if (json['tasks_self'] is List) {
+        json['tasks_self']
+            .forEach((v) => selfTasks!.add(LeadTaskItem.fromJson(v)));
+      }
+    }
+
+    if (json['subordinates_tasks'] != null &&
+        json['subordinates_tasks'] is Map) {
+      subordinatesTasks = {};
+      json['subordinates_tasks'].forEach((key, value) {
+        if (value is List) {
+          subordinatesTasks![key] =
+              value.map((v) => LeadTaskItem.fromJson(v)).toList();
+        }
+      });
+    } else if (json['tasks_subords'] != null && json['tasks_subords'] is Map) {
+      // Fallback
+      subordinatesTasks = {};
+      json['tasks_subords'].forEach((key, value) {
+        if (value is List) {
+          subordinatesTasks![key] =
+              value.map((v) => LeadTaskItem.fromJson(v)).toList();
+        }
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (todaySelf != null) {
+      data['today_self'] = todaySelf!.map((v) => v.toJson()).toList();
+    }
+    if (pendingSelf != null) {
+      data['pending_self'] = pendingSelf!.map((v) => v.toJson()).toList();
+    }
+    // Subords and others can be added if needed for serialization, mostly read-only
+    return data;
+  }
+}
+
+class Goals {
+  Goals({
+    List<Goal>? selfGoals,
+    List<Goal>? assignedGoals,
+    List<Goal>? subordinatesGoals,
+  }) {
+    _selfGoals = selfGoals;
+    _assignedGoals = assignedGoals;
+    _subordinatesGoals = subordinatesGoals;
+  }
+
+  Goals.fromJson(dynamic json) {
+    if (json['self_goals'] != null) {
+      _selfGoals = [];
+      json['self_goals'].forEach((v) {
+        _selfGoals?.add(Goal.fromJson(v));
+      });
+    }
+    if (json['assigned_goals'] != null) {
+      _assignedGoals = [];
+      json['assigned_goals'].forEach((v) {
+        _assignedGoals?.add(Goal.fromJson(v));
+      });
+    }
+    if (json['subordinates_goals'] != null) {
+      _subordinatesGoals = [];
+      json['subordinates_goals'].forEach((v) {
+        _subordinatesGoals?.add(Goal.fromJson(v));
+      });
+    }
+  }
+
+  List<Goal>? _selfGoals;
+  List<Goal>? _assignedGoals;
+  List<Goal>? _subordinatesGoals;
+
+  List<Goal>? get selfGoals => _selfGoals;
+  List<Goal>? get assignedGoals => _assignedGoals;
+  List<Goal>? get subordinatesGoals => _subordinatesGoals;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    if (_selfGoals != null) {
+      map['self_goals'] = _selfGoals?.map((v) => v.toJson()).toList();
+    }
+    if (_assignedGoals != null) {
+      map['assigned_goals'] = _assignedGoals?.map((v) => v.toJson()).toList();
+    }
+    if (_subordinatesGoals != null) {
+      map['subordinates_goals'] =
+          _subordinatesGoals?.map((v) => v.toJson()).toList();
+    }
+    return map;
+  }
+}
+
+class Goal {
+  Goal({
+    String? id,
+    String? subject,
+    String? description,
+    String? startDate,
+    String? endDate,
+    String? goalType,
+    String? achievement,
+    String? staffId,
+    String? contractType,
+    String? notifyWhenFail,
+    String? notifyWhenAchieve,
+    String? notified,
+    String? addedFrom,
+    String? type,
+    String? staffFirstname,
+    String? staffLastname,
+  }) {
+    _id = id;
+    _subject = subject;
+    _description = description;
+    _startDate = startDate;
+    _endDate = endDate;
+    _goalType = goalType;
+    _achievement = achievement;
+    _staffId = staffId;
+    _contractType = contractType;
+    _notifyWhenFail = notifyWhenFail;
+    _notifyWhenAchieve = notifyWhenAchieve;
+    _notified = notified;
+    _addedFrom = addedFrom;
+    _type = type;
+    _staffFirstname = staffFirstname;
+    _staffLastname = staffLastname;
+  }
+
+  Goal.fromJson(dynamic json) {
+    _id = json['id'];
+    _subject = json['subject'];
+    _description = json['description'];
+    _startDate = json['start_date'];
+    _endDate = json['end_date'];
+    _goalType = json['goal_type'];
+    _achievement = json['achievement'];
+    _staffId = json['staff_id'];
+    _contractType = json['contract_type'];
+    _notifyWhenFail = json['notify_when_fail'];
+    _notifyWhenAchieve = json['notify_when_achieve'];
+    _notified = json['notified'];
+    _addedFrom = json['added_from'];
+    _type = json['type'];
+    _recurring = json['recurring'];
+    _typeKey = json['type_key'];
+    _typeValue = json['type_value'];
+    _staffFirstname = json['staff_firstname'];
+    _staffLastname = json['staff_lastname'];
+  }
+
+  String? _id;
+  String? _subject;
+  String? _description;
+  String? _startDate;
+  String? _endDate;
+  String? _goalType;
+  String? _achievement;
+  String? _staffId;
+  String? _contractType;
+  String? _notifyWhenFail;
+  String? _notifyWhenAchieve;
+  String? _notified;
+  String? _addedFrom;
+  String? _type;
+  String? _recurring;
+  dynamic _typeKey;
+  String? _typeValue;
+  String? _staffFirstname;
+  String? _staffLastname;
+
+  String? get id => _id;
+  String? get subject => _subject;
+  String? get description => _description;
+  String? get startDate => _startDate;
+  String? get endDate => _endDate;
+  String? get goalType => _goalType;
+  String? get achievement => _achievement;
+  String? get staffId => _staffId;
+  String? get contractType => _contractType;
+  String? get notifyWhenFail => _notifyWhenFail;
+  String? get notifyWhenAchieve => _notifyWhenAchieve;
+  String? get notified => _notified;
+  String? get addedFrom => _addedFrom;
+  String? get type => _type;
+  String? get recurring => _recurring;
+  dynamic get typeKey => _typeKey;
+  String? get typeValue => _typeValue;
+  String? get staffFirstname => _staffFirstname;
+  String? get staffLastname => _staffLastname;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['id'] = _id;
+    map['subject'] = _subject;
+    map['description'] = _description;
+    map['start_date'] = _startDate;
+    map['end_date'] = _endDate;
+    map['goal_type'] = _goalType;
+    map['achievement'] = _achievement;
+    map['staff_id'] = _staffId;
+    map['contract_type'] = _contractType;
+    map['notify_when_fail'] = _notifyWhenFail;
+    map['notify_when_achieve'] = _notifyWhenAchieve;
+    map['notified'] = _notified;
+    map['added_from'] = _addedFrom;
+    map['type'] = _type;
+    map['staff_firstname'] = _staffFirstname;
+    map['staff_lastname'] = _staffLastname;
     return map;
   }
 }
@@ -336,7 +819,7 @@ class Staff {
       return _profileImage!;
     }
     if (_profileImage!.contains('uploads/')) {
-       return '${UrlContainer.domainUrl}/$_profileImage';
+      return '${UrlContainer.domainUrl}/$_profileImage';
     }
     return '${UrlContainer.domainUrl}/uploads/staff_profile_images/$_staffId/$_profileImage';
   }
@@ -532,5 +1015,62 @@ class CustomerSummery {
     map['contacts_inactive'] = _contactsInactive;
     map['contacts_last_login'] = _contactsLastLogin;
     return map;
+  }
+}
+
+class LeadTaskItem {
+  String? id;
+  String? hash;
+  String? name;
+  String? subject;
+  String? title;
+  String? company;
+  String? companyIndustry;
+  String? description;
+  String? country;
+  String? assigned;
+  String? status; // Lead status ID
+
+  LeadTaskItem({
+    this.id,
+    this.hash,
+    this.name,
+    this.subject,
+    this.title,
+    this.company,
+    this.companyIndustry,
+    this.description,
+    this.country,
+    this.assigned,
+    this.status,
+  });
+
+  LeadTaskItem.fromJson(Map<String, dynamic> json) {
+    id = json['id']?.toString();
+    hash = json['hash'];
+    name = json['name'];
+    subject = json['subject'];
+    title = json['title'];
+    company = json['company'];
+    companyIndustry = json['company_industry'];
+    description = json['description'];
+    country = json['country'];
+    assigned = json['assigned']?.toString();
+    status = json['status']?.toString();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['hash'] = hash;
+    data['name'] = name;
+    data['subject'] = subject;
+    data['title'] = title;
+    data['company'] = company;
+    data['company_industry'] = companyIndustry;
+    data['description'] = description;
+    data['country'] = country;
+    data['status'] = status;
+    return data;
   }
 }

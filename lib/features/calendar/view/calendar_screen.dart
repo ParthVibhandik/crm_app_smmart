@@ -3,6 +3,8 @@ import 'package:flutex_admin/features/attendance/attendance_service.dart';
 import 'package:flutex_admin/features/attendance/attendance_status.dart';
 import 'package:flutex_admin/features/task/model/tasks_model.dart';
 import 'package:flutex_admin/features/task/repo/task_repo.dart';
+import 'package:flutex_admin/features/lead/repo/lead_repo.dart';
+import 'package:flutex_admin/features/lead/model/reminders_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -22,6 +24,7 @@ class CalendarScreen extends StatelessWidget {
       Get.put(CalendarController(
         taskRepo: TaskRepo(apiClient: apiClient),
         attendanceService: AttendanceService(token),
+        leadRepo: LeadRepo(apiClient: apiClient),
       ));
     }
 
@@ -53,17 +56,37 @@ class CalendarScreen extends StatelessWidget {
                           color: Colors.deepPurple,
                           shape: BoxShape.circle,
                         ),
-                        markerDecoration: BoxDecoration(
-                          color: Colors.orange,
-                          shape: BoxShape.circle,
-                        ),
                       ),
                       headerStyle: const HeaderStyle(
                         formatButtonVisible: false,
                         titleCentered: true,
                       ),
+                      calendarBuilders: CalendarBuilders(
+                        markerBuilder: (context, date, events) {
+                          if (events.isEmpty) return const SizedBox();
+                          
+                          // Prioritize Reminder (Red) then Task (Orange)
+                          bool hasReminder = events.any((e) => e is Reminder);
+                          
+                          return Positioned(
+                            bottom: 1,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: hasReminder ? Colors.red : Colors.orange,
+                              ),
+                              width: 8.0,
+                              height: 8.0,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                     const Divider(),
+                    if (controller.allReminders.isEmpty && !controller.isLoading)
+                       // Optional: Warning/Info if reminders are still loading or empty
+                       // Not showing anything to keep UI clean, but debugging helps.
+                       const SizedBox.shrink(),
                     Expanded(
                       child: _buildEventList(controller),
                     ),
@@ -91,6 +114,8 @@ class CalendarScreen extends StatelessWidget {
           return _TaskTile(task: event);
         } else if (event is AttendanceStatus) {
           return _AttendanceTile(status: event);
+        } else if (event is Reminder) {
+          return _ReminderTile(reminder: event);
         }
         return const SizedBox.shrink();
       },
@@ -134,6 +159,26 @@ class _AttendanceTile extends StatelessWidget {
             : LocalStrings.notCheckedIn.tr
         ),
         trailing: Text(status.punchedOut ? 'Closed' : 'Active'),
+      ),
+    );
+  }
+}
+
+class _ReminderTile extends StatelessWidget {
+  final Reminder reminder;
+  const _ReminderTile({required this.reminder});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 3,
+      shadowColor: Colors.red.withOpacity(0.3),
+      child: ListTile(
+        leading: const Icon(Icons.notifications_active, color: Colors.red),
+        title: Text(reminder.description ?? 'Untitled Reminder', style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text('Staff: ${reminder.staffId ?? 'Unknown'}'),
+        trailing: Text(reminder.date ?? '', style: const TextStyle(color: Colors.red)),
       ),
     );
   }
