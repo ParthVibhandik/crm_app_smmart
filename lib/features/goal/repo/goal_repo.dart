@@ -31,7 +31,29 @@ class GoalRepo {
     );
     return responseModel;
   }
+
+  Future<ResponseModel> getGoalDetails(String goalId) async {
+    String url = "${UrlContainer.baseUrl}goals/id/$goalId";
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.getMethod,
+      null,
+      passHeader: true,
+    );
+    return responseModel;
+  }
   Future<ResponseModel> createGoal(Map<String, dynamic> body) async {
+    String url = "${UrlContainer.baseUrl}goals/create";
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.postMethod,
+      body,
+      passHeader: true,
+    );
+    return responseModel;
+  }
+
+  Future<ResponseModel> updateGoal(Map<String, dynamic> body) async {
     String url = "${UrlContainer.baseUrl}goals/create";
     ResponseModel responseModel = await apiClient.request(
       url,
