@@ -29,14 +29,11 @@ class _AddGoalScreenState extends State<AddGoalScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CustomAppBar(title: "Add Goal"),
-      body: GetBuilder<GoalController>(
-        builder: (controller) {
-          if (controller.isLoading) {
-            return const CustomLoader();
-          }
-          return SingleChildScrollView(
+    return GetBuilder<GoalController>(
+      builder: (controller) {
+        return Scaffold(
+          appBar: CustomAppBar(title: controller.editingGoalId != null ? "Update Goal" : "Add Goal"),
+          body: controller.isLoading ? const CustomLoader() : SingleChildScrollView(
             padding: const EdgeInsets.all(Dimensions.space15),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,9 +144,9 @@ class _AddGoalScreenState extends State<AddGoalScreen> {
                 ),
                 const SizedBox(height: Dimensions.space15),
                 CustomTextField(
-                  labelText: "Achievement",
+                  labelText: "Target Goal Amount",
                   controller: controller.achievementController,
-                  hintText: "Enter achievement value",
+                  hintText: "Enter target amount",
                   textInputType: TextInputType.number,
                   onChanged: (val){},
                 ),
@@ -163,16 +160,16 @@ class _AddGoalScreenState extends State<AddGoalScreen> {
                 ),
                 const SizedBox(height: Dimensions.space25),
                 controller.isSubmitLoading ? const CustomLoader() : RoundedButton(
-                  text: "Save Goal",
+                  text: controller.editingGoalId != null ? "Update Goal" : "Save Goal",
                   press: () {
                     controller.createGoal();
                   },
                 )
               ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

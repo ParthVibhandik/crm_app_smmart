@@ -44,94 +44,107 @@ class _StaffGoalsScreenState extends State<StaffGoalsScreen> {
            if (goals == null || goals.isEmpty) {
              return Center(child: Text("No goals found for this staff member.", style: regularDefault));
           }
-          return ListView.builder(
-            padding: const EdgeInsets.all(Dimensions.space15),
-            itemCount: goals.length,
-            itemBuilder: (context, index) {
-              final goal = goals[index];
-              return Container(
-                margin: const EdgeInsets.only(bottom: Dimensions.space15),
-                padding: const EdgeInsets.all(Dimensions.space15),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(Dimensions.cardRadius),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).shadowColor.withValues(alpha: 0.05),
-                      spreadRadius: 1,
-                      blurRadius: 4,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            goal.subject ?? "No Subject",
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: ColorResources.primaryColor.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            controller.goalTypes[goal.goalType] ?? goal.goalType ?? 'N/A',
-                            style: regularSmall.copyWith(color: ColorResources.primaryColor),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: Dimensions.space5),
-                    Text(
-                       goal.typeValue ?? 'Value',
-                       style: lightSmall.copyWith(color: ColorResources.blueGreyColor),
-                    ),
-                    const CustomDivider(space: Dimensions.space15),
-                    
-                    if (goal.description != null && goal.description!.isNotEmpty) ...[
-                      Text("Description", style: lightDefault),
-                      const SizedBox(height: Dimensions.space5),
-                      Text(Converter.parseHtmlString(goal.description!)),
-                      const CustomDivider(space: Dimensions.space15),
-                    ],
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildInfoItem(context, "Start Date", goal.startDate ?? '-'),
-                        ),
-                        Expanded(
-                          child: _buildInfoItem(context, "End Date", goal.endDate ?? '-'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: Dimensions.space15),
-                    
-                    Row(
-                      children: [
-                         Expanded(
-                          child: _buildInfoItem(context, "Achievement", goal.achievement ?? '-', isHighlight: true),
-                        ),
-                        Expanded(
-                          child: _buildInfoItem(context, "Recurring", goal.recurring ?? 'No'),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              );
+          return RefreshIndicator(
+            onRefresh: () async {
+              controller.staffGoalsMap.remove(widget.staffId);
+              await controller.loadStaffGoals(widget.staffId);
             },
+            child: ListView.builder(
+              padding: const EdgeInsets.all(Dimensions.space15),
+              itemCount: goals.length,
+              itemBuilder: (context, index) {
+                final goal = goals[index];
+                return InkWell(
+                  onTap: () {
+                    if (goal.id != null) {
+                      controller.loadGoalDetails(goal.id!);
+                    }
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: Dimensions.space15),
+                    padding: const EdgeInsets.all(Dimensions.space15),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(Dimensions.cardRadius),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).shadowColor.withValues(alpha: 0.05),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              goal.subject ?? "No Subject",
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: ColorResources.primaryColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              controller.goalTypes[goal.goalType] ?? goal.goalType ?? 'N/A',
+                              style: regularSmall.copyWith(color: ColorResources.primaryColor),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: Dimensions.space5),
+                      Text(
+                         goal.typeValue ?? 'Value',
+                         style: lightSmall.copyWith(color: ColorResources.blueGreyColor),
+                      ),
+                      const CustomDivider(space: Dimensions.space15),
+                      
+                      if (goal.description != null && goal.description!.isNotEmpty) ...[
+                        Text("Description", style: lightDefault),
+                        const SizedBox(height: Dimensions.space5),
+                        Text(Converter.parseHtmlString(goal.description!)),
+                        const CustomDivider(space: Dimensions.space15),
+                      ],
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildInfoItem(context, "Start Date", goal.startDate ?? '-'),
+                          ),
+                          Expanded(
+                            child: _buildInfoItem(context, "End Date", goal.endDate ?? '-'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: Dimensions.space15),
+                      
+                      Row(
+                        children: [
+                           Expanded(
+                            child: _buildInfoItem(context, "Achievement", goal.achievement ?? '-', isHighlight: true),
+                          ),
+                          Expanded(
+                            child: _buildInfoItem(context, "Recurring", goal.recurring ?? 'No'),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                );
+              },
+            ),
           );
         },
       ),
