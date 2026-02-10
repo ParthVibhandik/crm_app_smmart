@@ -1,8 +1,10 @@
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutex_admin/common/components/app-bar/custom_appbar.dart';
+import 'package:flutex_admin/common/components/buttons/rounded_button.dart';
 import 'package:flutex_admin/common/components/custom_loader/custom_loader.dart';
 import 'package:flutex_admin/common/components/dialog/warning_dialog.dart';
 import 'package:flutex_admin/common/components/text/text_icon.dart';
+import 'package:flutex_admin/features/lead/view/convert_to_customer_sheet.dart';
 import 'package:flutex_admin/core/route/route.dart';
 import 'package:flutex_admin/core/service/api_service.dart';
 import 'package:flutex_admin/core/utils/color_resources.dart';
@@ -163,6 +165,22 @@ class _LeadDetailsScreenState extends State<LeadDetailsScreen> {
                     ],
                   ));
         },
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(
+            horizontal: Dimensions.space15, vertical: Dimensions.space10),
+        color: Theme.of(context).cardColor,
+        child: RoundedButton(
+          text: LocalStrings.convertToCustomer,
+          press: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) => ConvertToCustomerSheet(leadId: widget.id),
+            );
+          },
+        ),
       ),
     );
   }
