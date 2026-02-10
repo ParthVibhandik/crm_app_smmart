@@ -28,6 +28,21 @@ class LeadDetailsController extends GetxController {
   RemindersModel remindersModel = RemindersModel();
   bool sendEmailReminder = false;
   bool leadContacted = false;
+  bool isConvertLoading = false;
+
+  TextEditingController companyController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController websiteController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController cityController = TextEditingController();
+  TextEditingController stateController = TextEditingController();
+  TextEditingController countryController = TextEditingController();
+  TextEditingController zipController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController designationController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   Future<void> loadLeadDetails(leadId) async {
     ResponseModel responseModel = await leadRepo.getLeadDetails(leadId);
@@ -223,6 +238,68 @@ class LeadDetailsController extends GetxController {
     }
 
     downloadLoading = false;
+    update();
+  }
+
+  void initConversionForm() {
+    var data = leadDetailsModel.data;
+    if (data != null) {
+      companyController.text = data.company ?? '';
+      phoneNumberController.text = data.phoneNumber ?? '';
+      websiteController.text = data.website ?? '';
+      addressController.text = data.address ?? '';
+      cityController.text = data.city ?? '';
+      stateController.text = data.state ?? '';
+      countryController.text = data.country ?? '';
+      zipController.text = data.zip ?? '';
+      
+      // Split name into first and last name if possible
+      var nameParts = (data.name ?? '').split(' ');
+      if (nameParts.isNotEmpty) {
+        firstNameController.text = nameParts.first;
+        if (nameParts.length > 1) {
+          lastNameController.text = nameParts.sublist(1).join(' ');
+        }
+      }
+      
+      emailController.text = data.email ?? '';
+      designationController.text = data.title ?? ''; // Mapping title to designation as per request
+    }
+  }
+
+
+  Future<void> convertLead(String leadId) async {
+    isConvertLoading = true;
+    update();
+
+    Map<String, dynamic> body = {
+      "leadid": leadId,
+      "company": companyController.text,
+      "phonenumber": phoneNumberController.text,
+      "website": websiteController.text,
+      "address": addressController.text,
+      "city": cityController.text,
+      "state": stateController.text,
+      "country": countryController.text, 
+      "zip": zipController.text,
+      "firstname": firstNameController.text,
+      "lastname": lastNameController.text,
+      "email": emailController.text,
+      "designation": designationController.text,
+      "password": passwordController.text,
+    };
+
+    ResponseModel responseModel = await leadRepo.convertLeadToCustomer(body);
+
+    if (responseModel.status) {
+       Get.back(); // Close dialog
+       Get.back(); // Go back to list or refresh? User didn't specify, but usually we go back.
+       CustomSnackBar.success(successList: [responseModel.message.tr]);
+    } else {
+      CustomSnackBar.error(errorList: [responseModel.message.tr]);
+    }
+
+    isConvertLoading = false;
     update();
   }
 

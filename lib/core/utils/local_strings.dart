@@ -613,6 +613,7 @@ class LocalStrings {
   static const String updatedLeadStatusFrom = "Updated lead status from";
   static const String assignedTo = "Assigned to";
   static const String leadsKanban = "Leads Kanban";
+  static const String convertToCustomer = "Convert to Customer";
 
   // Staff
   static const String staff = "Staff";

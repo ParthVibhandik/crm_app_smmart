@@ -7,13 +7,31 @@ import 'package:flutex_admin/features/dashboard/model/dashboard_model.dart';
 import 'package:flutex_admin/core/route/route.dart';
 import 'package:get/get.dart';
 
-class LeadsTasksCard extends StatelessWidget {
+class LeadsTasksCard extends StatefulWidget {
   final DashboardController controller;
   const LeadsTasksCard({super.key, required this.controller});
 
   @override
+  State<LeadsTasksCard> createState() => _LeadsTasksCardState();
+}
+
+class _LeadsTasksCardState extends State<LeadsTasksCard> {
+  String _lastFilterKey = '';
+
+  @override
   Widget build(BuildContext context) {
     return GetBuilder<DashboardController>(builder: (controller) {
+      // Generate unique key for current filter state
+      String currentFilterKey =
+          '${controller.selectedLeadsCategory}_${controller.selectedLeadsMainTab}_${controller.selectedLeadsSubTab}';
+
+      // Reset expansion if filters have changed
+      if (currentFilterKey != _lastFilterKey) {
+        // We can safely update this state during build because it's derived from the controller state
+        // and we want it to reflect immediately in this build pass.
+        _lastFilterKey = currentFilterKey;
+      }
+
       // Use unified subordinates from controller (includes both goals and leads/tasks)
       List<DashboardSubordinate> unifiedSubs = controller.unifiedSubordinates;
 
@@ -238,8 +256,43 @@ class LeadsTasksCard extends StatelessWidget {
       );
     }
 
+    // Truncation Logic
+    bool showViewMore = items.length > 5;
+    List<LeadTaskItem> visibleItems =
+        (!showViewMore) ? items : items.take(5).toList();
+
     return Column(
-      children: items.map((item) => _buildListItem(controller, item)).toList(),
+      children: [
+        ...visibleItems
+            .map((item) => _buildListItem(controller, item)),
+        if (showViewMore)
+           Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: InkWell(
+              onTap: () {
+                if(controller.selectedLeadsCategory == 'leads') {
+                   Get.toNamed(RouteHelper.leadScreen);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                width: double.infinity,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  "View More",
+                  style: regularDefault.copyWith(
+                    color: ColorResources.primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 

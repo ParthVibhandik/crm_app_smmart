@@ -7,13 +7,31 @@ import 'package:flutex_admin/features/dashboard/model/dashboard_model.dart';
 import 'package:get/get.dart';
 // import 'package:intl/intl.dart';
 
-class GoalsCard extends StatelessWidget {
+class GoalsCard extends StatefulWidget {
   final DashboardController controller;
   const GoalsCard({super.key, required this.controller});
 
   @override
+  State<GoalsCard> createState() => _GoalsCardState();
+}
+
+class _GoalsCardState extends State<GoalsCard> {
+  bool _isExpanded = false;
+  String _lastFilterKey = '';
+
+  @override
   Widget build(BuildContext context) {
-    Goals? goals = controller.homeModel.goals;
+    // Generate a unique key based on current filter states
+    String currentFilterKey =
+        '${widget.controller.selectedGoalMainTab}_${widget.controller.selectedGoalSubTab}_${widget.controller.selectedGoalDateFilter}';
+
+    // Reset expansion if filters have changed
+    if (currentFilterKey != _lastFilterKey) {
+      _isExpanded = false; // Reset to default view
+      _lastFilterKey = currentFilterKey;
+    }
+
+    Goals? goals = widget.controller.homeModel.goals;
     if (goals == null) {
       return Card(
         child: Padding(
@@ -24,7 +42,7 @@ class GoalsCard extends StatelessWidget {
     }
 
     // Use unified subordinates from controller (includes both goals and leads/tasks)
-    List<DashboardSubordinate> unifiedSubs = controller.unifiedSubordinates;
+    List<DashboardSubordinate> unifiedSubs = widget.controller.unifiedSubordinates;
 
     return Card(
       elevation: 2,
@@ -54,10 +72,10 @@ class GoalsCard extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _buildFilterTab('All', 'all', controller),
-                      _buildFilterTab('MTD', 'mtd', controller),
-                      _buildFilterTab('YTD', 'ytd', controller),
-                      _buildFilterTab('Custom', 'custom', controller),
+                      _buildFilterTab('All', 'all', widget.controller),
+                      _buildFilterTab('MTD', 'mtd', widget.controller),
+                      _buildFilterTab('YTD', 'ytd', widget.controller),
+                      _buildFilterTab('Custom', 'custom', widget.controller),
                     ],
                   ),
                 ),
@@ -72,17 +90,17 @@ class GoalsCard extends StatelessWidget {
                 children: [
                   _buildMainTabButton(
                       'My',
-                      controller.selectedGoalMainTab == 'my',
-                      () => controller.changeGoalMainTab('my')),
+                      widget.controller.selectedGoalMainTab == 'my',
+                      () => widget.controller.changeGoalMainTab('my')),
                   if (unifiedSubs.isNotEmpty)
                     ...unifiedSubs.map((sub) {
                       String name = sub.name;
                       bool isSelected =
-                          controller.selectedGoalMainTab == sub.id;
+                          widget.controller.selectedGoalMainTab == sub.id;
                       return Padding(
                         padding: const EdgeInsets.only(left: 10),
                         child: _buildMainTabButton(name, isSelected,
-                            () => controller.changeGoalMainTab(sub.id)),
+                            () => widget.controller.changeGoalMainTab(sub.id)),
                       );
                     }),
                 ],
@@ -93,22 +111,22 @@ class GoalsCard extends StatelessWidget {
             const SizedBox(height: 10),
 
             // Row 3: Conditional Sub-tabs (Only for "My")
-            if (controller.selectedGoalMainTab == 'my') ...[
+            if (widget.controller.selectedGoalMainTab == 'my') ...[
               Row(
                 children: [
                   Expanded(
                     child: _buildSubTabButton(
                       'Assigned Goals',
-                      controller.selectedGoalSubTab == 'assigned',
-                      () => controller.changeGoalSubTab('assigned'),
+                      widget.controller.selectedGoalSubTab == 'assigned',
+                      () => widget.controller.changeGoalSubTab('assigned'),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: _buildSubTabButton(
                       'Self Assigned Goals',
-                      controller.selectedGoalSubTab == 'self',
-                      () => controller.changeGoalSubTab('self'),
+                      widget.controller.selectedGoalSubTab == 'self',
+                      () => widget.controller.changeGoalSubTab('self'),
                     ),
                   ),
                 ],
@@ -189,36 +207,36 @@ class GoalsCard extends StatelessWidget {
                         color: Colors.black.withOpacity(0.05), blurRadius: 2)
                   ]
                 : null),
-        child: Text(
-          label,
-          style: regularSmall.copyWith(
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? Colors.black : Colors.grey[600]),
-        ),
+      child: Text(
+        label,
+        style: regularSmall.copyWith(
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? Colors.black : Colors.grey[600]),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildGoalsList(BuildContext context, Goals goals) {
     List<Goal> sourceGoals = [];
 
     // 1. Select Source
-    if (controller.selectedGoalMainTab == 'my') {
-      if (controller.selectedGoalSubTab == 'assigned') {
+    if (widget.controller.selectedGoalMainTab == 'my') {
+      if (widget.controller.selectedGoalSubTab == 'assigned') {
         sourceGoals = goals.assignedGoals ?? [];
       } else {
         sourceGoals = goals.selfGoals ?? [];
       }
     } else {
       // It's a specific subordinate
-      String staffId = controller.selectedGoalMainTab;
+      String staffId = widget.controller.selectedGoalMainTab;
       sourceGoals = (goals.subordinatesGoals ?? [])
           .where((g) => g.staffId == staffId)
           .toList();
     }
 
     // 2. Apply Type Filter (MTD, YTD, Custom)
-    List<Goal> displayGoals = _filterGoalsByType(sourceGoals, controller);
+    List<Goal> displayGoals = _filterGoalsByType(sourceGoals, widget.controller);
 
     if (displayGoals.isEmpty) {
       return Center(
@@ -229,9 +247,42 @@ class GoalsCard extends StatelessWidget {
       );
     }
 
+    // Logic for truncation
+    bool showViewMore = displayGoals.length > 5;
+    List<Goal> visibleGoals =
+        (_isExpanded || !showViewMore) ? displayGoals : displayGoals.take(5).toList();
+
     return Column(
-      children:
-          displayGoals.map((goal) => _buildGoalItem(context, goal)).toList(),
+      children: [
+        ...visibleGoals.map((goal) => _buildGoalItem(context, goal)),
+        if (showViewMore)
+           Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  _isExpanded = !_isExpanded;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                width: double.infinity,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _isExpanded ? "View Less" : "View More",
+                  style: regularDefault.copyWith(
+                    color: ColorResources.primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 

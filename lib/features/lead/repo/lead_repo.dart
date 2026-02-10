@@ -292,4 +292,15 @@ class LeadRepo {
     );
     return responseModel;
   }
+
+  Future<ResponseModel> convertLeadToCustomer(Map<String, dynamic> body) async {
+    String url = "${UrlContainer.baseUrl}${UrlContainer.leadsUrl}/convert-to-customer";
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.postMethod,
+      body,
+      passHeader: true,
+    );
+    return responseModel;
+  }
 }
