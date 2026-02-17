@@ -29,6 +29,8 @@ class GoalRepo {
       null,
       passHeader: true,
     );
+    print('Goal Route: $url');
+    print('Goal Response: ${responseModel.responseJson}');
     return responseModel;
   }
 
@@ -40,6 +42,8 @@ class GoalRepo {
       null,
       passHeader: true,
     );
+    print('Goal Details Route: $url');
+    print('Goal Details Response: ${responseModel.responseJson}');
     return responseModel;
   }
   Future<ResponseModel> createGoal(Map<String, dynamic> body) async {
@@ -50,6 +54,8 @@ class GoalRepo {
       body,
       passHeader: true,
     );
+    print('Create Goal Route: $url');
+    print('Create Goal Response: ${responseModel.responseJson}');
     return responseModel;
   }
 
@@ -61,6 +67,8 @@ class GoalRepo {
       body,
       passHeader: true,
     );
+    print('Update Goal Route: $url');
+    print('Update Goal Response: ${responseModel.responseJson}');
     return responseModel;
   }
 }

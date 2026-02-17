@@ -232,16 +232,24 @@ class _LeadsTasksCardState extends State<LeadsTasksCard> {
     }
     // TASKS LOGIC
     else {
+      print("[DEBUG] LeadsTasksCard: Task Logic - MainTab: ${controller.selectedLeadsMainTab}");
       if (controller.selectedLeadsMainTab == 'my') {
         items = data.selfTasks ?? [];
+        print("[DEBUG] Self Tasks Count: ${items.length}");
       } else {
         // Subordinates Logic - Use unified subordinate list
         String staffId = controller.selectedLeadsMainTab;
         DashboardSubordinate? sub = controller.unifiedSubordinates
             .firstWhereOrNull((s) => s.id == staffId);
+        
+        print("[DEBUG] Subordinate Lookup: ID=$staffId, Found=${sub?.name}");
         if (sub != null) {
           String keyName = sub.name;
+          print("[DEBUG] Looking for tasks for key: '$keyName'");
+          print("[DEBUG] Available Subordinate Task Keys: ${data.subordinatesTasks?.keys.toList()}");
+          
           items = data.subordinatesTasks?[keyName] ?? [];
+          print("[DEBUG] Found ${items.length} tasks for $keyName");
         }
       }
     }

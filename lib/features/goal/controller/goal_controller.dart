@@ -148,7 +148,12 @@ class GoalController extends GetxController {
   Future<void> loadGoals() async {
     isLoading = true;
     update();
+    print('Loading Goal Screen (Fetching Staff List)...');
     ResponseModel responseModel = await staffRepo.getAllStaffs();
+    if (!responseModel.status) {
+      print('getAllStaffs failed, trying getSubordinates...');
+      responseModel = await staffRepo.getSubordinates();
+    }
     if(responseModel.status){
        staffsModel = StaffsModel.fromJson(jsonDecode(responseModel.responseJson));
     }

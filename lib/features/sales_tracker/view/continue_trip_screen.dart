@@ -11,6 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
+import 'package:flutex_admin/common/models/response_model.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:dio/dio.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 
 class ContinueTripScreen extends StatefulWidget {
@@ -272,11 +275,12 @@ class _ContinueTripScreenState extends State<ContinueTripScreen> {
   Future<void> _startTrip() async {
     // Validation
     if (isManualAddress && _manualAddressController.text.trim().isEmpty) {
-      Get.snackbar("Error", "Please enter the manual address");
+      CustomSnackBar.error(errorList: ["Please enter the manual address"]);
       return;
     }
     if (isManualAddress && _reasonController.text.trim().isEmpty) {
-      Get.snackbar("Error", "Please enter a reason for changing the address");
+      CustomSnackBar.error(
+          errorList: ["Please enter a reason for changing the address"]);
       return;
     }
 
@@ -299,16 +303,36 @@ class _ContinueTripScreenState extends State<ContinueTripScreen> {
         leadId = widget.lead.id != null ? int.tryParse(widget.lead.id!) : null;
       }
 
-      // Get destination coordinates (from the lead/customer address)
-      // For now, using placeholder values - these should be geocoded from the address
-      double destinationLat = 22.3039; // Placeholder
-      double destinationLng = 70.8022; // Placeholder
+      // Get destination coordinates (from the lead/customer address or manual address)
+      double destinationLat = 0.0;
+      double destinationLng = 0.0;
+      String destinationAddress = "";
 
-      // Get alternate address coordinates if provided
       if (isManualAddress) {
-        // TODO: Geocode the manual address to get coordinates
-        destinationLat = 22.3105; // Placeholder
-        destinationLng = 70.8152; // Placeholder
+        destinationAddress = _manualAddressController.text.trim();
+      } else {
+        // Construct address from lead parts
+        destinationAddress = [
+          widget.lead.address,
+          widget.lead.city,
+          widget.lead.state,
+          widget.lead.country
+        ].where((s) => s != null && s.trim().isNotEmpty).join(', ');
+      }
+
+      if (destinationAddress.isNotEmpty) {
+        try {
+          // Use our custom helper that tries Google first
+          geo.Location? loc = await _getCoordinatesFromAddress(destinationAddress);
+          if (loc != null) {
+            destinationLat = loc.latitude;
+            destinationLng = loc.longitude;
+          }
+        } catch (e) {
+          print("Geocoding failed for startTrip: $e");
+          CustomSnackBar.error(
+              errorList: ["Could not find location for address"]);
+        }
       }
 
       // Resolve human-readable start address via reverse geocoding
@@ -332,7 +356,7 @@ class _ContinueTripScreenState extends State<ContinueTripScreen> {
       print("  Alt Reason: $altAddressReason");
 
       // Call API
-      final response = await _salesTrackerRepo.startTrip(
+      ResponseModel responseModel = await _salesTrackerRepo.startTrip(
         leadId: leadId,
         customerId: customerId,
         destinationLat: destinationLat,
@@ -345,37 +369,85 @@ class _ContinueTripScreenState extends State<ContinueTripScreen> {
         modeOfTransport: _modeOfTransport,
       );
 
-      if (response.status) {
+      if (responseModel.status) {
         // Success
-        // Extract trip ID from response and store it
-        var responseData = response.responseJson;
+        String tripId = '';
         try {
-          var decodedData = jsonDecode(responseData);
+          var decodedData = jsonDecode(responseModel.responseJson);
           if (decodedData['data'] != null &&
               decodedData['data']['id'] != null) {
-            String tripId = decodedData['data']['id'].toString();
-            // Store trip ID in secure storage
-            await TripSession.setActiveTrip(tripId, tripData: responseData);
-            print('Trip ID stored: $tripId');
+            tripId = decodedData['data']['id'].toString();
+          } else if (decodedData['trip_id'] != null) {
+            tripId = decodedData['trip_id'].toString();
           }
+          
+           // Fallback tripID extraction if structure differs
+          if(tripId.isEmpty && decodedData is Map && decodedData.containsKey('id')){
+             tripId = decodedData['id'].toString();
+          }
+          
+          if (tripId.isNotEmpty) {
+             await TripSession.setActiveTrip(tripId, tripData: responseModel.responseJson);
+             print('Trip ID stored: $tripId');
+          }
+
         } catch (e) {
           print('Error storing trip ID: $e');
         }
 
         CustomSnackBar.success(successList: ["Trip started successfully"]);
-        Get.to(() => const TripFlowScreen());
+        Get.off(() => const TripFlowScreen());
       } else {
         // Error response from API
-        CustomSnackBar.error(errorList: [response.message.tr]);
+        CustomSnackBar.error(errorList: [responseModel.message.tr]);
       }
     } catch (e) {
       print("Error starting trip: $e");
       CustomSnackBar.error(errorList: ["Error starting trip: $e"]);
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
+  }
+
+  Future<geo.Location?> _getCoordinatesFromAddress(String address) async {
+    String? googleApiKey = dotenv.env['GOOGLE_API_KEY'];
+
+    // 1. Try Google Geocoding API if key is available
+    if (googleApiKey != null && googleApiKey.isNotEmpty) {
+      try {
+        final response = await Dio().get(
+            'https://maps.googleapis.com/maps/api/geocode/json',
+            queryParameters: {'address': address, 'key': googleApiKey});
+
+        if (response.data['status'] == 'OK' &&
+            response.data['results'].isNotEmpty) {
+          var location = response.data['results'][0]['geometry']['location'];
+            // Return as a geo.Location object for compatibility
+            return geo.Location(
+                latitude: location['lat'], 
+                longitude: location['lng'], 
+                timestamp: DateTime.now());
+        }
+      } catch (e) {
+        print('Google Geocoding error in continue_trip: $e');
+      }
+    }
+
+    // 2. Fallback to native geocoding package
+    try {
+      List<geo.Location> locations = await geo.locationFromAddress(address);
+      if (locations.isNotEmpty) {
+        return locations.first;
+      }
+    } catch (e) {
+      print("Native geocoding failed: $e");
+    }
+    
+    return null;
   }
 
   Future<String> _getAddressFromLatLng(double lat, double lng) async {

@@ -14,6 +14,7 @@ import 'package:flutex_admin/features/lead/repo/lead_repo.dart';
 import 'package:flutex_admin/features/attendance/attendance_service.dart'; // Fixed import
 import 'package:get/get.dart';
 import 'package:flutex_admin/common/components/divider/custom_divider.dart';
+import 'package:flutex_admin/core/route/route.dart';
 
 class CalendarScheduleCard extends StatelessWidget {
   const CalendarScheduleCard({super.key});
@@ -158,16 +159,40 @@ class CalendarScheduleCard extends StatelessWidget {
                          // 2. Show Other Events (Tasks, Reminders)
                          ...dayEvents.where((e) => e is! AttendanceStatus).map((event) {
                              if (event is Task) {
+                               // print('DEBUG: Rendering Task: ${event.name}, Priority: ${event.priority}');
                                return ListTile(
                                   leading: const Icon(Icons.task_alt, color: Colors.orange),
                                   title: Text(event.name ?? 'Untitled Task', style: mediumSmall),
-                                  subtitle: Text('Status: ${event.status ?? 'Unknown'}', style: regularSmall),
+                                  // CHANGED: Show Priority instead of Status
+                                  subtitle: Text('Priority: ${event.priority ?? 'Unknown'}', style: regularSmall),
+                                  onTap: () {
+                                    print('DEBUG: Tapped Task ${event.id}');
+                                    if (event.id != null) {
+                                      Get.toNamed(RouteHelper.taskDetailsScreen, arguments: event.id);
+                                    }
+                                  },
                                );
                              } else if (event is Reminder) {
+                               // print('DEBUG: Rendering Reminder: ${event.description}, RelType: ${event.relType}, RelId: ${event.relId}');
                                return ListTile(
                                   leading: const Icon(Icons.notifications_active, color: Colors.red),
                                   title: Text(event.description ?? 'Untitled Reminder', style: mediumSmall),
                                   subtitle: Text('Staff: ${event.staffId ?? 'Unknown'}', style: regularSmall),
+                                  onTap: () {
+                                    print('DEBUG: Tapped Reminder ${event.id}, RelType: ${event.relType}, RelId: ${event.relId}');
+                                    if (event.relType == 'lead' && event.relId != null) {
+                                      Get.toNamed(RouteHelper.leadDetailsScreen, arguments: event.relId);
+                                    } else if (event.relType == 'customer' && event.relId != null) {
+                                       // Assuming customer route exists or use lead for now if compatible
+                                       Get.toNamed(RouteHelper.customerDetailsScreen, arguments: event.relId);
+                                    } else {
+                                      // Fallback or handle other types
+                                      if (event.relId != null) {
+                                         // Try lead details as fallback for now
+                                         Get.toNamed(RouteHelper.leadDetailsScreen, arguments: event.relId);
+                                      }
+                                    }
+                                  },
                                );
                              }
                              return const SizedBox.shrink();

@@ -330,6 +330,7 @@ class SalesTrackerController extends GetxController {
 
     // 1. Try Google Geocoding API first
     if (googleApiKey != null && googleApiKey.isNotEmpty) {
+      print("Using Google Geocoding API for address: $address");
       try {
         final response = await Dio().get(
             'https://maps.googleapis.com/maps/api/geocode/json',

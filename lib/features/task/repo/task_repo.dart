@@ -27,6 +27,8 @@ class TaskRepo {
       null,
       passHeader: true,
     );
+    print('Task List Route: $url');
+    print('Task List Response: ${responseModel.responseJson}');
     return responseModel;
   }
 
@@ -38,6 +40,8 @@ class TaskRepo {
       null,
       passHeader: true,
     );
+    print('Task Details Route: $url');
+    print('Task Details Response: ${responseModel.responseJson}');
     return responseModel;
   }
 
@@ -142,6 +146,8 @@ class TaskRepo {
       passHeader: true,
       isJson: true,
     );
+    print('Create/Update Task Route: $url');
+    print('Create/Update Task Response: ${responseModel.responseJson}');
     return responseModel;
   }
 
