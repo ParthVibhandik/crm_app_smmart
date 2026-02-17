@@ -13,13 +13,28 @@ class StaffRepo {
   StaffRepo({required this.apiClient});
 
   Future<ResponseModel> getAllStaffs() async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.staffsUrl}";
+    String url = "${UrlContainer.baseUrl}${UrlContainer.staffsUrl}?limit=1000&offset=0";
     ResponseModel responseModel = await apiClient.request(
       url,
       Method.getMethod,
       null,
       passHeader: true,
     );
+    print('Staff List Route: $url');
+    print('Staff List Response: ${responseModel.responseJson}');
+    return responseModel;
+  }
+
+  Future<ResponseModel> getSubordinates() async {
+    String url = "${UrlContainer.baseUrl}get-subs";
+    ResponseModel responseModel = await apiClient.request(
+      url,
+      Method.getMethod,
+      null,
+      passHeader: true,
+    );
+    print('Staff (Subordinates) List Route: $url');
+    print('Staff (Subordinates) List Response: ${responseModel.responseJson}');
     return responseModel;
   }
 

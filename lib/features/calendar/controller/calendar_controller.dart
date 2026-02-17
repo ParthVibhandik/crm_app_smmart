@@ -50,23 +50,23 @@ class CalendarController extends GetxController {
 
   Future<void> _loadAllTasks() async {
     try {
-      print('CalendarController: Loading tasks...');
+      // print('CalendarController: Loading tasks...');
       ResponseModel responseModel = await taskRepo.getAllTasks(page: 0);
-      print('CalendarController: Task response status: ${responseModel.status}');
+      // print('CalendarController: Task response status: ${responseModel.status}');
       
       // LOG RAW JSON
-      print('CalendarController: Task RAW JSON: ${responseModel.responseJson}'); 
+      // print('CalendarController: Task RAW JSON: ${responseModel.responseJson}'); 
 
       if (responseModel.status) {
         final tasksModel = TasksModel.fromJson(jsonDecode(responseModel.responseJson));
         allTasks = tasksModel.data ?? [];
-        print('CalendarController: Loaded ${allTasks.length} tasks.');
+        // print('CalendarController: Loaded ${allTasks.length} tasks.');
         if (allTasks.isNotEmpty) {
-           print('CalendarController: Sample Task Date: ${allTasks.first.startDate}');
+           // print('CalendarController: Sample Task Date: ${allTasks.first.startDate}');
         }
       }
     } catch (e) {
-      print('Error loading tasks for calendar: $e');
+      // print('Error loading tasks for calendar: $e');
     }
   }
 
@@ -74,18 +74,18 @@ class CalendarController extends GetxController {
     try {
       todayAttendance = await attendanceService.getTodayStatus();
     } catch (e) {
-      print('Error loading attendance for calendar: $e');
+      // print('Error loading attendance for calendar: $e');
     }
   }
 
   Future<void> _loadAllLeadReminders() async {
     try {
-      print('CalendarController: Loading leads for reminders...');
+      // print('CalendarController: Loading leads for reminders...');
       ResponseModel leadsResponse = await leadRepo.getAllLeads();
-      print('CalendarController: Leads response status: ${leadsResponse.status}');
+      // print('CalendarController: Leads response status: ${leadsResponse.status}');
       
       // LOG RAW JSON
-      print('CalendarController: Leads RAW JSON: ${leadsResponse.responseJson}'); 
+      // print('CalendarController: Leads RAW JSON: ${leadsResponse.responseJson}'); 
 
       if (leadsResponse.status) {
         var decoded = jsonDecode(leadsResponse.responseJson);
@@ -100,7 +100,7 @@ class CalendarController extends GetxController {
            leadsList = decoded;
         }
         
-        print('CalendarController: Found ${leadsList.length} leads (checking first 20).');
+        // print('CalendarController: Found ${leadsList.length} leads (checking first 20).');
 
         List<Future<void>> futures = [];
         for (var item in leadsList.take(20)) { 
@@ -114,13 +114,13 @@ class CalendarController extends GetxController {
            }
         }
         await Future.wait(futures);
-        print('CalendarController: Loaded total ${allReminders.length} reminders.');
+        // print('CalendarController: Loaded total ${allReminders.length} reminders.');
         if (allReminders.isNotEmpty) {
-           print('CalendarController: Sample Reminder Date: ${allReminders.first.date}');
+           // print('CalendarController: Sample Reminder Date: ${allReminders.first.date}');
         }
       }
     } catch (e) {
-      print('Error loading reminders: $e');
+      // print('Error loading reminders: $e');
     }
   }
 
@@ -147,7 +147,7 @@ class CalendarController extends GetxController {
         DateTime startDate = DateTime.parse(task.startDate!);
         return isSameDay(startDate, day);
       } catch (_) {
-        print('CalendarController: Failed to parse task date: ${task.startDate}');
+        // print('CalendarController: Failed to parse task date: ${task.startDate}');
         return false;
       }
     }));
@@ -160,7 +160,7 @@ class CalendarController extends GetxController {
         return isSameDay(reminderDate, day);
       } catch (_) {
          // Debug failed parse
-         print('CalendarController: Failed to parse reminder date: ${reminder.date}');
+         // print('CalendarController: Failed to parse reminder date: ${reminder.date}');
          return false;
       }
     }));

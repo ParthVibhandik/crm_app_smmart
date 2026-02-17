@@ -35,7 +35,7 @@ class AttendanceService {
   /// ==============================
   Future<AttendanceStatus> getTodayStatus() async {
     final response = await _dio.get('/flutex_admin_api/attendance/today');
-    print(response.data);
+    // print(response.data);
 
     if (response.data['status'] != true) {
       throw Exception(response.data['message'] ?? 'Failed');
@@ -270,16 +270,30 @@ class AttendanceService {
       'reason': reason,
     });
 
-    final response = await _dio.post(
-      '/flutex_admin_api/attendance/regularize',
-      data: formData,
-    );
+    try {
+      final response = await _dio.post(
+        '/flutex_admin_api/attendance/regularize',
+        data: formData,
+      );
 
-    return {
-      'success': response.data['status'] == true,
-      'message': response.data['message'] ?? 'Unknown error',
-      'code': response.data['code'] ?? response.statusCode,
-    };
+      print('Regularization Route: ${response.requestOptions.uri}');
+      print('Regularization Response: ${response.data}');
+
+      return {
+        'success': response.data['status'] == true,
+        'message': response.data['message'] ?? 'Unknown error',
+        'code': response.data['code'] ?? response.statusCode,
+      };
+    } catch (e) {
+      if (e is DioException) {
+        print('Regularization Route: ${e.requestOptions.uri}');
+        print('Regularization Error Response: ${e.response?.data}');
+        print('Regularization Error Message: ${e.message}');
+      } else {
+        print('Regularization Error: $e');
+      }
+      rethrow;
+    }
   }
   Future<AttendanceStatus?> getAttendanceForDate(DateTime date) async {
     try {
@@ -290,7 +304,7 @@ class AttendanceService {
         queryParameters: {'date': dateStr},
       );
       
-      print('Attendance for $dateStr: ${response.data}');
+      // print('Attendance for $dateStr: ${response.data}');
 
       if (response.data['status'] == true) {
          if (response.data.containsKey('data') && response.data['data'] is Map) {
@@ -299,7 +313,7 @@ class AttendanceService {
          return AttendanceStatus.fromJson(response.data);
       }
     } catch (e) {
-      print('Error fetching attendance for $date: $e');
+      // print('Error fetching attendance for $date: $e');
     }
     return null;
   }

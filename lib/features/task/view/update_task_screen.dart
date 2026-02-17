@@ -189,12 +189,14 @@ class _UpdateTicketScreenState extends State<UpdateTaskScreen> {
                           const SizedBox(height: Dimensions.space15),
                           Row(
                             children: [
-                              Expanded(
+                                Expanded(
                                 child: CustomDateFormField(
                                   labelText: LocalStrings.startDate.tr,
-                                  initialValue:
-                                      DateConverter.convertStringToDatetime(
-                                          controller.startDateController.text),
+                                  initialValue: controller
+                                          .startDateController.text.isNotEmpty
+                                      ? DateConverter.convertStringToDatetime(
+                                          controller.startDateController.text)
+                                      : DateTime.now(),
                                   onChanged: (DateTime? value) {
                                     controller.startDateController.text =
                                         DateConverter.formatDate(value!);
@@ -205,9 +207,11 @@ class _UpdateTicketScreenState extends State<UpdateTaskScreen> {
                               Expanded(
                                 child: CustomDateFormField(
                                   labelText: LocalStrings.dueDate.tr,
-                                  initialValue:
-                                      DateConverter.convertStringToDatetime(
-                                          controller.dueDateController.text),
+                                  initialValue: controller
+                                          .dueDateController.text.isNotEmpty
+                                      ? DateConverter.convertStringToDatetime(
+                                          controller.dueDateController.text)
+                                      : DateTime.now(),
                                   onChanged: (DateTime? value) {
                                     controller.dueDateController.text =
                                         DateConverter.formatDate(value!);

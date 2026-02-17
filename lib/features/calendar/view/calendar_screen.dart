@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
+import 'package:flutex_admin/core/route/route.dart';
 import '../controller/calendar_controller.dart';
 
 class CalendarScreen extends StatelessWidget {
@@ -127,6 +128,36 @@ class _TaskTile extends StatelessWidget {
   final Task task;
   const _TaskTile({required this.task});
 
+  String _getPriorityLabel(String? priority) {
+    switch (priority) {
+      case '1':
+        return 'Low';
+      case '2':
+        return 'Medium';
+      case '3':
+        return 'High';
+      case '4':
+        return 'Urgent';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  Color _getPriorityColor(String? priority) {
+    switch (priority) {
+      case '1':
+        return Colors.green;
+      case '2':
+        return Colors.orange;
+      case '3':
+        return Colors.deepOrange;
+      case '4':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -134,8 +165,24 @@ class _TaskTile extends StatelessWidget {
       child: ListTile(
         leading: const Icon(Icons.task_alt, color: Colors.blue),
         title: Text(task.name ?? 'Untitled Task'),
-        subtitle: Text('Status: ${task.status ?? 'Unknown'}'),
+        subtitle: Row(
+          children: [
+            Text('Priority: '),
+            Text(
+              _getPriorityLabel(task.priority),
+              style: TextStyle(
+                color: _getPriorityColor(task.priority),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
         trailing: Text(task.startDate ?? ''),
+        onTap: () {
+          if (task.id != null) {
+            Get.toNamed(RouteHelper.taskDetailsScreen, arguments: task.id);
+          }
+        },
       ),
     );
   }
@@ -179,6 +226,12 @@ class _ReminderTile extends StatelessWidget {
         title: Text(reminder.description ?? 'Untitled Reminder', style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text('Staff: ${reminder.staffId ?? 'Unknown'}'),
         trailing: Text(reminder.date ?? '', style: const TextStyle(color: Colors.red)),
+        onTap: () {
+          // Navigate to lead details screen using relId (lead ID)
+          if (reminder.relId != null && reminder.relId!.isNotEmpty) {
+            Get.toNamed(RouteHelper.leadDetailsScreen, arguments: reminder.relId);
+          }
+        },
       ),
     );
   }
