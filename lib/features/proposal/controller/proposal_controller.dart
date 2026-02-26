@@ -122,8 +122,8 @@ class ProposalController extends GetxController {
       proposalDetailsModel = ProposalDetailsModel.fromJson(
         jsonDecode(responseModel.responseJson),
       );
-      ResponseModel settingsResponseModel = await proposalRepo
-          .getSettingsData();
+      ResponseModel settingsResponseModel =
+          await proposalRepo.getSettingsData();
       settingsModel = SettingsModel.fromJson(
         jsonDecode(settingsResponseModel.responseJson),
       );
@@ -146,8 +146,8 @@ class ProposalController extends GetxController {
           proposalItemList.add(
             ProposalItemModel(
               itemNameController: TextEditingController(
-                text: proposalDetailsModel.data!.items![i].description
-                    .toString(),
+                text:
+                    proposalDetailsModel.data!.items![i].description.toString(),
               ),
               descriptionController: TextEditingController(
                 text: proposalDetailsModel.data!.items![i].longDescription

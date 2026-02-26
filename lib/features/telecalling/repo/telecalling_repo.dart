@@ -9,7 +9,8 @@ class TelecallingRepo {
   TelecallingRepo({required this.apiClient});
 
   Future<ResponseModel> searchLeads(String keyword) async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.salesTrackerSearchLeadUrl}";
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.salesTrackerSearchLeadUrl}";
     Map<String, String> params = {"keyword": keyword};
 
     ResponseModel responseModel = await apiClient.request(
@@ -22,7 +23,8 @@ class TelecallingRepo {
   }
 
   Future<ResponseModel> getAssignedLeads() async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.salesTrackerGetLeadsUrl}";
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.salesTrackerGetLeadsUrl}";
     // Body should be empty map {}
     Map<String, dynamic> params = {};
 

@@ -165,8 +165,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                             return CustomDropDownTextField(
                               hintText: LocalStrings.selectCurrency.tr,
                               onChanged: (value) {
-                                controller.currencyController.text = value
-                                    .toString();
+                                controller.currencyController.text =
+                                    value.toString();
                               },
                               selectedValue: controller.currencyController.text,
                               items: controller.currenciesModel.data!.map((
@@ -234,8 +234,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                             return CustomDropDownTextField(
                               hintText: LocalStrings.selectCountry.tr,
                               onChanged: (value) {
-                                controller.countryController.text = value
-                                    .toString();
+                                controller.countryController.text =
+                                    value.toString();
                               },
                               selectedValue: controller.countryController.text,
                               items: controller.countriesModel.data!.map((
@@ -321,8 +321,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                           return CustomDropDownTextField(
                             hintText: LocalStrings.selectBillingCountry.tr,
                             onChanged: (value) {
-                              controller.billingCountryController.text = value
-                                  .toString();
+                              controller.billingCountryController.text =
+                                  value.toString();
                             },
                             selectedValue:
                                 controller.billingCountryController.text,
@@ -388,8 +388,8 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                           return CustomDropDownTextField(
                             hintText: LocalStrings.selectShippingCountry.tr,
                             onChanged: (value) {
-                              controller.shippingCountryController.text = value
-                                  .toString();
+                              controller.shippingCountryController.text =
+                                  value.toString();
                             },
                             selectedValue:
                                 controller.shippingCountryController.text,

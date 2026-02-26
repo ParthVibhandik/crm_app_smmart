@@ -252,7 +252,7 @@ class LeadDetailsController extends GetxController {
       stateController.text = data.state ?? '';
       countryController.text = data.country ?? '';
       zipController.text = data.zip ?? '';
-      
+
       // Split name into first and last name if possible
       var nameParts = (data.name ?? '').split(' ');
       if (nameParts.isNotEmpty) {
@@ -261,12 +261,12 @@ class LeadDetailsController extends GetxController {
           lastNameController.text = nameParts.sublist(1).join(' ');
         }
       }
-      
+
       emailController.text = data.email ?? '';
-      designationController.text = data.title ?? ''; // Mapping title to designation as per request
+      designationController.text =
+          data.title ?? ''; // Mapping title to designation as per request
     }
   }
-
 
   Future<void> convertLead(String leadId) async {
     isConvertLoading = true;
@@ -280,7 +280,7 @@ class LeadDetailsController extends GetxController {
       "address": addressController.text,
       "city": cityController.text,
       "state": stateController.text,
-      "country": countryController.text, 
+      "country": countryController.text,
       "zip": zipController.text,
       "firstname": firstNameController.text,
       "lastname": lastNameController.text,
@@ -292,9 +292,9 @@ class LeadDetailsController extends GetxController {
     ResponseModel responseModel = await leadRepo.convertLeadToCustomer(body);
 
     if (responseModel.status) {
-       Get.back(); // Close dialog
-       Get.back(); // Go back to list or refresh? User didn't specify, but usually we go back.
-       CustomSnackBar.success(successList: [responseModel.message.tr]);
+      Get.back(); // Close dialog
+      Get.back(); // Go back to list or refresh? User didn't specify, but usually we go back.
+      CustomSnackBar.success(successList: [responseModel.message.tr]);
     } else {
       CustomSnackBar.error(errorList: [responseModel.message.tr]);
     }

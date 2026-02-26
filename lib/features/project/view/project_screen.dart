@@ -145,27 +145,20 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                     scrollDirection: Axis.horizontal,
                                     itemBuilder: (context, index) {
                                       return OverviewCard(
-                                        name: controller
-                                            .projectsModel
-                                            .overview![index]
-                                            .status!
-                                            .tr,
-                                        number: controller
-                                            .projectsModel
-                                            .overview![index]
-                                            .total
+                                        name: controller.projectsModel
+                                            .overview![index].status!.tr,
+                                        number: controller.projectsModel
+                                            .overview![index].total
                                             .toString(),
                                         color: ColorResources.blueColor,
                                       );
                                     },
                                     separatorBuilder: (context, index) =>
                                         const SizedBox(
-                                          width: Dimensions.space5,
-                                        ),
+                                      width: Dimensions.space5,
+                                    ),
                                     itemCount: controller
-                                        .projectsModel
-                                        .overview!
-                                        .length,
+                                        .projectsModel.overview!.length,
                                   ),
                                 ),
                               ),

@@ -39,47 +39,47 @@ class _LeadActivityLogState extends State<LeadActivityLog> {
           body: controller.isLoading
               ? const CustomLoader()
               : controller.activityLogModel.status ?? false
-              ? RefreshIndicator(
-                  color: Theme.of(context).primaryColor,
-                  backgroundColor: Theme.of(context).cardColor,
-                  onRefresh: () async {
-                    controller.loadLeadActivityLog(widget.id);
-                  },
-                  child: Timeline.tileBuilder(
-                    theme: TimelineThemeData(
-                      nodePosition: 0,
-                      connectorTheme: const ConnectorThemeData(
-                        thickness: 3.0,
-                        color: Color(0xffd3d3d3),
-                      ),
-                      indicatorTheme: const IndicatorThemeData(size: 15.0),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: Dimensions.space20,
-                    ),
-                    builder: TimelineTileBuilder.connected(
-                      contentsBuilder: (context, index) => Padding(
+                  ? RefreshIndicator(
+                      color: Theme.of(context).primaryColor,
+                      backgroundColor: Theme.of(context).cardColor,
+                      onRefresh: () async {
+                        controller.loadLeadActivityLog(widget.id);
+                      },
+                      child: Timeline.tileBuilder(
+                        theme: TimelineThemeData(
+                          nodePosition: 0,
+                          connectorTheme: const ConnectorThemeData(
+                            thickness: 3.0,
+                            color: Color(0xffd3d3d3),
+                          ),
+                          indicatorTheme: const IndicatorThemeData(size: 15.0),
+                        ),
                         padding: const EdgeInsets.symmetric(
-                          vertical: Dimensions.space10,
-                          horizontal: Dimensions.space10,
+                          horizontal: Dimensions.space20,
                         ),
-                        child: ActivityLogCard(
-                          index: index,
-                          activityLog: controller.activityLogModel.data!,
-                        ),
-                      ),
-                      connectorBuilder: (_, index, __) =>
-                          const SolidLineConnector(),
-                      indicatorBuilder: (_, index) =>
-                          const OutlinedDotIndicator(
+                        builder: TimelineTileBuilder.connected(
+                          contentsBuilder: (context, index) => Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: Dimensions.space10,
+                              horizontal: Dimensions.space10,
+                            ),
+                            child: ActivityLogCard(
+                              index: index,
+                              activityLog: controller.activityLogModel.data!,
+                            ),
+                          ),
+                          connectorBuilder: (_, index, __) =>
+                              const SolidLineConnector(),
+                          indicatorBuilder: (_, index) =>
+                              const OutlinedDotIndicator(
                             color: Color(0xffbabdc0),
                             backgroundColor: Color(0xffe6e7e9),
                           ),
-                      itemCount: controller.activityLogModel.data!.length,
-                    ),
-                  ),
-                )
-              : const Center(child: NoDataWidget()),
+                          itemCount: controller.activityLogModel.data!.length,
+                        ),
+                      ),
+                    )
+                  : const Center(child: NoDataWidget()),
         );
       },
     );

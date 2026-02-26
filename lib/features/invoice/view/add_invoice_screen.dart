@@ -119,13 +119,10 @@ class _AddInvoiceScreenState extends State<AddInvoiceScreen> {
                                   customer.billingStreet ?? '';
                               controller.currencyController.text =
                                   customer.defaultCurrency == '0'
-                                  ? controller
-                                            .settingsModel
-                                            .data
-                                            ?.currency
-                                            ?.id ??
-                                        '0'
-                                  : customer.defaultCurrency ?? '0';
+                                      ? controller.settingsModel.data?.currency
+                                              ?.id ??
+                                          '0'
+                                      : customer.defaultCurrency ?? '0';
                               controller.update();
                             },
                             validator: (value) {
@@ -189,9 +186,7 @@ class _AddInvoiceScreenState extends State<AddInvoiceScreen> {
                             initialValue: DateTime.now().add(
                               Duration(
                                 days: int.parse(
-                                  controller
-                                          .settingsModel
-                                          .data
+                                  controller.settingsModel.data
                                           ?.invoiceDueAfter ??
                                       '0',
                                 ),
@@ -235,8 +230,8 @@ class _AddInvoiceScreenState extends State<AddInvoiceScreen> {
                             //(value) {
                             //  controller.currencyController.text = value;
                             //},
-                            selectedValue:
-                                controller.currencyController.text.isEmpty
+                            selectedValue: controller
+                                    .currencyController.text.isEmpty
                                 ? controller.settingsModel.data?.currency?.id
                                 : controller.currencyController.text,
                             items: controller.currenciesModel.data!.map((
@@ -545,8 +540,7 @@ class _AddInvoiceScreenState extends State<AddInvoiceScreen> {
                               children: [
                                 CustomTextField(
                                   labelText: LocalStrings.itemName.tr,
-                                  controller: controller
-                                      .invoiceItemList[index]
+                                  controller: controller.invoiceItemList[index]
                                       .itemNameController,
                                   textInputType: TextInputType.text,
                                   validator: (value) {
@@ -563,8 +557,7 @@ class _AddInvoiceScreenState extends State<AddInvoiceScreen> {
                                 CustomTextField(
                                   labelText: LocalStrings.description.tr,
                                   textInputType: TextInputType.text,
-                                  controller: controller
-                                      .invoiceItemList[index]
+                                  controller: controller.invoiceItemList[index]
                                       .descriptionController,
                                   onChanged: (value) {
                                     return;
@@ -674,18 +667,18 @@ class _AddInvoiceScreenState extends State<AddInvoiceScreen> {
           bottomNavigationBar: controller.isLoading
               ? const CustomLoader()
               : controller.isSubmitLoading
-              ? const RoundedLoadingBtn()
-              : Padding(
-                  padding: const EdgeInsets.all(Dimensions.space10),
-                  child: RoundedButton(
-                    text: LocalStrings.submit.tr,
-                    press: () {
-                      if (formKey.currentState!.validate()) {
-                        controller.submitInvoice();
-                      }
-                    },
-                  ),
-                ),
+                  ? const RoundedLoadingBtn()
+                  : Padding(
+                      padding: const EdgeInsets.all(Dimensions.space10),
+                      child: RoundedButton(
+                        text: LocalStrings.submit.tr,
+                        press: () {
+                          if (formKey.currentState!.validate()) {
+                            controller.submitInvoice();
+                          }
+                        },
+                      ),
+                    ),
         );
       },
     );

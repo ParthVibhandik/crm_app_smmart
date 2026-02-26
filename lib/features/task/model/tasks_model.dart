@@ -31,21 +31,22 @@ class TasksModel {
       // specific assignment for backward compatibility if needed, using self_tasks as main data source
       _data = _selfTasks;
     } else if (json['data'] != null) {
-       _data = [];
+      _data = [];
       json['data'].forEach((v) {
         _data?.add(Task.fromJson(v));
       });
     }
 
-    if (json['subordinates_tasks'] != null && json['subordinates_tasks'] is Map) {
+    if (json['subordinates_tasks'] != null &&
+        json['subordinates_tasks'] is Map) {
       _subordinatesTasks = {};
       json['subordinates_tasks'].forEach((key, value) {
         List<Task> tasks = [];
-         if (value is List) {
-           value.forEach((v) {
-             tasks.add(Task.fromJson(v));
-           });
-         }
+        if (value is List) {
+          for (var v in value) {
+            tasks.add(Task.fromJson(v));
+          }
+        }
         _subordinatesTasks?[key] = tasks;
       });
     }
@@ -75,7 +76,7 @@ class TasksModel {
     if (_data != null) {
       map['data'] = _data?.map((v) => v.toJson()).toList();
     }
-     if (_selfTasks != null) {
+    if (_selfTasks != null) {
       map['self_tasks'] = _selfTasks?.map((v) => v.toJson()).toList();
     }
     if (_subordinatesTasks != null) {

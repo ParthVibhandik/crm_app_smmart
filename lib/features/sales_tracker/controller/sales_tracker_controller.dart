@@ -8,7 +8,6 @@ import 'package:flutex_admin/core/route/route.dart';
 import 'package:flutex_admin/features/attendance/attendance_service.dart';
 import 'package:flutex_admin/features/attendance/attendance_status.dart';
 import 'package:flutex_admin/features/lead/model/lead_model.dart';
-import 'package:flutex_admin/features/sales_tracker/model/trip_session.dart';
 import 'package:flutex_admin/features/sales_tracker/repo/sales_tracker_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -109,18 +108,21 @@ class SalesTrackerController extends GetxController {
     }
     final lowered = raw.toLowerCase();
     if (lowered.contains('not_started')) return 'not_started';
-    if (lowered.contains('started') && !lowered.contains('call'))
+    if (lowered.contains('started') && !lowered.contains('call')) {
       return 'started';
+    }
     if (lowered.contains('reached')) return 'reached';
-    if (lowered.contains('call') && lowered.contains('started'))
+    if (lowered.contains('call') && lowered.contains('started')) {
       return 'call_started';
+    }
     return 'unknown';
   }
 
   String _normalizeStatus(String s) {
     final lowered = s.toLowerCase().replaceAll(' ', '_').replaceAll('-', '_');
-    if (lowered.contains('call') && lowered.contains('started'))
+    if (lowered.contains('call') && lowered.contains('started')) {
       return 'call_started';
+    }
     if (lowered == 'not_started') return 'not_started';
     if (lowered == 'started') return 'started';
     if (lowered == 'reached') return 'reached';

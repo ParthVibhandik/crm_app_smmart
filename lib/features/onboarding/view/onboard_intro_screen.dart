@@ -150,17 +150,18 @@ class _OnBoardIntroScreenState extends State<OnBoardIntroScreen> {
             child: RoundedButton(
               text:
                   (currentPageID + 1) == introKey.currentState?.getPagesLength()
-                  ? LocalStrings.getStarted.tr
-                  : LocalStrings.next.tr,
+                      ? LocalStrings.getStarted.tr
+                      : LocalStrings.next.tr,
               cornerRadius: Dimensions.space10,
               press: () async {
                 if (introKey.currentState!.getCurrentPage() + 1 ==
                     introKey.currentState!.getPagesLength()) {
-                  await Get.find<ApiClient>().sharedPreferences
+                  await Get.find<ApiClient>()
+                      .sharedPreferences
                       .setBool(SharedPreferenceHelper.onboardKey, true)
                       .whenComplete(() {
-                        Get.offAllNamed(RouteHelper.loginScreen);
-                      });
+                    Get.offAllNamed(RouteHelper.loginScreen);
+                  });
                 } else {
                   introKey.currentState!.next();
                 }

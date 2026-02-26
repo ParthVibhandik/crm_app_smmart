@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 class AttendanceHistoryController extends GetxController {
   final AttendanceService attendanceService;
-  
+
   AttendanceHistoryController({required this.attendanceService});
 
   bool isLoading = true;
@@ -21,33 +21,38 @@ class AttendanceHistoryController extends GetxController {
     update();
 
     try {
-      // For now, if we don't have a real history endpoint, we'll mock some data 
+      // For now, if we don't have a real history endpoint, we'll mock some data
       // based on the assumption that a real API would return a list of AttendanceStatus.
       // We will try a hypothetical history endpoint first.
-      
+
       // If we find the real endpoint later, we update this.
       // For the "Pro" version, we want to at least show the structure.
-      
+
       // Mock Data for demonstration if real fetch fails or to populate the UI
       await Future.delayed(const Duration(seconds: 1));
-      
+
       history = [
         AttendanceStatus(
           punchedIn: true,
           punchedOut: true,
-          attendanceId: "101",
-          punchInTime: DateTime.now().subtract(const Duration(days: 1, hours: 9)).toIso8601String(),
-          punchOutTime: DateTime.now().subtract(const Duration(days: 1, hours: 1)).toIso8601String(),
+          punchInTime: DateTime.now()
+              .subtract(const Duration(days: 1, hours: 9))
+              .toIso8601String(),
+          punchOutTime: DateTime.now()
+              .subtract(const Duration(days: 1, hours: 1))
+              .toIso8601String(),
         ),
         AttendanceStatus(
           punchedIn: true,
           punchedOut: true,
-          attendanceId: "100",
-          punchInTime: DateTime.now().subtract(const Duration(days: 2, hours: 8, minutes: 30)).toIso8601String(),
-          punchOutTime: DateTime.now().subtract(const Duration(days: 2, hours: 0, minutes: 15)).toIso8601String(),
+          punchInTime: DateTime.now()
+              .subtract(const Duration(days: 2, hours: 8, minutes: 30))
+              .toIso8601String(),
+          punchOutTime: DateTime.now()
+              .subtract(const Duration(days: 2, hours: 0, minutes: 15))
+              .toIso8601String(),
         ),
       ];
-      
     } catch (e) {
       print('[AttendanceHistory] Error: $e');
     } finally {

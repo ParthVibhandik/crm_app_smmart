@@ -10,8 +10,11 @@ class DCRRepo {
   DCRRepo({required this.apiClient});
 
   Future<ResponseModel> getDCR() async {
-    String staffId = apiClient.sharedPreferences.getString(SharedPreferenceHelper.userIdKey) ?? "";
-    String url = "${UrlContainer.baseUrl}${UrlContainer.dcrUrl}?staff_id=$staffId";
+    String staffId = apiClient.sharedPreferences
+            .getString(SharedPreferenceHelper.userIdKey) ??
+        "";
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.dcrUrl}?staff_id=$staffId";
 
     ResponseModel responseModel = await apiClient.request(
       url,

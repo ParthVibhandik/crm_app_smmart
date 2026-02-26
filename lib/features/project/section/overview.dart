@@ -66,8 +66,8 @@ class OverviewWidget extends StatelessWidget {
                       projectDetailsModel.billingType == '1'
                           ? LocalStrings.fixedRate.tr
                           : projectDetailsModel.billingType == '2'
-                          ? LocalStrings.projectHours.tr
-                          : LocalStrings.taskHours.tr,
+                              ? LocalStrings.projectHours.tr
+                              : LocalStrings.taskHours.tr,
                       style: regularDefault,
                     ),
                   ],
@@ -108,8 +108,8 @@ class OverviewWidget extends StatelessWidget {
                       projectDetailsModel.billingType == '1'
                           ? projectDetailsModel.projectCost ?? '-'
                           : projectDetailsModel.billingType == '2'
-                          ? '${projectDetailsModel.projectRatePerHour} / ${LocalStrings.hours.tr}'
-                          : projectDetailsModel.projectCost ?? '-',
+                              ? '${projectDetailsModel.projectRatePerHour} / ${LocalStrings.hours.tr}'
+                              : projectDetailsModel.projectCost ?? '-',
                       style: regularDefault,
                     ),
                     Text(
@@ -175,13 +175,12 @@ class OverviewWidget extends StatelessWidget {
                   ),
                   child: CustomLinerProgress(
                     color: ColorResources.greenColor,
-                    value:
-                        projectDetailsModel.openTasks != null &&
+                    value: projectDetailsModel.openTasks != null &&
                             projectDetailsModel.totalTasks != null &&
                             int.parse(projectDetailsModel.totalTasks!) > 0
                         ? (int.parse(projectDetailsModel.totalTasks!) -
-                                  int.parse(projectDetailsModel.openTasks!)) /
-                              int.parse(projectDetailsModel.totalTasks!)
+                                int.parse(projectDetailsModel.openTasks!)) /
+                            int.parse(projectDetailsModel.totalTasks!)
                         : 0.0,
                     name: LocalStrings.openTasks.tr,
                     data:

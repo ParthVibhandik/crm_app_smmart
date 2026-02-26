@@ -135,11 +135,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                       children: [
                                         CustomContainer(
                                           name: LocalStrings.totalCustomers.tr,
-                                          number:
-                                              controller
-                                                  .customersModel
-                                                  .overview
-                                                  ?.customersTotal ??
+                                          number: controller.customersModel
+                                                  .overview?.customersTotal ??
                                               '',
                                           icon: Icons.group,
                                           color: ColorResources.blueColor,
@@ -149,11 +146,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                         ),
                                         CustomContainer(
                                           name: LocalStrings.activeCustomers.tr,
-                                          number:
-                                              controller
-                                                  .customersModel
-                                                  .overview
-                                                  ?.customersActive ??
+                                          number: controller.customersModel
+                                                  .overview?.customersActive ??
                                               '',
                                           icon: Icons.group_add,
                                           color: ColorResources.greenColor,
@@ -164,8 +158,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                         CustomContainer(
                                           name:
                                               LocalStrings.inactiveCustomers.tr,
-                                          number:
-                                              controller
+                                          number: controller
                                                   .customersModel
                                                   .overview
                                                   ?.customersInactive ??
@@ -180,11 +173,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                       children: [
                                         CustomContainer(
                                           name: LocalStrings.activeContacts.tr,
-                                          number:
-                                              controller
-                                                  .customersModel
-                                                  .overview
-                                                  ?.contactsActive ??
+                                          number: controller.customersModel
+                                                  .overview?.contactsActive ??
                                               '',
                                           icon:
                                               Icons.add_circle_outline_outlined,
@@ -196,11 +186,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                         CustomContainer(
                                           name:
                                               LocalStrings.inactiveContacts.tr,
-                                          number:
-                                              controller
-                                                  .customersModel
-                                                  .overview
-                                                  ?.contactsInactive ??
+                                          number: controller.customersModel
+                                                  .overview?.contactsInactive ??
                                               '',
                                           icon: Icons
                                               .remove_circle_outline_outlined,
@@ -212,8 +199,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                         CustomContainer(
                                           name:
                                               LocalStrings.lastLoginContacts.tr,
-                                          number:
-                                              controller
+                                          number: controller
                                                   .customersModel
                                                   .overview
                                                   ?.contactsLastLogin ??

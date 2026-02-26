@@ -13,7 +13,8 @@ class StaffRepo {
   StaffRepo({required this.apiClient});
 
   Future<ResponseModel> getAllStaffs() async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.staffsUrl}?limit=1000&offset=0";
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.staffsUrl}?limit=1000&offset=0";
     ResponseModel responseModel = await apiClient.request(
       url,
       Method.getMethod,

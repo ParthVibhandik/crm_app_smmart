@@ -22,7 +22,8 @@ class DashboardRepo {
   }
 
   Future<ResponseModel> getAttendanceDate(String date) async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.getAttendanceDateUrl}?date=$date";
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.getAttendanceDateUrl}?date=$date";
     ResponseModel responseModel = await apiClient.request(
       url,
       Method.getMethod,

@@ -126,15 +126,10 @@ class _LeadScreenState extends State<LeadScreen> {
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder: (context, index) {
                                     return OverviewCard(
-                                      name: controller
-                                          .leadsModel
-                                          .overview![index]
-                                          .status!
-                                          .tr,
+                                      name: controller.leadsModel
+                                          .overview![index].status!.tr,
                                       number: controller
-                                          .leadsModel
-                                          .overview![index]
-                                          .total
+                                          .leadsModel.overview![index].total
                                           .toString(),
                                       color: ColorResources.blueColor,
                                     );
@@ -223,8 +218,8 @@ class _LeadScreenState extends State<LeadScreen> {
                                   },
                                   separatorBuilder: (context, index) =>
                                       const SizedBox(
-                                        height: Dimensions.space10,
-                                      ),
+                                    height: Dimensions.space10,
+                                  ),
                                   itemCount: controller.leads.length,
                                 ),
                               ),

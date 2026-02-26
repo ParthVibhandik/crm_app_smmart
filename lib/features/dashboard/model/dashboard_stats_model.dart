@@ -28,7 +28,7 @@ class GoalTarget {
   final String period; // Today, Month, Year
   final double target;
   final double achieved;
-  
+
   double get remaining => (target - achieved) < 0 ? 0 : (target - achieved);
   double get progress => target == 0 ? 0 : (achieved / target);
 
@@ -43,7 +43,7 @@ class CalendarAppointment {
   final String time;
   final String title;
   final String client;
-  
+
   CalendarAppointment({
     required this.time,
     required this.title,
@@ -56,14 +56,14 @@ class DashboardNewStats {
   List<LeadJourneyStep> leadJourney;
   List<GoalTarget> goals;
   Map<String, int> leadStatusPie; // "Contacted": 10
-  
+
   DashboardNewStats({
     required this.leadsTasks,
     required this.leadJourney,
     required this.goals,
     required this.leadStatusPie,
   });
-  
+
   // Factory for empty/mock
   factory DashboardNewStats.empty() {
     return DashboardNewStats(

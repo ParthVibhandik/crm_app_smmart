@@ -38,30 +38,30 @@ class _ProjectEstimatesState extends State<ProjectEstimates> {
           body: controller.isLoading
               ? const CustomLoader()
               : controller.estimatesModel.status ?? false
-              ? RefreshIndicator(
-                  color: Theme.of(context).primaryColor,
-                  backgroundColor: Theme.of(context).cardColor,
-                  onRefresh: () async {
-                    controller.loadProjectGroup(widget.id, 'estimates');
-                  },
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: Dimensions.space15,
-                    ),
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return EstimateCard(
-                        index: index,
-                        estimateModel: controller.estimatesModel,
-                      );
-                    },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: Dimensions.space10),
-                    itemCount: controller.estimatesModel.data!.length,
-                  ),
-                )
-              : const Center(child: NoDataWidget()),
+                  ? RefreshIndicator(
+                      color: Theme.of(context).primaryColor,
+                      backgroundColor: Theme.of(context).cardColor,
+                      onRefresh: () async {
+                        controller.loadProjectGroup(widget.id, 'estimates');
+                      },
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: Dimensions.space15,
+                        ),
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return EstimateCard(
+                            index: index,
+                            estimateModel: controller.estimatesModel,
+                          );
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: Dimensions.space10),
+                        itemCount: controller.estimatesModel.data!.length,
+                      ),
+                    )
+                  : const Center(child: NoDataWidget()),
         );
       },
     );

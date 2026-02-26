@@ -1,4 +1,3 @@
-import 'package:flutex_admin/core/helper/shared_preference_helper.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,7 +23,8 @@ class SecurityController extends GetxController {
   }
 
   Future<void> checkBiometrics() async {
-    isBiometricAvailable = await auth.canCheckBiometrics || await auth.isDeviceSupported();
+    isBiometricAvailable =
+        await auth.canCheckBiometrics || await auth.isDeviceSupported();
     update();
   }
 

@@ -1,4 +1,3 @@
-import 'package:flutex_admin/common/components/card/glass_card.dart';
 import 'package:flutex_admin/core/helper/security_controller.dart';
 import 'package:flutex_admin/core/utils/color_resources.dart';
 import 'package:flutex_admin/core/utils/style.dart';
@@ -35,7 +34,8 @@ class _AppLockScreenState extends State<AppLockScreen> {
       setState(() {
         _pin.clear();
       });
-      Get.snackbar('Error', 'Incorrect PIN', backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Error', 'Incorrect PIN',
+          backgroundColor: Colors.red, colorText: Colors.white);
     }
   }
 
@@ -54,9 +54,11 @@ class _AppLockScreenState extends State<AppLockScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.lock_person_rounded, size: 80, color: Colors.white),
+            const Icon(Icons.lock_person_rounded,
+                size: 80, color: Colors.white),
             const SizedBox(height: 20),
-            Text('App Locked', style: semiBoldOverLarge.copyWith(color: Colors.white)),
+            Text('App Locked',
+                style: semiBoldOverLarge.copyWith(color: Colors.white)),
             const SizedBox(height: 40),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -116,11 +118,12 @@ class _AppLockScreenState extends State<AppLockScreen> {
           color: Colors.white.withValues(alpha: 0.1),
         ),
         alignment: Alignment.center,
-        child: isBio 
-          ? const Icon(Icons.fingerprint, color: Colors.white)
-          : isDel 
-            ? const Icon(Icons.backspace, color: Colors.white)
-            : Text(text, style: semiBoldOverLarge.copyWith(color: Colors.white)),
+        child: isBio
+            ? const Icon(Icons.fingerprint, color: Colors.white)
+            : isDel
+                ? const Icon(Icons.backspace, color: Colors.white)
+                : Text(text,
+                    style: semiBoldOverLarge.copyWith(color: Colors.white)),
       ),
     );
   }

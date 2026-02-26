@@ -150,12 +150,13 @@ class TaskController extends GetxController {
     );
     tasksModel = TasksModel.fromJson(jsonDecode(responseModel.responseJson));
     if (responseModel.status) {
-      if(tasksModel.selfTasks != null || tasksModel.subordinatesTasks != null){
-         // New structure, clear legacy tasks list to avoid confusion if we use it, 
-         // or we can just rely on tasksModel in view
-         tasks.clear(); 
-         if(tasksModel.selfTasks != null) tasks.addAll(tasksModel.selfTasks!);
-         // We don't add subordinates tasks to the main flat list to keep them separate in UI
+      if (tasksModel.selfTasks != null ||
+          tasksModel.subordinatesTasks != null) {
+        // New structure, clear legacy tasks list to avoid confusion if we use it,
+        // or we can just rely on tasksModel in view
+        tasks.clear();
+        if (tasksModel.selfTasks != null) tasks.addAll(tasksModel.selfTasks!);
+        // We don't add subordinates tasks to the main flat list to keep them separate in UI
       } else {
         // Legacy structure
         tasks.addAll(tasksModel.data ?? []);
@@ -266,7 +267,8 @@ class TaskController extends GetxController {
       startDateController.text = taskDetailsModel.data?.startDate ?? '';
       dueDateController.text = taskDetailsModel.data?.dueDate ?? '';
       taskPriorityController.text = taskDetailsModel.data?.priority ?? '';
-      taskStatusController.text = taskDetailsModel.data?.status ?? '1'; // Default to 1 (Not Started)
+      taskStatusController.text =
+          taskDetailsModel.data?.status ?? '1'; // Default to 1 (Not Started)
       taskRelatedController.text = taskDetailsModel.data?.relType ?? '';
       relationIdController.text = taskDetailsModel.data?.relId ?? '';
       descriptionController.text = formatter.Converter.parseHtmlString(
@@ -432,7 +434,8 @@ class TaskController extends GetxController {
   Future<void> changeTaskStatus(String taskId, String status) async {
     isLoading = true;
     update();
-    ResponseModel responseModel = await taskRepo.updateTaskStatus(taskId, status);
+    ResponseModel responseModel =
+        await taskRepo.updateTaskStatus(taskId, status);
     if (responseModel.status) {
       await loadTaskDetails(taskId);
       CustomSnackBar.success(successList: [responseModel.message.tr]);

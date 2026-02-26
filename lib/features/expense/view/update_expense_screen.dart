@@ -187,8 +187,8 @@ class _UpdateExpenseScreenState extends State<UpdateExpenseScreen> {
                               labelText: LocalStrings.date.tr,
                               initialValue:
                                   DateConverter.convertStringToDatetime(
-                                    controller.dateController.text,
-                                  ),
+                                controller.dateController.text,
+                              ),
                               validator: (value) {
                                 if (controller.dateController.text.isEmpty) {
                                   return '${LocalStrings.date.tr} ${LocalStrings.isRequired.tr}';
@@ -243,18 +243,18 @@ class _UpdateExpenseScreenState extends State<UpdateExpenseScreen> {
             return controller.isLoading
                 ? const SizedBox.shrink()
                 : controller.isSubmitLoading
-                ? const RoundedLoadingBtn()
-                : RoundedButton(
-                    text: LocalStrings.update.tr,
-                    press: () {
-                      if (formKey.currentState!.validate()) {
-                        controller.submitExpense(
-                          expenseId: widget.id,
-                          isUpdate: true,
-                        );
-                      }
-                    },
-                  );
+                    ? const RoundedLoadingBtn()
+                    : RoundedButton(
+                        text: LocalStrings.update.tr,
+                        press: () {
+                          if (formKey.currentState!.validate()) {
+                            controller.submitExpense(
+                              expenseId: widget.id,
+                              isUpdate: true,
+                            );
+                          }
+                        },
+                      );
           },
         ),
       ),

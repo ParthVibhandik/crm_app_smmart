@@ -33,12 +33,14 @@ class DCRController extends GetxController {
           if (data is Map<String, dynamic> && data.containsKey('items')) {
             List<dynamic> dataList = data['items'];
             dcrList = dataList.map((item) => DCRModel.fromJson(item)).toList();
-            
+
             if (data.containsKey('summary')) {
               var summary = data['summary'];
-              totalCalls = int.tryParse(summary['total_calls']?.toString() ?? '0') ?? 0;
+              totalCalls =
+                  int.tryParse(summary['total_calls']?.toString() ?? '0') ?? 0;
               f2fCalls = int.tryParse(summary['f2f']?.toString() ?? '0') ?? 0;
-              telecallCount = int.tryParse(summary['telecall']?.toString() ?? '0') ?? 0;
+              telecallCount =
+                  int.tryParse(summary['telecall']?.toString() ?? '0') ?? 0;
             }
           } else if (data is List) {
             dcrList = data.map((item) => DCRModel.fromJson(item)).toList();

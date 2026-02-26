@@ -114,8 +114,8 @@ class EstimateController extends GetxController {
       estimateDetailsModel = EstimateDetailsModel.fromJson(
         jsonDecode(responseModel.responseJson),
       );
-      ResponseModel settingsResponseModel = await estimateRepo
-          .getSettingsData();
+      ResponseModel settingsResponseModel =
+          await estimateRepo.getSettingsData();
       settingsModel = SettingsModel.fromJson(
         jsonDecode(settingsResponseModel.responseJson),
       );
@@ -138,8 +138,8 @@ class EstimateController extends GetxController {
           estimateItemList.add(
             EstimateItemsModel(
               itemNameController: TextEditingController(
-                text: estimateDetailsModel.data!.items![i].description
-                    .toString(),
+                text:
+                    estimateDetailsModel.data!.items![i].description.toString(),
               ),
               descriptionController: TextEditingController(
                 text: estimateDetailsModel.data!.items![i].longDescription

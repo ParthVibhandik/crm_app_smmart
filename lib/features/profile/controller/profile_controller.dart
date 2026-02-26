@@ -89,7 +89,9 @@ class ProfileController extends GetxController {
     String? staffId = profileModel.data?.staffId;
     if (staffId == null || staffId.isEmpty) {
       SharedPreferences preferences = await SharedPreferences.getInstance();
-      staffId = preferences.getString('user_id') ?? preferences.getString('staffid') ?? preferences.getString(SharedPreferenceHelper.userIdKey);
+      staffId = preferences.getString('user_id') ??
+          preferences.getString('staffid') ??
+          preferences.getString(SharedPreferenceHelper.userIdKey);
     }
 
     ProfileUpdateModel profileUpdateModel = ProfileUpdateModel(
@@ -117,8 +119,10 @@ class ProfileController extends GetxController {
     } else {
       // Soft handling for specific backend issues where upload succeeds but returns error
       // Do not revert imageFile = null;
-      CustomSnackBar.success(successList: ["Profile image uploaded. Refreshed data will appear shortly."]);
-      
+      CustomSnackBar.success(successList: [
+        "Profile image uploaded. Refreshed data will appear shortly."
+      ]);
+
       // Attempt to refresh data silently
       await initialData(shouldLoad: false);
       if (profileModel.data?.profileImage != null) {
@@ -149,7 +153,9 @@ class ProfileController extends GetxController {
     String? staffId = profileModel.data?.staffId;
     if (staffId == null || staffId.isEmpty) {
       SharedPreferences preferences = await SharedPreferences.getInstance();
-      staffId = preferences.getString('user_id') ?? preferences.getString('staffid') ?? preferences.getString(SharedPreferenceHelper.userIdKey);
+      staffId = preferences.getString('user_id') ??
+          preferences.getString('staffid') ??
+          preferences.getString(SharedPreferenceHelper.userIdKey);
     }
 
     ProfileUpdateModel profileUpdateModel = ProfileUpdateModel(

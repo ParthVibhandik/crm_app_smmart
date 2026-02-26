@@ -89,7 +89,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       future: subordinatesMemoizer
                           .runOnce(controller.loadSubordinates),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const CustomLoader(isFullScreen: false);
                         } else if (snapshot.hasData &&
                             snapshot.data!.status == true &&
@@ -101,8 +102,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             onChanged: (selectedItems) {
                               controller.update();
                             },
-                            items: snapshot.data!.data!
-                                .map((value) {
+                            items: snapshot.data!.data!.map((value) {
                               return DropdownItem<String>(
                                 label: "${value.firstName} ${value.lastName}",
                                 value: value.id.toString(),

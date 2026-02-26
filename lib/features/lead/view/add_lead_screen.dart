@@ -163,51 +163,54 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                           return const CustomLoader(isFullScreen: false);
                         }
                       }),
-                  // 4. Name* (Existing)
+                  // 4. Name (Existing)
                   CustomTextField(
-                    labelText: LocalStrings.name.tr,
-                    isRequired: true,
+                    hintText: LocalStrings.name.tr,
                     controller: controller.nameController,
                     focusNode: controller.nameFocusNode,
                     textInputType: TextInputType.text,
                     nextFocus: controller.companyFocusNode,
                     onChanged: (value) {},
                   ),
-                   // 5. Company name* (Existing)
+                  // 5. Company name (Existing)
                   CustomTextField(
-                    labelText: LocalStrings.company.tr,
-                    isRequired: true,
+                    hintText: LocalStrings.company.tr,
                     controller: controller.companyController,
                     focusNode: controller.companyFocusNode,
                     textInputType: TextInputType.text,
                     nextFocus: controller.campaignFocusNode,
                     onChanged: (value) {},
                   ),
-                  // 6. Company Industry* (dropdown) (NEW)
-                   FutureBuilder(
-                      future: industriesMemoizer.runOnce(controller.loadIndustries),
+                  // 6. Company Industry (dropdown) (NEW)
+                  FutureBuilder(
+                      future:
+                          industriesMemoizer.runOnce(controller.loadIndustries),
                       builder: (context, list) {
                         if (list.data?.status ?? false) {
                           return CustomDropDownTextField(
                             hintText: "Company Industry",
-                            isRequired: true,
                             needLabel: false,
                             onChanged: (value) {
-                              controller.companyIndustryController.text = value.toString();
+                              controller.companyIndustryController.text =
+                                  value.toString();
                             },
-                            selectedValue: controller.companyIndustryController.text,
-                            items: controller.industriesModel.data!.map((value) {
+                            selectedValue:
+                                controller.companyIndustryController.text,
+                            items:
+                                controller.industriesModel.data!.map((value) {
                               return DropdownMenuItem(
                                 value: value.name,
-                                child: Text(value.name ?? '', style: regularDefault.copyWith(color: Colors.black)),
+                                child: Text(value.name ?? '',
+                                    style: regularDefault.copyWith(
+                                        color: Colors.black)),
                               );
                             }).toList(),
                           );
                         } else {
-                           return const CustomLoader(isFullScreen: false);
+                          return const CustomLoader(isFullScreen: false);
                         }
                       }),
-                   // 7. Campaign Name (NEW)
+                  // 7. Campaign Name (NEW)
                   CustomTextField(
                     hintText: "Campaign Name",
                     controller: controller.campaignController,
@@ -215,28 +218,33 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                     textInputType: TextInputType.text,
                     onChanged: (value) {},
                   ),
-                   // 8. Designation (dropdown) (NEW)
-                   FutureBuilder(
-                      future: designationsMemoizer.runOnce(controller.loadDesignations),
+                  // 8. Designation (dropdown) (NEW)
+                  FutureBuilder(
+                      future: designationsMemoizer
+                          .runOnce(controller.loadDesignations),
                       builder: (context, list) {
                         if (list.data?.status ?? false) {
                           return CustomDropDownTextField(
                             hintText: "Designation",
-                            isRequired: true,
                             needLabel: false,
                             onChanged: (value) {
-                              controller.designationController.text = value.toString();
+                              controller.designationController.text =
+                                  value.toString();
                             },
-                            selectedValue: controller.designationController.text,
-                            items: controller.designationsModel.data!.map((value) {
+                            selectedValue:
+                                controller.designationController.text,
+                            items:
+                                controller.designationsModel.data!.map((value) {
                               return DropdownMenuItem(
-                                value: value.id, 
-                                child: Text(value.name ?? '', style: regularDefault.copyWith(color: Colors.black)),
+                                value: value.id,
+                                child: Text(value.name ?? '',
+                                    style: regularDefault.copyWith(
+                                        color: Colors.black)),
                               );
                             }).toList(),
                           );
                         } else {
-                           return const CustomLoader(isFullScreen: false);
+                          return const CustomLoader(isFullScreen: false);
                         }
                       }),
                   // 9. Email Address* (Existing)
@@ -261,11 +269,11 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                   CustomAmountTextField(
                     controller: controller.valueController,
                     hintText: LocalStrings.leadValue.tr,
-                    currency: '\$',
+                    currency: '₹',
                     onChanged: (value) {},
                   ),
                   // 12. Zip Code (NEW)
-                   CustomTextField(
+                  CustomTextField(
                     hintText: "Zip Code",
                     controller: controller.zipController,
                     focusNode: controller.zipFocusNode,
@@ -293,15 +301,15 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                     onChanged: (value) {},
                   ),
                   // 15. State (Existing)
-                   CustomTextField(
+                  CustomTextField(
                     hintText: "State",
                     controller: controller.stateController,
                     focusNode: controller.stateFocusNode,
                     textInputType: TextInputType.text,
                     onChanged: (value) {},
                   ),
-                   // 16. Country (Existing)
-                   CustomTextField(
+                  // 16. Country (Existing)
+                  CustomTextField(
                     hintText: "Country",
                     controller: controller.countryController,
                     focusNode: controller.countryFocusNode,
@@ -327,29 +335,30 @@ class _AddLeadScreenState extends State<AddLeadScreen> {
                     onChanged: (value) {},
                   ),
                   // 19. Description (Existing)
-                   CustomTextField(
+                  CustomTextField(
                     hintText: "Description",
                     controller: controller.descriptionController,
                     focusNode: controller.descriptionFocusNode,
                     textInputType: TextInputType.multiline,
                     onChanged: (value) {},
                   ),
-                   // 20. Interested in* (multi-select)
-                   FutureBuilder(
-                      future: interestedInMemoizer.runOnce(controller.loadInterestedIn),
+                  // 20. Interested in (multi-select)
+                  FutureBuilder(
+                      future: interestedInMemoizer
+                          .runOnce(controller.loadInterestedIn),
                       builder: (context, list) {
                         if (list.data?.status ?? false) {
                           return CustomMultiSelectDropDown(
                             hintText: "Interested In",
-                            isRequired: true,
                             items: controller.interestedInModel.data ?? [],
-                            initialSelectedIds: controller.selectedInterestedInIds,
+                            initialSelectedIds:
+                                controller.selectedInterestedInIds,
                             onChanged: (List<String> selectedIds) {
                               controller.selectedInterestedInIds = selectedIds;
                             },
                           );
                         } else {
-                           return const CustomLoader(isFullScreen: false);
+                          return const CustomLoader(isFullScreen: false);
                         }
                       }),
                   const SizedBox(height: Dimensions.space5),

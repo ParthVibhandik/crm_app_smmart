@@ -21,67 +21,73 @@ class ApiClient extends GetxService {
     Uri url = Uri.parse(uri);
     http.Response response;
     try {
-    Map<String, String> headers = {};
-    if (passHeader) {
-      initToken();
-      headers['Authorization'] = token;
-      headers['Accept'] = 'application/json';
-      if (isJson) {
-        headers['Content-Type'] = 'application/json';
-      }
-    } else {
-       if (isJson) {
-        headers['Content-Type'] = 'application/json';
+      Map<String, String> headers = {};
+      if (passHeader) {
+        initToken();
+        headers['Authorization'] = token;
         headers['Accept'] = 'application/json';
+        if (isJson) {
+          headers['Content-Type'] = 'application/json';
+        }
+      } else {
+        if (isJson) {
+          headers['Content-Type'] = 'application/json';
+          headers['Accept'] = 'application/json';
+        }
       }
-    }
 
-    if (method == Method.postMethod) {
-      if (isJson) {
-        response = await http.post(url, body: jsonEncode(params), headers: headers);
+      if (method == Method.postMethod) {
+        if (isJson) {
+          response =
+              await http.post(url, body: jsonEncode(params), headers: headers);
+        } else {
+          response = await http.post(url,
+              body: params, headers: headers.isEmpty ? null : headers);
+        }
+      } else if (method == Method.putMethod) {
+        // Put usually needs content type if body is present
+        if (!headers.containsKey('Content-Type')) {
+          headers['Content-Type'] =
+              'application/x-www-form-urlencoded; charset=UTF-8';
+        }
+        response = await http.put(url, body: params, headers: headers);
+      } else if (method == Method.deleteMethod) {
+        response = await http.delete(url, headers: headers);
       } else {
-        response = await http.post(url, body: params, headers: headers.isEmpty ? null : headers);
+        if (headers.isNotEmpty) {
+          response = await http.get(url, headers: headers);
+        } else {
+          response = await http.get(url);
+        }
       }
-    } else if (method == Method.putMethod) {
-      // Put usually needs content type if body is present
-      if (!headers.containsKey('Content-Type')) {
-          headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
-      }
-      response = await http.put(url, body: params, headers: headers);
-    } else if (method == Method.deleteMethod) {
-      response = await http.delete(url, headers: headers);
-    } else {
-      if (headers.isNotEmpty) {
-        response = await http.get(url, headers: headers);
-      } else {
-        response = await http.get(url);
-      }
-    }
 
-    // --- cURL Debugging ---
-    String curl = "curl -X $method '$url'";
-    headers.forEach((key, value) {
-      curl += " -H '$key: $value'";
-    });
-    if ((method == Method.postMethod || method == Method.putMethod) && params != null) {
-      if (isJson) {
-         curl += " -d '${jsonEncode(params)}'";
-      } else {
-         // rough approximation for form-data
-         List<String> parts = [];
-         params.forEach((key, value) => parts.add("$key=$value"));
-         curl += " -d '${parts.join("&")}'"; 
+      // --- cURL Debugging ---
+      String curl = "curl -X $method '$url'";
+      headers.forEach((key, value) {
+        curl += " -H '$key: $value'";
+      });
+      if ((method == Method.postMethod || method == Method.putMethod) &&
+          params != null) {
+        if (isJson) {
+          curl += " -d '${jsonEncode(params)}'";
+        } else {
+          // rough approximation for form-data
+          List<String> parts = [];
+          params.forEach((key, value) => parts.add("$key=$value"));
+          curl += " -d '${parts.join("&")}'";
+        }
       }
-    }
-    if (kDebugMode) {
-      print("-------------------------------------------------------------------");
-      print("CURL COMMAND:");
-      print(curl);
-      print("Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
-      print("-------------------------------------------------------------------");
-    }
-    // ----------------------
+      if (kDebugMode) {
+        print(
+            "-------------------------------------------------------------------");
+        print("CURL COMMAND:");
+        print(curl);
+        print("Status Code: ${response.statusCode}");
+        print("Response Body: ${response.body}");
+        print(
+            "-------------------------------------------------------------------");
+      }
+      // ----------------------
 
       if (kDebugMode) {
         // print('====> url: ${uri.toString()}');

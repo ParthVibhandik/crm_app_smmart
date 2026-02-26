@@ -20,7 +20,8 @@ class TaskAttachments extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(Dimensions.space15),
-      child: (taskModel.attachments != null && taskModel.attachments!.isNotEmpty)
+      child: (taskModel.attachments != null &&
+              taskModel.attachments!.isNotEmpty)
           ? ListView.separated(
               itemBuilder: (context, index) {
                 return Container(
@@ -42,20 +43,24 @@ class TaskAttachments extends StatelessWidget {
                     ),
                     child: ListTile(
                       onTap: () {
-                        String? previewUrl = taskModel.attachments?[index].previewUrl;
+                        String? previewUrl =
+                            taskModel.attachments?[index].previewUrl;
                         if (previewUrl != null && previewUrl.isNotEmpty) {
-                          bool isImage = taskModel.attachments?[index].fileType?.contains('image') ?? false;
+                          bool isImage = taskModel.attachments?[index].fileType
+                                  ?.contains('image') ??
+                              false;
                           if (isImage) {
-                             Get.to(() => ImageViewerScreen(
-                               url: previewUrl, 
-                               title: taskModel.attachments?[index].fileName ?? 'Image Preview'
-                             ));
+                            Get.to(() => ImageViewerScreen(
+                                url: previewUrl,
+                                title: taskModel.attachments?[index].fileName ??
+                                    'Image Preview'));
                           } else {
-                             UrlLauncherHelper.launchWebUrl(previewUrl);
+                            UrlLauncherHelper.launchWebUrl(previewUrl);
                           }
                         }
                       },
-                      leading: (taskModel.attachments?[index].previewUrl != null &&
+                      leading: (taskModel.attachments?[index].previewUrl !=
+                                  null &&
                               (taskModel.attachments?[index].fileType
                                       ?.contains('image') ??
                                   false))
@@ -91,7 +96,8 @@ class TaskAttachments extends StatelessWidget {
                       trailing: IconButton(
                         icon: const Icon(Icons.download),
                         onPressed: () {
-                          String? downloadUrl = taskModel.attachments?[index].downloadUrl;
+                          String? downloadUrl =
+                              taskModel.attachments?[index].downloadUrl;
                           if (downloadUrl != null && downloadUrl.isNotEmpty) {
                             UrlLauncherHelper.launchWebUrl(downloadUrl);
                           }

@@ -67,14 +67,18 @@ class _CustomDropDownTextFieldState extends State<CustomDropDownTextField> {
             ? const SizedBox(height: Dimensions.textToTextSpace)
             : const SizedBox(),
         DropdownButtonFormField(
-          value: validValue,
+          initialValue: validValue,
           dropdownColor: widget.dropDownColor ?? Theme.of(context).cardColor,
           focusColor: widget.focusColor ?? Theme.of(context).cardColor,
           hint: Text.rich(
             TextSpan(
               text: widget.hintText.toString(),
               style: regularDefault.copyWith(
-                color: Theme.of(context).textTheme.bodyMedium!.color?.withOpacity(0.6),
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .color
+                    ?.withOpacity(0.6),
               ),
               children: [
                 if (widget.isRequired)
@@ -138,8 +142,7 @@ class _CustomDropDownTextFieldState extends State<CustomDropDownTextField> {
           items: widget.items,
           icon: Icon(
             Icons.arrow_drop_down,
-            color:
-                widget.iconColor ??
+            color: widget.iconColor ??
                 Theme.of(context).textTheme.bodyMedium!.color,
           ),
         ),

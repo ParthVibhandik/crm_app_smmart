@@ -10,9 +10,8 @@ class ProposalDetailsModel {
   ProposalDetailsModel.fromJson(dynamic json) {
     _status = json['status'];
     _message = json['message'];
-    _data = json['data'] != null
-        ? ProposalDetails.fromJson(json['data'])
-        : null;
+    _data =
+        json['data'] != null ? ProposalDetails.fromJson(json['data']) : null;
   }
 
   bool? _status;

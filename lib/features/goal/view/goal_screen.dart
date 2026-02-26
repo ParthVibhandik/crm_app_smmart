@@ -25,10 +25,12 @@ class _GoalScreenState extends State<GoalScreen> {
     Get.put(ApiClient(sharedPreferences: Get.find()));
     Get.put(StaffRepo(apiClient: Get.find()));
     Get.put(GoalRepo(apiClient: Get.find()));
-    final controller = Get.put(GoalController(staffRepo: Get.find(), goalRepo: Get.find()));
+    final controller =
+        Get.put(GoalController(staffRepo: Get.find(), goalRepo: Get.find()));
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (controller.staffsModel.data == null || controller.staffsModel.data!.isEmpty) {
+      if (controller.staffsModel.data == null ||
+          controller.staffsModel.data!.isEmpty) {
         controller.loadGoals();
       }
     });
@@ -38,7 +40,7 @@ class _GoalScreenState extends State<GoalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        title: "Goals", 
+        title: "Goals",
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -52,8 +54,9 @@ class _GoalScreenState extends State<GoalScreen> {
           if (controller.isLoading) {
             return const CustomLoader();
           }
-          if (controller.staffsModel.data == null || controller.staffsModel.data!.isEmpty) {
-             return Center(child: Text("No staff found", style: regularDefault));
+          if (controller.staffsModel.data == null ||
+              controller.staffsModel.data!.isEmpty) {
+            return Center(child: Text("No staff found", style: regularDefault));
           }
           return ListView.builder(
             padding: const EdgeInsets.all(Dimensions.space15),
@@ -63,11 +66,14 @@ class _GoalScreenState extends State<GoalScreen> {
               return Card(
                 margin: const EdgeInsets.only(bottom: 10),
                 child: ListTile(
-                  onTap: (){
-                     Get.to(() => StaffGoalsScreen(staffId: staff.id!, staffName: "${staff.firstName} ${staff.lastName}"));
+                  onTap: () {
+                    Get.to(() => StaffGoalsScreen(
+                        staffId: staff.id!,
+                        staffName: "${staff.firstName} ${staff.lastName}"));
                   },
                   contentPadding: const EdgeInsets.all(10),
-                  title: Text("${staff.firstName} ${staff.lastName}", style: mediumDefault),
+                  title: Text("${staff.firstName} ${staff.lastName}",
+                      style: mediumDefault),
                   subtitle: Text(staff.email ?? '', style: lightSmall),
                   leading: CircleAvatar(
                       radius: 25,
@@ -78,8 +84,7 @@ class _GoalScreenState extends State<GoalScreen> {
                         isProfile: true,
                         width: 50,
                         height: 50,
-                      )
-                  ),
+                      )),
                 ),
               );
             },
@@ -98,7 +103,9 @@ class _GoalScreenState extends State<GoalScreen> {
         children: [
           SizedBox(
             width: 100,
-            child: Text("$label:", style: regularSmall.copyWith(color: Colors.grey[600], fontWeight: FontWeight.bold)),
+            child: Text("$label:",
+                style: regularSmall.copyWith(
+                    color: Colors.grey[600], fontWeight: FontWeight.bold)),
           ),
           Expanded(child: Text(value, style: regularSmall)),
         ],

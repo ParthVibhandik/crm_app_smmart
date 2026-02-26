@@ -5,7 +5,6 @@ import 'package:flutex_admin/core/service/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:flutex_admin/common/components/app-bar/custom_appbar.dart';
 
 class SalesTrackerScreen extends StatefulWidget {

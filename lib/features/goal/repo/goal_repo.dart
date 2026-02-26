@@ -2,7 +2,6 @@ import 'package:flutex_admin/core/service/api_service.dart';
 import 'package:flutex_admin/core/utils/method.dart';
 import 'package:flutex_admin/core/utils/url_container.dart';
 import 'package:flutex_admin/common/models/response_model.dart';
-import 'package:flutex_admin/features/goal/model/staff_goals_model.dart';
 
 class GoalRepo {
   final ApiClient apiClient;
@@ -19,7 +18,7 @@ class GoalRepo {
     // If it's specific endpoint "goals", it might be get all goals.
     // I'll try adding staff_id query param.
     // The user said "send his id to backend on api flutex_admin_api/goals".
-    
+
     // Attempt 1: GET with query param
     url += "?staff_id=$staffId";
 
@@ -46,6 +45,7 @@ class GoalRepo {
     print('Goal Details Response: ${responseModel.responseJson}');
     return responseModel;
   }
+
   Future<ResponseModel> createGoal(Map<String, dynamic> body) async {
     String url = "${UrlContainer.baseUrl}goals/create";
     ResponseModel responseModel = await apiClient.request(

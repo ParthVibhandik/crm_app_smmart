@@ -13,7 +13,8 @@ class PerformanceChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
-      margin: const EdgeInsets.symmetric(horizontal: Dimensions.space15, vertical: Dimensions.space10),
+      margin: const EdgeInsets.symmetric(
+          horizontal: Dimensions.space15, vertical: Dimensions.space10),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -29,11 +30,16 @@ class PerformanceChart extends StatelessWidget {
                 onPressed: () {
                   final controller = Get.find<DashboardController>();
                   ReportService.generateDashboardReport(
-                    staffName: '${controller.homeModel.staff?.firstName ?? ''} ${controller.homeModel.staff?.lastName ?? ''}',
-                    totalInvoices: controller.homeModel.overview?.totalInvoices ?? '0',
-                    totalLeads: controller.homeModel.overview?.totalLeads ?? '0',
-                    totalTasks: controller.homeModel.overview?.totalTasks ?? '0',
-                    totalProjects: controller.homeModel.overview?.totalProjects ?? '0',
+                    staffName:
+                        '${controller.homeModel.staff?.firstName ?? ''} ${controller.homeModel.staff?.lastName ?? ''}',
+                    totalInvoices:
+                        controller.homeModel.overview?.totalInvoices ?? '0',
+                    totalLeads:
+                        controller.homeModel.overview?.totalLeads ?? '0',
+                    totalTasks:
+                        controller.homeModel.overview?.totalTasks ?? '0',
+                    totalProjects:
+                        controller.homeModel.overview?.totalProjects ?? '0',
                   );
                 },
                 icon: const Icon(Icons.picture_as_pdf, color: Colors.white70),

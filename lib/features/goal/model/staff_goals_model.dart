@@ -22,13 +22,13 @@ class StaffGoalsModel {
         goals!.add(Goal.fromJson(v));
       });
     } else if (json['goals'] != null) {
-       // Support if it comes in 'goals' key
-       if (json['goals'] is List) {
-          goals = <Goal>[];
-          json['goals'].forEach((v) {
-            goals!.add(Goal.fromJson(v));
-          });
-       }
+      // Support if it comes in 'goals' key
+      if (json['goals'] is List) {
+        goals = <Goal>[];
+        json['goals'].forEach((v) {
+          goals!.add(Goal.fromJson(v));
+        });
+      }
     }
   }
 }

@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -141,9 +140,8 @@ Future<void> _startGpsServiceListener(
       }
       _startLocationTracking(
         service: service,
-        accuracy: Platform.isIOS
-            ? LocationAccuracy.best
-            : LocationAccuracy.high,
+        accuracy:
+            Platform.isIOS ? LocationAccuracy.best : LocationAccuracy.high,
         distanceFilter: 1,
         platform: platform,
       );
@@ -317,55 +315,55 @@ Future<void> _startLocationTracking({
 
   _positionSub =
       Geolocator.getPositionStream(locationSettings: locationSettings).listen(
-        (position) async {
-          print(
-            '[$platform] position stream -> ${position.latitude},${position.longitude}',
-          );
-          await _updateLastAlive();
-
-          if (_lastSentAt != null &&
-              DateTime.now().difference(_lastSentAt!).inSeconds < 15) {
-            return;
-          }
-
-          _lastSentAt = DateTime.now();
-
-          try {
-            final batteryLevel = await battery.batteryLevel;
-            final charging =
-                (await battery.batteryState) == BatteryState.charging ? 1 : 0;
-
-            print('[$platform] posting track...');
-            await dio.post(
-              '$BASE_URL$TRACK_API',
-              data: {
-                'attendance_id': attendanceId,
-                'latitude': position.latitude.toString(),
-                'longitude': position.longitude.toString(),
-                'battery_percent': batteryLevel.toString(),
-                'is_charging': charging.toString(),
-              },
-              options: Options(
-                contentType: Headers.formUrlEncodedContentType,
-                headers: {'Authorization': 'Bearer $token'},
-              ),
-            );
-            print('[$platform] ✅ track success');
-          } catch (_) {}
-        },
-        onError: (_) async {
-          print('[$platform] position stream error, will retry in 5s');
-          await _positionSub?.cancel();
-          _positionSub = null;
-          // Keep service alive; attempt to restart tracking after a short delay.
-          Future.delayed(const Duration(seconds: 5), () {
-            _startLocationTracking(
-              service: service,
-              accuracy: accuracy,
-              distanceFilter: distanceFilter,
-              platform: platform,
-            );
-          });
-        },
+    (position) async {
+      print(
+        '[$platform] position stream -> ${position.latitude},${position.longitude}',
       );
+      await _updateLastAlive();
+
+      if (_lastSentAt != null &&
+          DateTime.now().difference(_lastSentAt!).inSeconds < 15) {
+        return;
+      }
+
+      _lastSentAt = DateTime.now();
+
+      try {
+        final batteryLevel = await battery.batteryLevel;
+        final charging =
+            (await battery.batteryState) == BatteryState.charging ? 1 : 0;
+
+        print('[$platform] posting track...');
+        await dio.post(
+          '$BASE_URL$TRACK_API',
+          data: {
+            'attendance_id': attendanceId,
+            'latitude': position.latitude.toString(),
+            'longitude': position.longitude.toString(),
+            'battery_percent': batteryLevel.toString(),
+            'is_charging': charging.toString(),
+          },
+          options: Options(
+            contentType: Headers.formUrlEncodedContentType,
+            headers: {'Authorization': 'Bearer $token'},
+          ),
+        );
+        print('[$platform] ✅ track success');
+      } catch (_) {}
+    },
+    onError: (_) async {
+      print('[$platform] position stream error, will retry in 5s');
+      await _positionSub?.cancel();
+      _positionSub = null;
+      // Keep service alive; attempt to restart tracking after a short delay.
+      Future.delayed(const Duration(seconds: 5), () {
+        _startLocationTracking(
+          service: service,
+          accuracy: accuracy,
+          distanceFilter: distanceFilter,
+          platform: platform,
+        );
+      });
+    },
+  );
 }

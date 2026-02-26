@@ -195,8 +195,8 @@ class _UpdateProjectScreenState extends State<UpdateProjectScreen> {
                                       style: regularDefault.copyWith(
                                         color:
                                             ColorResources.projectStatusColor(
-                                              element.key,
-                                            ),
+                                          element.key,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -247,16 +247,16 @@ class _UpdateProjectScreenState extends State<UpdateProjectScreen> {
             return controller.isLoading
                 ? const SizedBox.shrink()
                 : controller.submitLoading
-                ? const RoundedLoadingBtn()
-                : RoundedButton(
-                    text: LocalStrings.update.tr,
-                    press: () {
-                      controller.submitProject(
-                        projectId: widget.id,
-                        isUpdate: true,
+                    ? const RoundedLoadingBtn()
+                    : RoundedButton(
+                        text: LocalStrings.update.tr,
+                        press: () {
+                          controller.submitProject(
+                            projectId: widget.id,
+                            isUpdate: true,
+                          );
+                        },
                       );
-                    },
-                  );
           },
         ),
       ),

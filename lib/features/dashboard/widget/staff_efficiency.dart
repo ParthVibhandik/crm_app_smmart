@@ -9,7 +9,8 @@ class StaffEfficiencyWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
-      margin: const EdgeInsets.symmetric(horizontal: Dimensions.space15, vertical: Dimensions.space10),
+      margin: const EdgeInsets.symmetric(
+          horizontal: Dimensions.space15, vertical: Dimensions.space10),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,7 +38,8 @@ class StaffEfficiencyWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(label, style: regularDefault.copyWith(color: Colors.white70)),
-            Text('${(percent * 100).toInt()}%', style: semiBoldDefault.copyWith(color: color)),
+            Text('${(percent * 100).toInt()}%',
+                style: semiBoldDefault.copyWith(color: color)),
           ],
         ),
         const SizedBox(height: 8),

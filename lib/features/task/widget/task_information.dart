@@ -95,8 +95,8 @@ class TaskInformation extends StatelessWidget {
                             horizontal: 10, vertical: 0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(5),
-                          border:
-                              Border.all(color: Colors.grey.withValues(alpha: 0.5)),
+                          border: Border.all(
+                              color: Colors.grey.withValues(alpha: 0.5)),
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(

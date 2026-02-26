@@ -47,6 +47,7 @@ class UrlContainer {
   static const String interestedInUrl = 'miscellaneous/interested_in';
   static const String telecallUrl = 'telecall';
   static const String dcrUrl = 'calls/daily-call-report';
+  static const String spancoUrl = 'spanco/';
 
   // Sales Tracker
   static const String salesTrackerGetLeadsUrl = 'sales-tracker/get-leads';

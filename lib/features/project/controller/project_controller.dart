@@ -100,13 +100,12 @@ class ProjectController extends GetxController {
 
       AvailableFeatures availableFeatures =
           projectDetailsModel.data?.settings?.availableFeatures ??
-          AvailableFeatures();
+              AvailableFeatures();
 
       projectOverviewEnable =
           availableFeatures.projectOverview.toString() == '1' ? true : false;
-      projectTasksEnable = availableFeatures.projectTasks.toString() == '1'
-          ? true
-          : false;
+      projectTasksEnable =
+          availableFeatures.projectTasks.toString() == '1' ? true : false;
       projectInvoicesEnable =
           availableFeatures.projectInvoices.toString() == '1' ? true : false;
       projectEstimatesEnable =

@@ -72,7 +72,8 @@ class StaffProfile extends StatelessWidget {
                     const SizedBox(width: Dimensions.space10),
                     Expanded(
                       child: InkWell(
-                        onTap: () => UrlLauncherHelper.call(staffModel.phoneNumber),
+                        onTap: () =>
+                            UrlLauncherHelper.call(staffModel.phoneNumber),
                         child: Text(
                           staffModel.phoneNumber ?? '',
                           textAlign: TextAlign.end,

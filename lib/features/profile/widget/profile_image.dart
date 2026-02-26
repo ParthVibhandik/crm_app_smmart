@@ -5,7 +5,6 @@ import 'package:flutex_admin/core/utils/images.dart';
 import 'package:flutex_admin/features/profile/controller/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ProfileWidget extends StatefulWidget {
   final String imagePath;

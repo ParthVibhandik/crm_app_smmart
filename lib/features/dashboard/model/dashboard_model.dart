@@ -128,10 +128,12 @@ class DashboardModel {
         void processSubordMapNew(dynamic mapData) {
           if (mapData is Map) {
             mapData.forEach((staffName, list) {
-              if (!perStaffCounts.containsKey(staffName))
+              if (!perStaffCounts.containsKey(staffName)) {
                 perStaffCounts[staffName] = {};
-              if (!perStaffIds.containsKey(staffName))
+              }
+              if (!perStaffIds.containsKey(staffName)) {
                 perStaffIds[staffName] = {};
+              }
 
               processList(
                   list, perStaffIds[staffName]!, perStaffCounts[staffName]!);

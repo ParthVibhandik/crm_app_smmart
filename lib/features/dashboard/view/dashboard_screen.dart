@@ -1,9 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutex_admin/common/components/app-bar/action_button_icon_widget.dart';
 import 'package:flutex_admin/common/components/circle_image_button.dart';
 import 'package:flutex_admin/common/components/custom_loader/custom_loader.dart';
-import 'package:flutex_admin/common/components/divider/custom_divider.dart';
 import 'package:flutex_admin/common/components/will_pop_widget.dart';
 import 'package:flutex_admin/core/route/route.dart';
 import 'package:flutex_admin/core/service/api_service.dart';
@@ -13,13 +10,8 @@ import 'package:flutex_admin/core/utils/images.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
 import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/dashboard/controller/dashboard_controller.dart';
-import 'package:flutex_admin/features/dashboard/model/dashboard_model.dart';
 import 'package:flutex_admin/features/dashboard/repo/dashboard_repo.dart';
-import 'package:flutex_admin/features/dashboard/widget/dashboard_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/drawer.dart';
-import 'package:flutex_admin/features/dashboard/widget/home_estimates_card.dart';
-import 'package:flutex_admin/features/dashboard/widget/home_invoices_card.dart';
-import 'package:flutex_admin/features/dashboard/widget/home_proposals_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/leads_tasks_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/lead_journey_card.dart';
 import 'package:flutex_admin/features/dashboard/widget/goals_card.dart';
@@ -28,9 +20,6 @@ import 'package:flutex_admin/features/attendance/attendance_screen.dart';
 import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/intl.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

@@ -38,25 +38,26 @@ class _ProjectTasksState extends State<ProjectTasks> {
           body: controller.isLoading
               ? const CustomLoader()
               : controller.tasksModel.status ?? false
-              ? RefreshIndicator(
-                  color: Theme.of(context).primaryColor,
-                  backgroundColor: Theme.of(context).cardColor,
-                  onRefresh: () async {
-                    controller.loadProjectGroup(widget.id, 'tasks');
-                  },
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(Dimensions.space15),
-                    itemBuilder: (context, index) {
-                      return TaskCard(task: controller.tasksModel.data![index]);
-                    },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: Dimensions.space10),
-                    itemCount: controller.tasksModel.data!.length,
-                  ),
-                )
-              : const Center(child: NoDataWidget()),
+                  ? RefreshIndicator(
+                      color: Theme.of(context).primaryColor,
+                      backgroundColor: Theme.of(context).cardColor,
+                      onRefresh: () async {
+                        controller.loadProjectGroup(widget.id, 'tasks');
+                      },
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(Dimensions.space15),
+                        itemBuilder: (context, index) {
+                          return TaskCard(
+                              task: controller.tasksModel.data![index]);
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: Dimensions.space10),
+                        itemCount: controller.tasksModel.data!.length,
+                      ),
+                    )
+                  : const Center(child: NoDataWidget()),
         );
       },
     );

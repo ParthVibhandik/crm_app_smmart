@@ -10,7 +10,8 @@ class UniversalSearch extends StatelessWidget {
   Widget build(BuildContext context) {
     return GlassCard(
       margin: const EdgeInsets.symmetric(vertical: Dimensions.space15),
-      padding: const EdgeInsets.symmetric(horizontal: Dimensions.space15, vertical: 5),
+      padding: const EdgeInsets.symmetric(
+          horizontal: Dimensions.space15, vertical: 5),
       borderRadius: 30,
       opacity: 0.15,
       child: Row(

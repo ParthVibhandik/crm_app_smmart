@@ -159,7 +159,7 @@ class _ContinueTripScreenState extends State<ContinueTripScreen> {
                         ),
                         const SizedBox(height: 12),
                         DropdownButtonFormField<String>(
-                          value: _modeOfTransport,
+                          initialValue: _modeOfTransport,
                           items: _transportModes
                               .map((m) => DropdownMenuItem<String>(
                                     value: m,
@@ -323,7 +323,8 @@ class _ContinueTripScreenState extends State<ContinueTripScreen> {
       if (destinationAddress.isNotEmpty) {
         try {
           // Use our custom helper that tries Google first
-          geo.Location? loc = await _getCoordinatesFromAddress(destinationAddress);
+          geo.Location? loc =
+              await _getCoordinatesFromAddress(destinationAddress);
           if (loc != null) {
             destinationLat = loc.latitude;
             destinationLng = loc.longitude;
@@ -380,17 +381,19 @@ class _ContinueTripScreenState extends State<ContinueTripScreen> {
           } else if (decodedData['trip_id'] != null) {
             tripId = decodedData['trip_id'].toString();
           }
-          
-           // Fallback tripID extraction if structure differs
-          if(tripId.isEmpty && decodedData is Map && decodedData.containsKey('id')){
-             tripId = decodedData['id'].toString();
-          }
-          
-          if (tripId.isNotEmpty) {
-             await TripSession.setActiveTrip(tripId, tripData: responseModel.responseJson);
-             print('Trip ID stored: $tripId');
+
+          // Fallback tripID extraction if structure differs
+          if (tripId.isEmpty &&
+              decodedData is Map &&
+              decodedData.containsKey('id')) {
+            tripId = decodedData['id'].toString();
           }
 
+          if (tripId.isNotEmpty) {
+            await TripSession.setActiveTrip(tripId,
+                tripData: responseModel.responseJson);
+            print('Trip ID stored: $tripId');
+          }
         } catch (e) {
           print('Error storing trip ID: $e');
         }
@@ -426,11 +429,11 @@ class _ContinueTripScreenState extends State<ContinueTripScreen> {
         if (response.data['status'] == 'OK' &&
             response.data['results'].isNotEmpty) {
           var location = response.data['results'][0]['geometry']['location'];
-            // Return as a geo.Location object for compatibility
-            return geo.Location(
-                latitude: location['lat'], 
-                longitude: location['lng'], 
-                timestamp: DateTime.now());
+          // Return as a geo.Location object for compatibility
+          return geo.Location(
+              latitude: location['lat'],
+              longitude: location['lng'],
+              timestamp: DateTime.now());
         }
       } catch (e) {
         print('Google Geocoding error in continue_trip: $e');
@@ -446,7 +449,7 @@ class _ContinueTripScreenState extends State<ContinueTripScreen> {
     } catch (e) {
       print("Native geocoding failed: $e");
     }
-    
+
     return null;
   }
 

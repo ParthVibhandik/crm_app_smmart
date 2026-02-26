@@ -22,6 +22,7 @@ class UrlLauncherHelper {
       await launchUrl(launchUri);
     }
   }
+
   static Future<void> launchWebUrl(String? url) async {
     if (url == null || url.isEmpty) return;
     final Uri launchUri = Uri.parse(url);

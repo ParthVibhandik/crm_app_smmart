@@ -1,4 +1,3 @@
-
 import 'package:flutex_admin/common/components/buttons/rounded_button.dart';
 import 'package:flutex_admin/common/components/buttons/rounded_loading_button.dart';
 import 'package:flutex_admin/common/components/text-form-field/custom_text_field.dart';
@@ -10,7 +9,7 @@ import 'package:get/get.dart';
 
 class ConvertToCustomerSheet extends StatefulWidget {
   final String leadId;
-  const ConvertToCustomerSheet({Key? key, required this.leadId}) : super(key: key);
+  const ConvertToCustomerSheet({super.key, required this.leadId});
 
   @override
   State<ConvertToCustomerSheet> createState() => _ConvertToCustomerSheetState();
@@ -30,7 +29,8 @@ class _ConvertToCustomerSheetState extends State<ConvertToCustomerSheet> {
         color: Theme.of(context).cardColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: Dimensions.space15, vertical: Dimensions.space20),
+      padding: const EdgeInsets.symmetric(
+          horizontal: Dimensions.space15, vertical: Dimensions.space20),
       child: GetBuilder<LeadDetailsController>(
         builder: (controller) {
           return SingleChildScrollView(
@@ -106,7 +106,7 @@ class _ConvertToCustomerSheetState extends State<ConvertToCustomerSheet> {
                   onChanged: (v) {},
                 ),
                 const SizedBox(height: Dimensions.space15),
-                 CustomTextField(
+                CustomTextField(
                   labelText: 'State',
                   controller: controller.stateController,
                   onChanged: (v) {},
@@ -137,7 +137,7 @@ class _ConvertToCustomerSheetState extends State<ConvertToCustomerSheet> {
                     : RoundedButton(
                         text: 'Convert',
                         press: () {
-                           controller.convertLead(widget.leadId);
+                          controller.convertLead(widget.leadId);
                         },
                       ),
                 const SizedBox(height: Dimensions.space20),

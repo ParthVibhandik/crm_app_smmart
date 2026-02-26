@@ -2,7 +2,6 @@ import 'package:flutex_admin/core/utils/color_resources.dart';
 import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class SuccessDialog extends StatelessWidget {
   final String message;

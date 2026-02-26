@@ -139,12 +139,8 @@ class _AddProposalScreenState extends State<AddProposalScreen> {
                                     lead.company ?? '';
                                 controller.clientEmailController.text =
                                     lead.email ?? '';
-                                controller.currencyController.text =
-                                    controller
-                                        .settingsModel
-                                        .data
-                                        ?.currency
-                                        ?.id ??
+                                controller.currencyController.text = controller
+                                        .settingsModel.data?.currency?.id ??
                                     '0';
                               },
                               validator: (value) {
@@ -199,13 +195,10 @@ class _AddProposalScreenState extends State<AddProposalScreen> {
                                 //    customer.email ?? '';
                                 controller.currencyController.text =
                                     customer.defaultCurrency == '0'
-                                    ? controller
-                                              .settingsModel
-                                              .data
-                                              ?.currency
-                                              ?.id ??
-                                          '0'
-                                    : customer.defaultCurrency ?? '0';
+                                        ? controller.settingsModel.data
+                                                ?.currency?.id ??
+                                            '0'
+                                        : customer.defaultCurrency ?? '0';
                               },
                               validator: (value) {
                                 if (controller.proposalRelatedController.text ==
@@ -305,9 +298,7 @@ class _AddProposalScreenState extends State<AddProposalScreen> {
                             initialValue: DateTime.now().add(
                               Duration(
                                 days: int.parse(
-                                  controller
-                                          .settingsModel
-                                          .data
+                                  controller.settingsModel.data
                                           ?.proposalDueAfter ??
                                       '0',
                                 ),
@@ -356,8 +347,8 @@ class _AddProposalScreenState extends State<AddProposalScreen> {
                             //(value) {
                             //  controller.currencyController.text = value;
                             //},
-                            selectedValue:
-                                controller.currencyController.text.isEmpty
+                            selectedValue: controller
+                                    .currencyController.text.isEmpty
                                 ? controller.settingsModel.data?.currency?.id
                                 : controller.currencyController.text,
                             items: controller.currenciesModel.data!.map((
@@ -629,8 +620,7 @@ class _AddProposalScreenState extends State<AddProposalScreen> {
                               children: [
                                 CustomTextField(
                                   labelText: LocalStrings.itemName.tr,
-                                  controller: controller
-                                      .proposalItemList[index]
+                                  controller: controller.proposalItemList[index]
                                       .itemNameController,
                                   textInputType: TextInputType.text,
                                   validator: (value) {
@@ -647,8 +637,7 @@ class _AddProposalScreenState extends State<AddProposalScreen> {
                                 CustomTextField(
                                   labelText: LocalStrings.description.tr,
                                   textInputType: TextInputType.text,
-                                  controller: controller
-                                      .proposalItemList[index]
+                                  controller: controller.proposalItemList[index]
                                       .descriptionController,
                                   onChanged: (value) {
                                     return;
@@ -735,18 +724,18 @@ class _AddProposalScreenState extends State<AddProposalScreen> {
           bottomNavigationBar: controller.isLoading
               ? const CustomLoader()
               : controller.isSubmitLoading
-              ? const RoundedLoadingBtn()
-              : Padding(
-                  padding: const EdgeInsets.all(Dimensions.space10),
-                  child: RoundedButton(
-                    text: LocalStrings.submit.tr,
-                    press: () {
-                      if (formKey.currentState!.validate()) {
-                        controller.submitProposal();
-                      }
-                    },
-                  ),
-                ),
+                  ? const RoundedLoadingBtn()
+                  : Padding(
+                      padding: const EdgeInsets.all(Dimensions.space10),
+                      child: RoundedButton(
+                        text: LocalStrings.submit.tr,
+                        press: () {
+                          if (formKey.currentState!.validate()) {
+                            controller.submitProposal();
+                          }
+                        },
+                      ),
+                    ),
         );
       },
     );

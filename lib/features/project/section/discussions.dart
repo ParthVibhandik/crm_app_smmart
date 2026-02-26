@@ -38,28 +38,29 @@ class _ProjectDiscussionsState extends State<ProjectDiscussions> {
           body: controller.isLoading
               ? const CustomLoader()
               : controller.projectDiscussionsModel.status ?? false
-              ? RefreshIndicator(
-                  color: Theme.of(context).primaryColor,
-                  backgroundColor: Theme.of(context).cardColor,
-                  onRefresh: () async {
-                    controller.loadProjectGroup(widget.id, 'discussions');
-                  },
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(Dimensions.space15),
-                    shrinkWrap: true,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return DiscussionCard(
-                        discussion:
-                            controller.projectDiscussionsModel.data![index],
-                      );
-                    },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: Dimensions.space10),
-                    itemCount: controller.projectDiscussionsModel.data!.length,
-                  ),
-                )
-              : const Center(child: NoDataWidget()),
+                  ? RefreshIndicator(
+                      color: Theme.of(context).primaryColor,
+                      backgroundColor: Theme.of(context).cardColor,
+                      onRefresh: () async {
+                        controller.loadProjectGroup(widget.id, 'discussions');
+                      },
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(Dimensions.space15),
+                        shrinkWrap: true,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return DiscussionCard(
+                            discussion:
+                                controller.projectDiscussionsModel.data![index],
+                          );
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: Dimensions.space10),
+                        itemCount:
+                            controller.projectDiscussionsModel.data!.length,
+                      ),
+                    )
+                  : const Center(child: NoDataWidget()),
         );
       },
     );

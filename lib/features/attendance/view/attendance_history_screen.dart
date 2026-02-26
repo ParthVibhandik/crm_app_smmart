@@ -1,7 +1,6 @@
 import 'package:flutex_admin/common/components/card/glass_card.dart';
 import 'package:flutex_admin/common/components/custom_loader/custom_loader.dart';
 import 'package:flutex_admin/core/utils/color_resources.dart';
-import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
 import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/features/attendance/controller/attendance_history_controller.dart';
@@ -20,7 +19,8 @@ class AttendanceHistoryScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
           extendBodyBehindAppBar: true,
           appBar: AppBar(
-            title: Text(LocalStrings.attendanceHistory.tr, style: regularLarge.copyWith(color: Colors.white)),
+            title: Text(LocalStrings.attendanceHistory.tr,
+                style: regularLarge.copyWith(color: Colors.white)),
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
@@ -45,19 +45,28 @@ class AttendanceHistoryScreen extends StatelessWidget {
             child: controller.isLoading
                 ? const CustomLoader()
                 : controller.history.isEmpty
-                    ? Center(child: Text('No history found', style: regularDefault.copyWith(color: Colors.white70)))
+                    ? Center(
+                        child: Text('No history found',
+                            style:
+                                regularDefault.copyWith(color: Colors.white70)))
                     : ListView.builder(
-                        padding: const EdgeInsets.only(top: 100, left: 15, right: 15, bottom: 20),
+                        padding: const EdgeInsets.only(
+                            top: 100, left: 15, right: 15, bottom: 20),
                         itemCount: controller.history.length,
                         itemBuilder: (context, index) {
                           final item = controller.history[index];
-                          final punchIn = item.punchInTime != null ? DateTime.parse(item.punchInTime!) : null;
-                          final punchOut = item.punchOutTime != null ? DateTime.parse(item.punchOutTime!) : null;
-                          
+                          final punchIn = item.punchInTime != null
+                              ? DateTime.parse(item.punchInTime!)
+                              : null;
+                          final punchOut = item.punchOutTime != null
+                              ? DateTime.parse(item.punchOutTime!)
+                              : null;
+
                           String duration = '--';
                           if (punchIn != null && punchOut != null) {
                             final diff = punchOut.difference(punchIn);
-                            duration = '${diff.inHours}h ${diff.inMinutes % 60}m';
+                            duration =
+                                '${diff.inHours}h ${diff.inMinutes % 60}m';
                           }
 
                           return GlassCard(
@@ -67,31 +76,52 @@ class AttendanceHistoryScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      punchIn != null ? DateFormat('EEEE, MMM d').format(punchIn) : 'Unknown Date',
-                                      style: semiBoldDefault.copyWith(color: Colors.white),
+                                      punchIn != null
+                                          ? DateFormat('EEEE, MMM d')
+                                              .format(punchIn)
+                                          : 'Unknown Date',
+                                      style: semiBoldDefault.copyWith(
+                                          color: Colors.white),
                                     ),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: Colors.green.withValues(alpha: 0.2),
+                                        color:
+                                            Colors.green.withValues(alpha: 0.2),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Text(
                                         duration,
-                                        style: regularSmall.copyWith(color: Colors.greenAccent),
+                                        style: regularSmall.copyWith(
+                                            color: Colors.greenAccent),
                                       ),
                                     ),
                                   ],
                                 ),
-                                const Divider(color: Colors.white12, height: 25),
+                                const Divider(
+                                    color: Colors.white12, height: 25),
                                 Row(
                                   children: [
-                                    _buildTimeColumn(Icons.login, LocalStrings.checkIn.tr, punchIn != null ? DateFormat('hh:mm a').format(punchIn) : '--'),
+                                    _buildTimeColumn(
+                                        Icons.login,
+                                        LocalStrings.checkIn.tr,
+                                        punchIn != null
+                                            ? DateFormat('hh:mm a')
+                                                .format(punchIn)
+                                            : '--'),
                                     const Spacer(),
-                                    _buildTimeColumn(Icons.logout, LocalStrings.checkOut.tr, punchOut != null ? DateFormat('hh:mm a').format(punchOut) : '--'),
+                                    _buildTimeColumn(
+                                        Icons.logout,
+                                        LocalStrings.checkOut.tr,
+                                        punchOut != null
+                                            ? DateFormat('hh:mm a')
+                                                .format(punchOut)
+                                            : '--'),
                                   ],
                                 ),
                               ],
@@ -113,7 +143,8 @@ class AttendanceHistoryScreen extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: regularExtraSmall.copyWith(color: Colors.white60)),
+            Text(label,
+                style: regularExtraSmall.copyWith(color: Colors.white60)),
             Text(time, style: mediumDefault.copyWith(color: Colors.white)),
           ],
         ),

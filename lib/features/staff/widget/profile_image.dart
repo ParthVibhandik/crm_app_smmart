@@ -112,18 +112,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   }
 
   Widget buildEditIconMethod(Color color) => buildCircle(
-    child: buildCircle(
-      child: Icon(
-        widget.isEdit ? Icons.add_a_photo : Icons.edit,
+        child: buildCircle(
+          child: Icon(
+            widget.isEdit ? Icons.add_a_photo : Icons.edit,
+            color: Theme.of(context).cardColor,
+            size: 20,
+          ),
+          all: 8,
+          color: color,
+        ),
+        all: 3,
         color: Theme.of(context).cardColor,
-        size: 20,
-      ),
-      all: 8,
-      color: color,
-    ),
-    all: 3,
-    color: Theme.of(context).cardColor,
-  );
+      );
 
   Widget buildCircle({
     required Widget child,

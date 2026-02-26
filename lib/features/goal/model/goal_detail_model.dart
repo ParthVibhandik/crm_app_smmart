@@ -114,7 +114,8 @@ class Achievement {
     }
     percent = json['percent']?.toString();
     if (json['progress_bar_percent'] != null) {
-      progressBarPercent = int.tryParse(json['progress_bar_percent'].toString());
+      progressBarPercent =
+          int.tryParse(json['progress_bar_percent'].toString());
     }
   }
 

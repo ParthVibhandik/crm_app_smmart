@@ -201,20 +201,28 @@ class LeadController extends GetxController {
           leadDetailsModel.data?.defaultLanguage ?? '';
       descriptionController.text = leadDetailsModel.data?.description ?? '';
       isPublicController.text = leadDetailsModel.data?.isPublic ?? '';
-      
-      companyIndustryController.text = leadDetailsModel.data?.companyIndustry ?? '';
-      campaignController.text = leadDetailsModel.data?.campaign ?? '';
-      designationController.text = leadDetailsModel.data?.designation ?? leadDetailsModel.data?.title ??  '';
-      zipController.text = leadDetailsModel.data?.zip ?? '';
-      alternatePhoneNumberController.text = leadDetailsModel.data?.alternatePhoneNumber ?? '';
-      // Use names for display if available, otherwise just keep it empty to let UI update it later or use fallback
-      interestedInController.text = leadDetailsModel.data?.interestedIn ?? ''; 
-      
-      print("Update Data - Raw InterestedIn: ${leadDetailsModel.data?.interestedIn}");
-      print("Update Data - Raw InterestedInId: ${leadDetailsModel.data?.interestedInId}");
 
-      if (leadDetailsModel.data?.interestedInId != null && leadDetailsModel.data!.interestedInId!.isNotEmpty) {
-        selectedInterestedInIds = leadDetailsModel.data!.interestedInId!.split(',');
+      companyIndustryController.text =
+          leadDetailsModel.data?.companyIndustry ?? '';
+      campaignController.text = leadDetailsModel.data?.campaign ?? '';
+      designationController.text = leadDetailsModel.data?.designation ??
+          leadDetailsModel.data?.title ??
+          '';
+      zipController.text = leadDetailsModel.data?.zip ?? '';
+      alternatePhoneNumberController.text =
+          leadDetailsModel.data?.alternatePhoneNumber ?? '';
+      // Use names for display if available, otherwise just keep it empty to let UI update it later or use fallback
+      interestedInController.text = leadDetailsModel.data?.interestedIn ?? '';
+
+      print(
+          "Update Data - Raw InterestedIn: ${leadDetailsModel.data?.interestedIn}");
+      print(
+          "Update Data - Raw InterestedInId: ${leadDetailsModel.data?.interestedInId}");
+
+      if (leadDetailsModel.data?.interestedInId != null &&
+          leadDetailsModel.data!.interestedInId!.isNotEmpty) {
+        selectedInterestedInIds =
+            leadDetailsModel.data!.interestedInId!.split(',');
       } else {
         selectedInterestedInIds = [];
       }
@@ -244,12 +252,13 @@ class LeadController extends GetxController {
   TextEditingController defaultLanguageController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController isPublicController = TextEditingController();
-  
+
   TextEditingController companyIndustryController = TextEditingController();
   TextEditingController campaignController = TextEditingController();
   TextEditingController designationController = TextEditingController();
   TextEditingController zipController = TextEditingController();
-  TextEditingController alternatePhoneNumberController = TextEditingController();
+  TextEditingController alternatePhoneNumberController =
+      TextEditingController();
   TextEditingController interestedInController = TextEditingController();
 
   FocusNode nameFocusNode = FocusNode();
@@ -268,7 +277,7 @@ class LeadController extends GetxController {
   FocusNode defaultLanguageFocusNode = FocusNode();
   FocusNode descriptionFocusNode = FocusNode();
   FocusNode isPublicFocusNode = FocusNode();
-  
+
   FocusNode campaignFocusNode = FocusNode();
   FocusNode zipFocusNode = FocusNode();
   FocusNode alternatePhoneNumberFocusNode = FocusNode();
@@ -285,7 +294,8 @@ class LeadController extends GetxController {
     String title = titleController.text.toString();
     String email = emailController.text.toString();
     String website = websiteController.text.toString();
-    String phoneNumber = phoneNumberController.text.toString().replaceAll(RegExp(r'\D'), '');
+    String phoneNumber =
+        phoneNumberController.text.toString().replaceAll(RegExp(r'\D'), '');
     String company = companyController.text.toString();
     String address = addressController.text.toString();
     String city = cityController.text.toString();
@@ -294,12 +304,14 @@ class LeadController extends GetxController {
     String defaultLanguage = defaultLanguageController.text.toString();
     String description = descriptionController.text.toString();
     String isPublic = isPublicController.text.toString();
-    
+
     String companyIndustry = companyIndustryController.text.toString();
     String campaign = campaignController.text.toString();
     String designation = designationController.text.toString();
     String zip = zipController.text.toString();
-    String alternatePhoneNumber = alternatePhoneNumberController.text.toString().replaceAll(RegExp(r'\D'), '');
+    String alternatePhoneNumber = alternatePhoneNumberController.text
+        .toString()
+        .replaceAll(RegExp(r'\D'), '');
     // String interestedIn = selectedInterestedInIds.join(',');
 
     if (source.isEmpty) {
@@ -312,22 +324,6 @@ class LeadController extends GetxController {
     }
     if (assigned.isEmpty) {
       CustomSnackBar.error(errorList: ["Please select assigned staff"]);
-      return;
-    }
-    if (name.isEmpty) {
-      CustomSnackBar.error(errorList: [LocalStrings.enterName.tr]);
-      return;
-    }
-    if (company.isEmpty) {
-      CustomSnackBar.error(errorList: ["Please enter company name"]);
-      return;
-    }
-    if (companyIndustry.isEmpty) {
-      CustomSnackBar.error(errorList: ["Please select company industry"]);
-      return;
-    }
-    if (designation.isEmpty) {
-      CustomSnackBar.error(errorList: ["Please select designation"]);
       return;
     }
     if (email.isEmpty) {
@@ -347,27 +343,27 @@ class LeadController extends GetxController {
       return;
     }
     if (phoneNumber.length < 10) {
-      CustomSnackBar.error(errorList: ["Phone number must be at least 10 digits"]);
+      CustomSnackBar.error(
+          errorList: ["Phone number must be at least 10 digits"]);
       return;
     }
     if (phoneNumber.length > 15) {
-      CustomSnackBar.error(errorList: ["Phone number cannot be more than 15 digits"]);
+      CustomSnackBar.error(
+          errorList: ["Phone number cannot be more than 15 digits"]);
       return;
     }
     if (alternatePhoneNumber.isNotEmpty) {
       if (alternatePhoneNumber.length < 10) {
-        CustomSnackBar.error(errorList: ["Alternate phone number must be at least 10 digits"]);
+        CustomSnackBar.error(
+            errorList: ["Alternate phone number must be at least 10 digits"]);
         return;
       }
       if (alternatePhoneNumber.length > 15) {
-        CustomSnackBar.error(errorList: ["Alternate phone number cannot be more than 15 digits"]);
+        CustomSnackBar.error(errorList: [
+          "Alternate phone number cannot be more than 15 digits"
+        ]);
         return;
       }
-    }
-    if (selectedInterestedInIds.isEmpty) {
-      print("Validation Failed. Selected IDs: $selectedInterestedInIds");
-      CustomSnackBar.error(errorList: ["Please select interested in"]);
-      return;
     }
 
     isSubmitLoading = true;
@@ -451,24 +447,28 @@ class LeadController extends GetxController {
     if (pincode.length != 6) return;
 
     try {
-      final response = await http.get(Uri.parse('https://api.postalpincode.in/pincode/$pincode'));
+      final response = await http
+          .get(Uri.parse('https://api.postalpincode.in/pincode/$pincode'));
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         if (data.isNotEmpty && data[0]['Status'] == 'Success') {
           final postOffice = data[0]['PostOffice'][0];
-          
-          cityController.text = postOffice['District'] ?? postOffice['Block'] ?? '';
+
+          cityController.text =
+              postOffice['District'] ?? postOffice['Block'] ?? '';
           stateController.text = postOffice['State'] ?? '';
           countryController.text = postOffice['Country'] ?? '';
-          
+
           if (countryController.text.toLowerCase() == 'india') {
             String code = "+91 ";
             if (!phoneNumberController.text.trim().startsWith('+91')) {
-                 phoneNumberController.text = code + phoneNumberController.text;
+              phoneNumberController.text = code + phoneNumberController.text;
             }
-             if (alternatePhoneNumberController.text.isNotEmpty && !alternatePhoneNumberController.text.trim().startsWith('+91')) {
-                 alternatePhoneNumberController.text = code + alternatePhoneNumberController.text;
-             }
+            if (alternatePhoneNumberController.text.isNotEmpty &&
+                !alternatePhoneNumberController.text.trim().startsWith('+91')) {
+              alternatePhoneNumberController.text =
+                  code + alternatePhoneNumberController.text;
+            }
           }
           update();
         }

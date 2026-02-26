@@ -115,17 +115,11 @@ class _TaskScreenState extends State<TaskScreen> {
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder: (context, index) {
                                     return OverviewCard(
-                                      name:
-                                          controller
-                                              .tasksModel
-                                              .overview![index]
-                                              .status
-                                              ?.tr ??
+                                      name: controller.tasksModel
+                                              .overview![index].status?.tr ??
                                           '',
                                       number: controller
-                                          .tasksModel
-                                          .overview![index]
-                                          .total
+                                          .tasksModel.overview![index].total
                                           .toString(),
                                       color: ColorResources.blueColor,
                                     );
@@ -177,104 +171,142 @@ class _TaskScreenState extends State<TaskScreen> {
                           ],
                         ),
                       ),
-                      controller.tasksModel.subordinatesTasks != null && controller.tasksModel.subordinatesTasks!.isNotEmpty 
-                      ? Flexible(
-                          child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.only(bottom: Dimensions.space20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (controller.tasksModel.selfTasks != null && controller.tasksModel.selfTasks!.isNotEmpty) ...[
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 5),
-                                    child: Text("Self Tasks", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                                  ),
-                                  ListView.separated(
-                                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.space15),
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: controller.tasksModel.selfTasks!.length,
-                                    separatorBuilder: (context, index) => const SizedBox(height: Dimensions.space10),
-                                    itemBuilder: (context, index) {
-                                       return TaskCard(task: controller.tasksModel.selfTasks![index]);
-                                    },
-                                  ),
-                                  const SizedBox(height: Dimensions.space15),
-                                ],
-
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(15, 10, 15, 5),
-                                  child: Text("Subordinates Tasks", style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                                ),
-                                ...controller.tasksModel.subordinatesTasks!.entries.map((entry) {
-                                  return ExpansionTile(
-                                    initiallyExpanded: false,
-                                    title: Text(entry.key, style: const TextStyle(fontWeight: FontWeight.w600)),
-                                    children: [
-                                      ListView.separated(
-                                        padding: const EdgeInsets.symmetric(horizontal: Dimensions.space15, vertical: 10),
-                                        physics: const NeverScrollableScrollPhysics(),
-                                        shrinkWrap: true,
-                                        itemCount: entry.value.length,
-                                        separatorBuilder: (context, index) => const SizedBox(height: Dimensions.space10),
-                                        itemBuilder: (context, index) {
-                                           return TaskCard(task: entry.value[index]);
-                                        },
-                                      )
-                                    ],
-                                  );
-                                }),
-                              ],
-                            ),
-                          ),
-                        )
-                      : controller.tasks.isNotEmpty
+                      controller.tasksModel.subordinatesTasks != null &&
+                              controller
+                                  .tasksModel.subordinatesTasks!.isNotEmpty
                           ? Flexible(
-                              child: Obx(
-                                () => ListView.separated(
-                                  controller: controller.scrollController,
-                                  padding: const EdgeInsets.fromLTRB(
-                                    Dimensions.space15,
-                                    0,
-                                    Dimensions.space15,
-                                    Dimensions.space15,
-                                  ),
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    bool isLastItem =
-                                        index == controller.tasks.length - 1;
-                                    if (isLastItem && controller.hasMoreData) {
-                                      return Column(
+                              child: SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.only(
+                                    bottom: Dimensions.space20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (controller.tasksModel.selfTasks !=
+                                            null &&
+                                        controller.tasksModel.selfTasks!
+                                            .isNotEmpty) ...[
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            15, 10, 15, 5),
+                                        child: Text("Self Tasks",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium
+                                                ?.copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                      ),
+                                      ListView.separated(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: Dimensions.space15),
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemCount: controller
+                                            .tasksModel.selfTasks!.length,
+                                        separatorBuilder: (context, index) =>
+                                            const SizedBox(
+                                                height: Dimensions.space10),
+                                        itemBuilder: (context, index) {
+                                          return TaskCard(
+                                              task: controller.tasksModel
+                                                  .selfTasks![index]);
+                                        },
+                                      ),
+                                      const SizedBox(
+                                          height: Dimensions.space15),
+                                    ],
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          15, 10, 15, 5),
+                                      child: Text("Subordinates Tasks",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(
+                                                  fontWeight: FontWeight.bold)),
+                                    ),
+                                    ...controller
+                                        .tasksModel.subordinatesTasks!.entries
+                                        .map((entry) {
+                                      return ExpansionTile(
+                                        initiallyExpanded: false,
+                                        title: Text(entry.key,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w600)),
                                         children: [
-                                          TaskCard(
-                                            task: controller.tasks[index],
-                                          ),
-                                          const SizedBox(
-                                            height: Dimensions.space10,
-                                          ),
-                                          const CustomLoader(
-                                            isFullScreen: false,
-                                            isPagination: true,
-                                          ),
+                                          ListView.separated(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: Dimensions.space15,
+                                                vertical: 10),
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            itemCount: entry.value.length,
+                                            separatorBuilder: (context,
+                                                    index) =>
+                                                const SizedBox(
+                                                    height: Dimensions.space10),
+                                            itemBuilder: (context, index) {
+                                              return TaskCard(
+                                                  task: entry.value[index]);
+                                            },
+                                          )
                                         ],
                                       );
-                                    }
-                                    return TaskCard(
-                                      task: controller.tasks[index],
-                                    );
-                                  },
-                                  separatorBuilder: (context, index) =>
-                                      const SizedBox(
-                                        height: Dimensions.space10,
-                                      ),
-                                  itemCount: controller.tasks.length,
+                                    }),
+                                  ],
                                 ),
                               ),
                             )
-                            : NoDataWidget(
-                                text: controller.tasksModel.message ??
-                                    LocalStrings.noDataFound),
+                          : controller.tasks.isNotEmpty
+                              ? Flexible(
+                                  child: Obx(
+                                    () => ListView.separated(
+                                      controller: controller.scrollController,
+                                      padding: const EdgeInsets.fromLTRB(
+                                        Dimensions.space15,
+                                        0,
+                                        Dimensions.space15,
+                                        Dimensions.space15,
+                                      ),
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        bool isLastItem = index ==
+                                            controller.tasks.length - 1;
+                                        if (isLastItem &&
+                                            controller.hasMoreData) {
+                                          return Column(
+                                            children: [
+                                              TaskCard(
+                                                task: controller.tasks[index],
+                                              ),
+                                              const SizedBox(
+                                                height: Dimensions.space10,
+                                              ),
+                                              const CustomLoader(
+                                                isFullScreen: false,
+                                                isPagination: true,
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                        return TaskCard(
+                                          task: controller.tasks[index],
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) =>
+                                          const SizedBox(
+                                        height: Dimensions.space10,
+                                      ),
+                                      itemCount: controller.tasks.length,
+                                    ),
+                                  ),
+                                )
+                              : NoDataWidget(
+                                  text: controller.tasksModel.message ??
+                                      LocalStrings.noDataFound),
                     ],
                   ),
                 ),

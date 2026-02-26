@@ -15,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutex_admin/core/utils/dimensions.dart';
 import 'package:flutex_admin/core/helper/url_launcher_helper.dart';
-import 'package:flutex_admin/core/utils/color_resources.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

@@ -57,15 +57,16 @@ class ProfileRepo {
 
     String jsonResponse = await response.stream.bytesToString();
     dynamic jsonEncoded = jsonDecode(jsonResponse);
-    
+
     bool status = false;
     String message = '';
-    
-    if(jsonEncoded != null && jsonEncoded is Map){
-       if (jsonEncoded['status'].toString() == 'true' || jsonEncoded['status'] == true) {
-         status = true;
-       }
-       message = jsonEncoded['message']?.toString() ?? '';
+
+    if (jsonEncoded != null && jsonEncoded is Map) {
+      if (jsonEncoded['status'].toString() == 'true' ||
+          jsonEncoded['status'] == true) {
+        status = true;
+      }
+      message = jsonEncoded['message']?.toString() ?? '';
     }
 
     ResponseModel responseModel = ResponseModel(status, message, jsonResponse);

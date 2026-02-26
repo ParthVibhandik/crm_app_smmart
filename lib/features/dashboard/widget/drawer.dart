@@ -223,7 +223,14 @@ class HomeDrawer extends StatelessWidget {
                       Get.toNamed(RouteHelper.goalScreen);
                     },
                   ),
-
+                  buildListTile(
+                    leadingIcon: Icons.space_dashboard_outlined,
+                    title: "Spanco",
+                    onTap: () {
+                      Navigator.pop(context);
+                      Get.toNamed(RouteHelper.spancoScreen);
+                    },
+                  ),
                   homeModel.menuItems?.expenses ?? false
                       ? buildListTile(
                           leadingIcon: Icons.monetization_on_outlined,

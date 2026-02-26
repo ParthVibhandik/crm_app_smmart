@@ -248,8 +248,8 @@ class _UpdateProposalScreenState extends State<UpdateProposalScreen> {
                                   labelText: LocalStrings.date.tr,
                                   initialValue:
                                       DateConverter.convertStringToDatetime(
-                                        controller.dateController.text,
-                                      ),
+                                    controller.dateController.text,
+                                  ),
                                   onChanged: (DateTime? value) {
                                     controller.dateController.text =
                                         DateConverter.formatDate(value!);
@@ -262,8 +262,8 @@ class _UpdateProposalScreenState extends State<UpdateProposalScreen> {
                                   labelText: LocalStrings.dueDate.tr,
                                   initialValue:
                                       DateConverter.convertStringToDatetime(
-                                        controller.openTillController.text,
-                                      ),
+                                    controller.openTillController.text,
+                                  ),
                                   onChanged: (DateTime? value) {
                                     controller.openTillController.text =
                                         DateConverter.formatDate(value!);
@@ -518,8 +518,7 @@ class _UpdateProposalScreenState extends State<UpdateProposalScreen> {
                                           validator: (value) {
                                             if (value!.isEmpty) {
                                               return LocalStrings
-                                                  .enterItemName
-                                                  .tr;
+                                                  .enterItemName.tr;
                                             } else {
                                               return null;
                                             }
@@ -618,16 +617,16 @@ class _UpdateProposalScreenState extends State<UpdateProposalScreen> {
             child: controller.isLoading
                 ? const SizedBox.shrink()
                 : controller.isSubmitLoading
-                ? const RoundedLoadingBtn()
-                : RoundedButton(
-                    text: LocalStrings.update.tr,
-                    press: () {
-                      controller.submitProposal(
-                        proposalId: widget.id,
-                        isUpdate: true,
-                      );
-                    },
-                  ),
+                    ? const RoundedLoadingBtn()
+                    : RoundedButton(
+                        text: LocalStrings.update.tr,
+                        press: () {
+                          controller.submitProposal(
+                            proposalId: widget.id,
+                            isUpdate: true,
+                          );
+                        },
+                      ),
           ),
         );
       },

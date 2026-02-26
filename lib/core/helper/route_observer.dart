@@ -4,10 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AppRouteObserver extends GetObserver {
   @override
-  void didPush(Route<dynamic>? route, Route<dynamic>? previousRoute) {
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPush(route, previousRoute);
-    if (route?.settings.name != null) {
-      _saveRoute(route!.settings.name!);
+    if (route.settings.name != null) {
+      _saveRoute(route.settings.name!);
     }
   }
 

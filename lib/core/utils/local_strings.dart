@@ -139,11 +139,12 @@ class LocalStrings {
   static const String logoutSureWarningMSg =
       "Are you sure you want to log out from your account?";
   static const String logoutSuccessMsg = "Sign Out Successfully";
-  
+
   // Calendar
   static const String calendar = "Calendar";
   static const String noEventsFound = "No events found for this day";
   static const String attendance = "Attendance";
+  static const String attendanceHistory = "Attendance History";
   static const String checkIn = "Check In";
   static const String notCheckedIn = "Not Checked In";
   static const String checkOut = "Check Out";

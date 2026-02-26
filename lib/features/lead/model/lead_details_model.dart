@@ -179,22 +179,22 @@ class LeadDetails {
     _alternatePhoneNumber = json['alternate_phonenumber'];
     _campaign = json['camp_name']; // New
     _designation = json['designation']; // New
-    
+
     if (json['interested_products'] != null) {
       if (json['interested_products'] is List) {
-         var list = (json['interested_products'] as List);
-         _interestedIn = list.map((e) => e['name'].toString()).join(', ');
-         _interestedInId = list.map((e) => e['id'].toString()).join(',');
+        var list = (json['interested_products'] as List);
+        _interestedIn = list.map((e) => e['name'].toString()).join(', ');
+        _interestedInId = list.map((e) => e['id'].toString()).join(',');
       } else {
         // Handle case where it might be a string or other format
         _interestedIn = json['interested_products'].toString();
       }
-    } 
+    }
     // Fallback or legacy support if interested_products is missing but interested_in matches
     else if (json['interested_in'] != null) {
-        _interestedInId = json['interested_in'].toString();
-        // If we have IDs but no names, we might need to fetch them or just show IDs (suboptimal)
-        // Or maybe interested_in is the names? Let's assume IDs for now as that's usually the column name
+      _interestedInId = json['interested_in'].toString();
+      // If we have IDs but no names, we might need to fetch them or just show IDs (suboptimal)
+      // Or maybe interested_in is the names? Let's assume IDs for now as that's usually the column name
     }
 
     if (json['attachments'] != null) {
@@ -250,8 +250,8 @@ class LeadDetails {
   String? _interestedIn;
   String? _interestedInId; // New
   String? _alternatePhoneNumber;
-  String? _campaign; 
-  String? _designation; 
+  String? _campaign;
+  String? _designation;
   List<Attachments>? _attachments;
 
   String? get id => _id;
@@ -299,8 +299,8 @@ class LeadDetails {
   String? get interestedIn => _interestedIn;
   String? get interestedInId => _interestedInId; // New
   String? get alternatePhoneNumber => _alternatePhoneNumber;
-  String? get campaign => _campaign; 
-  String? get designation => _designation; 
+  String? get campaign => _campaign;
+  String? get designation => _designation;
   List<Attachments>? get attachments => _attachments;
 
   Map<String, dynamic> toJson() {

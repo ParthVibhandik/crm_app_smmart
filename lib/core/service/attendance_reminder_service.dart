@@ -9,8 +9,8 @@ class AttendanceReminderService {
     await fln.show(
       999, // Static ID for geofence alerts
       entered ? 'Office Zone Entered' : 'Office Zone Exited',
-      entered 
-          ? 'Don\'t forget to punch in for your attendance!' 
+      entered
+          ? 'Don\'t forget to punch in for your attendance!'
           : 'Don\'t forget to punch out before you leave!',
       const NotificationDetails(
         android: AndroidNotificationDetails(

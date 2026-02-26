@@ -101,11 +101,8 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
                         invoiceId: controller.invoiceDetailsModel.data!.id!,
                         paymentsModel:
                             controller.invoiceDetailsModel.data!.payments!,
-                        currency:
-                            controller
-                                .invoiceDetailsModel
-                                .data!
-                                .currencySymbol ??
+                        currency: controller
+                                .invoiceDetailsModel.data!.currencySymbol ??
                             '-',
                       ),
                     ],

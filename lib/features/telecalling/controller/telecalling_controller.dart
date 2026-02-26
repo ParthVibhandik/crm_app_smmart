@@ -14,13 +14,13 @@ import 'package:flutex_admin/core/service/api_service.dart';
 class TelecallingController extends GetxController {
   final TelecallingRepo telecallingRepo;
   late InvoiceRepo invoiceRepo;
-  
+
   TelecallingController({required this.telecallingRepo}) {
-     _ensureInvoiceRepo();
-     _loadInvoices();
-     loadAssignedLeads();
+    _ensureInvoiceRepo();
+    _loadInvoices();
+    loadAssignedLeads();
   }
-  
+
   void _ensureInvoiceRepo() {
     try {
       invoiceRepo = Get.find<InvoiceRepo>();
@@ -31,17 +31,17 @@ class TelecallingController extends GetxController {
 
   bool isLoading = false;
   bool isSubmitLoading = false;
-  
+
   List<Lead> searchResultLeads = [];
   Lead? selectedLead;
-  
+
   TextEditingController searchController = TextEditingController();
   TextEditingController durationController = TextEditingController();
   TextEditingController remarksController = TextEditingController();
-  
+
   String selectedStatus = 'hot';
   List<String> statusOptions = ['hot', 'warm', 'cold', 'converted', 'lost'];
-  
+
   List<Invoice> invoices = [];
   String? selectedInvoiceId;
   bool isLoadingInvoices = false;
@@ -57,7 +57,8 @@ class TelecallingController extends GetxController {
           List<Invoice> sortedInvoices = model.data!;
           // Sort by ID descending (newest first)
           sortedInvoices.sort((a, b) {
-             return (int.tryParse(b.id ?? '0') ?? 0).compareTo(int.tryParse(a.id ?? '0') ?? 0);
+            return (int.tryParse(b.id ?? '0') ?? 0)
+                .compareTo(int.tryParse(a.id ?? '0') ?? 0);
           });
           invoices = sortedInvoices;
         }
@@ -68,7 +69,7 @@ class TelecallingController extends GetxController {
     isLoadingInvoices = false;
     update();
   }
-  
+
   void setInvoiceId(String? id) {
     selectedInvoiceId = id;
     update();
@@ -86,13 +87,13 @@ class TelecallingController extends GetxController {
       if (responseModel.status) {
         var decoded = jsonDecode(responseModel.responseJson);
         List<dynamic> leadsList = [];
-        
+
         if (decoded is Map<String, dynamic> && decoded.containsKey('data')) {
           var dataObj = decoded['data'];
           if (dataObj is Map<String, dynamic>) {
-             if (dataObj.containsKey('leads') && dataObj['leads'] is List) {
-               leadsList = dataObj['leads'];
-             }
+            if (dataObj.containsKey('leads') && dataObj['leads'] is List) {
+              leadsList = dataObj['leads'];
+            }
           } else if (dataObj is List) {
             leadsList = dataObj;
           }
@@ -133,8 +134,9 @@ class TelecallingController extends GetxController {
             leadsList = dataObj;
           }
         }
-        
-        searchResultLeads = leadsList.map((item) => Lead.fromJson(item)).toList();
+
+        searchResultLeads =
+            leadsList.map((item) => Lead.fromJson(item)).toList();
       } else {
         CustomSnackBar.error(errorList: [responseModel.message.tr]);
       }

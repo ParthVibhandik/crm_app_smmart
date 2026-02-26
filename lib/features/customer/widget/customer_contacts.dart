@@ -85,26 +85,27 @@ class _CustomerContactsState extends State<CustomerContacts> {
           body: controller.isLoading
               ? const CustomLoader()
               : controller.customerContactsModel.status ?? false
-              ? RefreshIndicator(
-                  color: ColorResources.primaryColor,
-                  onRefresh: () async {
-                    await controller.loadCustomerContacts(widget.id);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(Dimensions.space10),
-                    child: ListView.builder(
-                      controller: scrollController,
-                      itemBuilder: (context, index) {
-                        return ContactCard(
-                          index: index,
-                          contactModel: controller.customerContactsModel,
-                        );
+                  ? RefreshIndicator(
+                      color: ColorResources.primaryColor,
+                      onRefresh: () async {
+                        await controller.loadCustomerContacts(widget.id);
                       },
-                      itemCount: controller.customerContactsModel.data!.length,
-                    ),
-                  ),
-                )
-              : const Center(child: NoDataWidget()),
+                      child: Padding(
+                        padding: const EdgeInsets.all(Dimensions.space10),
+                        child: ListView.builder(
+                          controller: scrollController,
+                          itemBuilder: (context, index) {
+                            return ContactCard(
+                              index: index,
+                              contactModel: controller.customerContactsModel,
+                            );
+                          },
+                          itemCount:
+                              controller.customerContactsModel.data!.length,
+                        ),
+                      ),
+                    )
+                  : const Center(child: NoDataWidget()),
         );
       },
     );

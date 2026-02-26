@@ -4,7 +4,6 @@ import 'package:flutex_admin/core/utils/url_container.dart';
 import 'package:flutex_admin/common/models/response_model.dart';
 import 'package:flutex_admin/features/lead/model/lead_create_model.dart';
 import 'package:flutex_admin/features/lead/model/reminder_create_model.dart';
-import 'dart:convert';
 
 class LeadRepo {
   ApiClient apiClient;
@@ -249,8 +248,8 @@ class LeadRepo {
       int index = 0;
       for (var item in leadModel.interestedIn!) {
         if (item.isNotEmpty && item != "null") {
-           params["interested_in[$index]"] = item;
-           index++;
+          params["interested_in[$index]"] = item;
+          index++;
         }
       }
     }
@@ -294,7 +293,8 @@ class LeadRepo {
   }
 
   Future<ResponseModel> convertLeadToCustomer(Map<String, dynamic> body) async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.leadsUrl}/convert-to-customer";
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.leadsUrl}/convert-to-customer";
     ResponseModel responseModel = await apiClient.request(
       url,
       Method.postMethod,

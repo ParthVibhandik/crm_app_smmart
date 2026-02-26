@@ -4,7 +4,6 @@ import 'package:flutex_admin/core/utils/style.dart';
 import 'package:flutex_admin/core/utils/color_resources.dart';
 import 'package:flutex_admin/features/dashboard/controller/dashboard_controller.dart';
 import 'package:flutex_admin/features/dashboard/model/dashboard_model.dart';
-import 'package:get/get.dart';
 // import 'package:intl/intl.dart';
 
 class GoalsCard extends StatefulWidget {
@@ -42,7 +41,8 @@ class _GoalsCardState extends State<GoalsCard> {
     }
 
     // Use unified subordinates from controller (includes both goals and leads/tasks)
-    List<DashboardSubordinate> unifiedSubs = widget.controller.unifiedSubordinates;
+    List<DashboardSubordinate> unifiedSubs =
+        widget.controller.unifiedSubordinates;
 
     return Card(
       elevation: 2,
@@ -207,15 +207,15 @@ class _GoalsCardState extends State<GoalsCard> {
                         color: Colors.black.withOpacity(0.05), blurRadius: 2)
                   ]
                 : null),
-      child: Text(
-        label,
-        style: regularSmall.copyWith(
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            color: isSelected ? Colors.black : Colors.grey[600]),
+        child: Text(
+          label,
+          style: regularSmall.copyWith(
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected ? Colors.black : Colors.grey[600]),
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildGoalsList(BuildContext context, Goals goals) {
     List<Goal> sourceGoals = [];
@@ -236,7 +236,8 @@ class _GoalsCardState extends State<GoalsCard> {
     }
 
     // 2. Apply Type Filter (MTD, YTD, Custom)
-    List<Goal> displayGoals = _filterGoalsByType(sourceGoals, widget.controller);
+    List<Goal> displayGoals =
+        _filterGoalsByType(sourceGoals, widget.controller);
 
     if (displayGoals.isEmpty) {
       return Center(
@@ -249,14 +250,15 @@ class _GoalsCardState extends State<GoalsCard> {
 
     // Logic for truncation
     bool showViewMore = displayGoals.length > 5;
-    List<Goal> visibleGoals =
-        (_isExpanded || !showViewMore) ? displayGoals : displayGoals.take(5).toList();
+    List<Goal> visibleGoals = (_isExpanded || !showViewMore)
+        ? displayGoals
+        : displayGoals.take(5).toList();
 
     return Column(
       children: [
         ...visibleGoals.map((goal) => _buildGoalItem(context, goal)),
         if (showViewMore)
-           Padding(
+          Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: InkWell(
               onTap: () {

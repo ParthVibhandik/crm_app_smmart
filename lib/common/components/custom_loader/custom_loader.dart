@@ -23,21 +23,21 @@ class CustomLoader extends StatelessWidget {
             ),
           )
         : isPagination
-        ? Center(
-            child: SpinKitWave(
-              color: Theme.of(context).primaryColor,
-              size: 20.0,
-            ),
-            //Padding(
-            //  padding: const EdgeInsets.all(10),
-            //  child: LoadingIndicator(strokeWidth: strokeWidth),
-            //),
-          )
-        : Center(
-            child: SpinKitThreeBounce(
-              color: Theme.of(context).primaryColor,
-              size: 20.0,
-            ),
-          );
+            ? Center(
+                child: SpinKitWave(
+                  color: Theme.of(context).primaryColor,
+                  size: 20.0,
+                ),
+                //Padding(
+                //  padding: const EdgeInsets.all(10),
+                //  child: LoadingIndicator(strokeWidth: strokeWidth),
+                //),
+              )
+            : Center(
+                child: SpinKitThreeBounce(
+                  color: Theme.of(context).primaryColor,
+                  size: 20.0,
+                ),
+              );
   }
 }

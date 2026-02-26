@@ -83,8 +83,8 @@ class _ItemScreenState extends State<ItemScreen> {
                                   },
                                   separatorBuilder: (context, index) =>
                                       const SizedBox(
-                                        height: Dimensions.space10,
-                                      ),
+                                    height: Dimensions.space10,
+                                  ),
                                   itemCount: controller.itemsModel.data!.length,
                                 ),
                               ),

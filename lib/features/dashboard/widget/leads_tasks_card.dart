@@ -232,7 +232,8 @@ class _LeadsTasksCardState extends State<LeadsTasksCard> {
     }
     // TASKS LOGIC
     else {
-      print("[DEBUG] LeadsTasksCard: Task Logic - MainTab: ${controller.selectedLeadsMainTab}");
+      print(
+          "[DEBUG] LeadsTasksCard: Task Logic - MainTab: ${controller.selectedLeadsMainTab}");
       if (controller.selectedLeadsMainTab == 'my') {
         items = data.selfTasks ?? [];
         print("[DEBUG] Self Tasks Count: ${items.length}");
@@ -241,13 +242,14 @@ class _LeadsTasksCardState extends State<LeadsTasksCard> {
         String staffId = controller.selectedLeadsMainTab;
         DashboardSubordinate? sub = controller.unifiedSubordinates
             .firstWhereOrNull((s) => s.id == staffId);
-        
+
         print("[DEBUG] Subordinate Lookup: ID=$staffId, Found=${sub?.name}");
         if (sub != null) {
           String keyName = sub.name;
           print("[DEBUG] Looking for tasks for key: '$keyName'");
-          print("[DEBUG] Available Subordinate Task Keys: ${data.subordinatesTasks?.keys.toList()}");
-          
+          print(
+              "[DEBUG] Available Subordinate Task Keys: ${data.subordinatesTasks?.keys.toList()}");
+
           items = data.subordinatesTasks?[keyName] ?? [];
           print("[DEBUG] Found ${items.length} tasks for $keyName");
         }
@@ -271,15 +273,14 @@ class _LeadsTasksCardState extends State<LeadsTasksCard> {
 
     return Column(
       children: [
-        ...visibleItems
-            .map((item) => _buildListItem(controller, item)),
+        ...visibleItems.map((item) => _buildListItem(controller, item)),
         if (showViewMore)
-           Padding(
+          Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: InkWell(
               onTap: () {
-                if(controller.selectedLeadsCategory == 'leads') {
-                   Get.toNamed(RouteHelper.leadScreen);
+                if (controller.selectedLeadsCategory == 'leads') {
+                  Get.toNamed(RouteHelper.leadScreen);
                 }
               },
               child: Container(
@@ -310,7 +311,8 @@ class _LeadsTasksCardState extends State<LeadsTasksCard> {
         // Only navigate for leads, not tasks
         if (controller.selectedLeadsCategory == 'leads' && item.id != null) {
           Get.toNamed(RouteHelper.leadDetailsScreen, arguments: item.id);
-        } else if (controller.selectedLeadsCategory == 'tasks' && item.id != null) {
+        } else if (controller.selectedLeadsCategory == 'tasks' &&
+            item.id != null) {
           Get.toNamed(RouteHelper.taskDetailsScreen, arguments: item.id);
         }
       },
@@ -384,8 +386,9 @@ class _LeadsTasksCardState extends State<LeadsTasksCard> {
       if (sub != null) {
         String keyName = sub.name;
         if (type == 'today') return data.todaySubords?[keyName]?.length ?? 0;
-        if (type == 'pending')
+        if (type == 'pending') {
           return data.pendingSubords?[keyName]?.length ?? 0;
+        }
       }
     }
     return 0;

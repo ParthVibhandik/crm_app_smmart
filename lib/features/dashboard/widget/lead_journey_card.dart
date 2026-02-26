@@ -48,7 +48,7 @@ class LeadJourneyCard extends StatelessWidget {
                             child: _buildTab(
                                 name, name), // name is both label and key
                           );
-                        }).toList(),
+                        }),
                     ],
                   ),
                 ),

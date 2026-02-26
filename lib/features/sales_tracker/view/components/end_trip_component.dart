@@ -27,7 +27,7 @@ class _EndTripComponentState extends State<EndTripComponent> {
   late InvoiceRepo _invoiceRepo;
   bool _isSubmitting = false;
   final TextEditingController _callRemarkController = TextEditingController();
-  
+
   List<Invoice> _invoices = [];
   String? _selectedInvoiceId;
   bool _isLoadingInvoices = false;
@@ -39,7 +39,7 @@ class _EndTripComponentState extends State<EndTripComponent> {
     _ensureInvoiceRepo();
     _loadInvoices();
   }
-  
+
   void _ensureInvoiceRepo() {
     if (Get.isRegistered<InvoiceRepo>()) {
       _invoiceRepo = Get.find<InvoiceRepo>();
@@ -57,28 +57,32 @@ class _EndTripComponentState extends State<EndTripComponent> {
         final model = InvoicesModel.fromJson(jsonDecode(response.responseJson));
         if (model.data != null) {
           final now = DateTime.now();
-          final todayStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-          
+          final todayStr =
+              "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
           List<Invoice> sortedInvoices = model.data!;
           // Sort by ID descending (newest first)
           sortedInvoices.sort((a, b) {
-             return (int.tryParse(b.id ?? '0') ?? 0).compareTo(int.tryParse(a.id ?? '0') ?? 0);
+            return (int.tryParse(b.id ?? '0') ?? 0)
+                .compareTo(int.tryParse(a.id ?? '0') ?? 0);
           });
-          
+
           setState(() {
             _invoices = sortedInvoices;
-            
+
             // Auto-select if there is an invoice created today
             // We check 'date' or 'datecreated' (datecreated often includes time or is YYYY-MM-DD)
-            // Ideally we check if it was created within the last few hours (session duration), 
+            // Ideally we check if it was created within the last few hours (session duration),
             // but for now, "today" and "top of list" is a good heuristic.
-            
+
             // Let's look for the first invoice that has today's date
             try {
               final recentInvoice = _invoices.firstWhere((inv) {
-                 // Check date (YYYY-MM-DD)
-                 bool isToday = inv.date == todayStr || (inv.dateCreated != null && inv.dateCreated!.startsWith(todayStr));
-                 return isToday;
+                // Check date (YYYY-MM-DD)
+                bool isToday = inv.date == todayStr ||
+                    (inv.dateCreated != null &&
+                        inv.dateCreated!.startsWith(todayStr));
+                return isToday;
               });
               _selectedInvoiceId = recentInvoice.id;
             } catch (_) {
@@ -119,9 +123,7 @@ class _EndTripComponentState extends State<EndTripComponent> {
     setState(() => _isSubmitting = true);
     try {
       final response = await _repo.endTrip(
-          callRemark: remark, 
-          invoiceId: _selectedInvoiceId
-      );
+          callRemark: remark, invoiceId: _selectedInvoiceId);
       if (response.status) {
         CustomSnackBar.success(successList: ['Trip ended successfully']);
         await TripSession.clearActiveTrip();
@@ -173,7 +175,6 @@ class _EndTripComponentState extends State<EndTripComponent> {
                       style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const SizedBox(height: 20),
-                    
                     Row(
                       children: [
                         Expanded(
@@ -212,21 +213,23 @@ class _EndTripComponentState extends State<EndTripComponent> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    
                     if (_isLoadingInvoices)
-                       const Center(child: LinearProgressIndicator())
+                      const Center(child: LinearProgressIndicator())
                     else if (_invoices.isNotEmpty)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text("Link Created Invoice (Optional)", style: TextStyle(fontWeight: FontWeight.bold)),
+                          const Text("Link Created Invoice (Optional)",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
-                            value: _selectedInvoiceId,
+                            initialValue: _selectedInvoiceId,
                             isExpanded: true,
                             decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 12),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8)),
                             ),
                             hint: const Text("Select Invoice"),
                             items: [
@@ -235,15 +238,15 @@ class _EndTripComponentState extends State<EndTripComponent> {
                                 child: Text("None (Do not send any invoice)"),
                               ),
                               ..._invoices.take(50).map((inv) {
-                               return DropdownMenuItem<String>(
-                                 value: inv.id,
-                                 child: Text(
-                                   "${inv.prefix ?? ''}${inv.number ?? ''} - ${inv.clientName ?? 'Unknown'} - ${inv.total ?? ''} (${inv.date ?? ''})",
-                                   overflow: TextOverflow.ellipsis,
-                                   style: const TextStyle(fontSize: 13),
-                                 ),
-                               );
-                            }),
+                                return DropdownMenuItem<String>(
+                                  value: inv.id,
+                                  child: Text(
+                                    "${inv.prefix ?? ''}${inv.number ?? ''} - ${inv.clientName ?? 'Unknown'} - ${inv.total ?? ''} (${inv.date ?? ''})",
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontSize: 13),
+                                  ),
+                                );
+                              }),
                             ].toList(),
                             onChanged: (val) {
                               setState(() {
@@ -254,7 +257,6 @@ class _EndTripComponentState extends State<EndTripComponent> {
                           const SizedBox(height: 20),
                         ],
                       ),
-                      
                     CustomTextField(
                       controller: _callRemarkController,
                       labelText: 'Call Remark',
@@ -284,4 +286,3 @@ class _EndTripComponentState extends State<EndTripComponent> {
     super.dispose();
   }
 }
-

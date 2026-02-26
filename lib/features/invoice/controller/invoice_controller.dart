@@ -146,8 +146,8 @@ class InvoiceController extends GetxController {
           invoiceItemList.add(
             InvoiceItemModel(
               itemNameController: TextEditingController(
-                text: invoiceDetailsModel.data!.items![i].description
-                    .toString(),
+                text:
+                    invoiceDetailsModel.data!.items![i].description.toString(),
               ),
               descriptionController: TextEditingController(
                 text: invoiceDetailsModel.data!.items![i].longDescription
@@ -170,11 +170,9 @@ class InvoiceController extends GetxController {
         removedItemsList.add(invoiceDetailsModel.data!.items![i].id.toString());
       }
       if (invoiceDetailsModel.data!.allowedPaymentModes!.isNotEmpty) {
-        for (
-          var i = 0;
-          i < invoiceDetailsModel.data!.allowedPaymentModes!.length;
-          i++
-        ) {
+        for (var i = 0;
+            i < invoiceDetailsModel.data!.allowedPaymentModes!.length;
+            i++) {
           allowedPaymentModesList.add(
             invoiceDetailsModel.data!.allowedPaymentModes![i].toString(),
           );

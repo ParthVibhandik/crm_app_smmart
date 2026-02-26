@@ -22,6 +22,15 @@ class ColorResources {
   static const Color inputColorDark = Color(0xff1F1F1F);
 
   // New
+  static const Color neonCyan = Color(0xFF00FFFF);
+  static const Color electricPurple = Color(0xFFBF00FF);
+  static const Color voidBackground = Color(0xFF0D0D0D);
+  static const Color primaryBlue = Color(0xFF007BFF);
+  static const Color secondaryIndigo = Color(0xFF6610F2);
+  static const Color gradientStart = Color(0xFF2E3192);
+  static const Color gradientMid = Color(0xFF1BFFFF);
+  static const Color gradientEnd = Color(0xFF1BFFFF);
+
   static const Color lightBackgroundColor = Color(0xFFF5F6F9);
   static const Color darkColor = Color(0xFF202A44);
   static const Color textDarkColor = Color(0xFF444952);

@@ -70,81 +70,182 @@ class _CustomTextFieldState extends State<CustomTextField> {
   Widget build(BuildContext context) {
     return widget.needOutlineBorder
         ? widget.animatedLabel
-              ? TextFormField(
-                  maxLines: widget.maxLines,
-                  readOnly: widget.readOnly,
-                  style: regularDefault.copyWith(
-                    color: Theme.of(context).textTheme.bodyMedium!.color,
+            ? TextFormField(
+                maxLines: widget.maxLines,
+                readOnly: widget.readOnly,
+                style: regularDefault.copyWith(
+                  color: Theme.of(context).textTheme.bodyMedium!.color,
+                ),
+                //textAlign: TextAlign.left,
+                cursorColor: Theme.of(context).textTheme.bodyMedium!.color,
+                controller: widget.controller,
+                autofocus: false,
+                textInputAction: widget.inputAction,
+                enabled: widget.isEnable,
+                focusNode: widget.focusNode,
+                validator: widget.validator,
+                keyboardType: widget.textInputType,
+                obscureText: widget.isPassword ? obscureText : false,
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.only(
+                    top: 5,
+                    left: 15,
+                    right: 15,
+                    bottom: 5,
                   ),
-                  //textAlign: TextAlign.left,
-                  cursorColor: Theme.of(context).textTheme.bodyMedium!.color,
-                  controller: widget.controller,
-                  autofocus: false,
-                  textInputAction: widget.inputAction,
-                  enabled: widget.isEnable,
-                  focusNode: widget.focusNode,
-                  validator: widget.validator,
-                  keyboardType: widget.textInputType,
-                  obscureText: widget.isPassword ? obscureText : false,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.only(
-                      top: 5,
-                      left: 15,
-                      right: 15,
-                      bottom: 5,
-                    ),
-                    label: widget.labelText != null
-                        ? Text.rich(
-                            TextSpan(
-                              text: widget.labelText!.tr,
-                              style: regularDefault.copyWith(
-                                color: Theme.of(context).hintColor,
-                              ),
-                              children: [
-                                if (widget.isRequired)
-                                  TextSpan(
-                                    text: ' *',
-                                    style: semiBoldDefault.copyWith(
-                                        color: ColorResources.colorRed),
-                                  )
-                              ],
+                  label: widget.labelText != null
+                      ? Text.rich(
+                          TextSpan(
+                            text: widget.labelText!.tr,
+                            style: regularDefault.copyWith(
+                              color: Theme.of(context).hintColor,
                             ),
-                          )
-                        : null,
-                    hintText: widget.hintText ?? '',
-                    hintStyle: regularDefault,
-                    fillColor: widget.fillColor ?? Theme.of(context).cardColor,
-                    filled: true,
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 0.5,
-                        color: ColorResources.getUnselectedIconColor(),
-                      ),
-                      borderRadius: BorderRadius.circular(
-                        Dimensions.defaultRadius,
-                      ),
+                            children: [
+                              if (widget.isRequired)
+                                TextSpan(
+                                  text: ' *',
+                                  style: semiBoldDefault.copyWith(
+                                      color: ColorResources.colorRed),
+                                )
+                            ],
+                          ),
+                        )
+                      : null,
+                  hintText: widget.hintText ?? '',
+                  hintStyle: regularDefault,
+                  fillColor: widget.fillColor ?? Theme.of(context).cardColor,
+                  filled: true,
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 0.5,
+                      color: ColorResources.getUnselectedIconColor(),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 0.5,
-                        color: ColorResources.getUnselectedIconColor(),
-                      ),
-                      borderRadius: BorderRadius.circular(
-                        Dimensions.defaultRadius,
-                      ),
+                    borderRadius: BorderRadius.circular(
+                      Dimensions.defaultRadius,
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        width: 0.5,
-                        color: ColorResources.getUnselectedIconColor(),
-                      ),
-                      borderRadius: BorderRadius.circular(
-                        Dimensions.defaultRadius,
-                      ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 0.5,
+                      color: ColorResources.getUnselectedIconColor(),
                     ),
-                    prefix: widget.prefix,
-                    suffixIcon: widget.isShowSuffixIcon
-                        ? widget.isPassword
+                    borderRadius: BorderRadius.circular(
+                      Dimensions.defaultRadius,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 0.5,
+                      color: ColorResources.getUnselectedIconColor(),
+                    ),
+                    borderRadius: BorderRadius.circular(
+                      Dimensions.defaultRadius,
+                    ),
+                  ),
+                  prefix: widget.prefix,
+                  suffixIcon: widget.isShowSuffixIcon
+                      ? widget.isPassword
+                          ? IconButton(
+                              icon: Icon(
+                                obscureText
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: ColorResources.hintTextColor,
+                                size: 20,
+                              ),
+                              onPressed: _toggle,
+                            )
+                          : widget.isIcon
+                              ? IconButton(
+                                  onPressed: widget.onSuffixTap,
+                                  icon: Icon(
+                                    widget.isSearch
+                                        ? Icons.search_outlined
+                                        : widget.isCountryPicker
+                                            ? Icons.arrow_drop_down_outlined
+                                            : Icons.camera_alt_outlined,
+                                    size: 25,
+                                    color: ColorResources.getPrimaryColor(),
+                                  ),
+                                )
+                              : null
+                      : null,
+                ),
+                onFieldSubmitted: (text) => widget.nextFocus != null
+                    ? FocusScope.of(context).requestFocus(widget.nextFocus)
+                    : null,
+                onChanged: (text) => widget.onChanged!(text),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.labelText != null) ...[
+                    LabelText(
+                      text: widget.labelText!,
+                      isRequired: widget.isRequired,
+                    ),
+                    const SizedBox(height: Dimensions.textToTextSpace),
+                  ],
+                  TextFormField(
+                    maxLines: widget.maxLines,
+                    readOnly: widget.readOnly,
+                    style: regularDefault.copyWith(
+                      color: Theme.of(context).textTheme.bodyMedium!.color,
+                    ),
+                    //textAlign: TextAlign.left,
+                    cursorColor: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium!.color,
+                    controller: widget.controller,
+                    autofocus: false,
+                    textInputAction: widget.inputAction,
+                    enabled: widget.isEnable,
+                    focusNode: widget.focusNode,
+                    validator: widget.validator,
+                    keyboardType: widget.textInputType,
+                    obscureText: widget.isPassword ? obscureText : false,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.only(
+                        top: 5,
+                        left: 15,
+                        right: 15,
+                        bottom: 5,
+                      ),
+                      hintText: widget.hintText ?? '',
+                      hintStyle: regularSmall.copyWith(
+                        color: ColorResources.getHintTextColor(),
+                      ),
+                      fillColor: widget.fillColor,
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 0.5,
+                          color: ColorResources.getTextFieldDisableBorder(),
+                        ),
+                        borderRadius: BorderRadius.circular(
+                          Dimensions.defaultRadius,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 0.5,
+                          color: ColorResources.getTextFieldEnableBorder(),
+                        ),
+                        borderRadius: BorderRadius.circular(
+                          Dimensions.defaultRadius,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          width: 0.5,
+                          color: ColorResources.getTextFieldDisableBorder(),
+                        ),
+                        borderRadius: BorderRadius.circular(
+                          Dimensions.defaultRadius,
+                        ),
+                      ),
+                      suffixIcon: widget.isShowSuffixIcon
+                          ? widget.isPassword
                               ? IconButton(
                                   icon: Icon(
                                     obscureText
@@ -156,131 +257,30 @@ class _CustomTextFieldState extends State<CustomTextField> {
                                   onPressed: _toggle,
                                 )
                               : widget.isIcon
-                              ? IconButton(
-                                  onPressed: widget.onSuffixTap,
-                                  icon: Icon(
-                                    widget.isSearch
-                                        ? Icons.search_outlined
-                                        : widget.isCountryPicker
-                                        ? Icons.arrow_drop_down_outlined
-                                        : Icons.camera_alt_outlined,
-                                    size: 25,
-                                    color: ColorResources.getPrimaryColor(),
-                                  ),
-                                )
-                              : null
-                        : null,
-                  ),
-                  onFieldSubmitted: (text) => widget.nextFocus != null
-                      ? FocusScope.of(context).requestFocus(widget.nextFocus)
-                      : null,
-                  onChanged: (text) => widget.onChanged!(text),
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if(widget.labelText != null) ...[
-                      LabelText(
-                        text: widget.labelText!,
-                        isRequired: widget.isRequired,
-                      ),
-                      const SizedBox(height: Dimensions.textToTextSpace),
-                    ],
-                    TextFormField(
-                      maxLines: widget.maxLines,
-                      readOnly: widget.readOnly,
-                      style: regularDefault.copyWith(
-                        color: Theme.of(context).textTheme.bodyMedium!.color,
-                      ),
-                      //textAlign: TextAlign.left,
-                      cursorColor: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium!.color,
-                      controller: widget.controller,
-                      autofocus: false,
-                      textInputAction: widget.inputAction,
-                      enabled: widget.isEnable,
-                      focusNode: widget.focusNode,
-                      validator: widget.validator,
-                      keyboardType: widget.textInputType,
-                      obscureText: widget.isPassword ? obscureText : false,
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(
-                          top: 5,
-                          left: 15,
-                          right: 15,
-                          bottom: 5,
-                        ),
-                        hintText: widget.hintText ?? '',
-                        hintStyle: regularSmall.copyWith(
-                          color: ColorResources.getHintTextColor(),
-                        ),
-                        fillColor: widget.fillColor,
-                        filled: true,
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 0.5,
-                            color: ColorResources.getTextFieldDisableBorder(),
-                          ),
-                          borderRadius: BorderRadius.circular(
-                            Dimensions.defaultRadius,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 0.5,
-                            color: ColorResources.getTextFieldEnableBorder(),
-                          ),
-                          borderRadius: BorderRadius.circular(
-                            Dimensions.defaultRadius,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 0.5,
-                            color: ColorResources.getTextFieldDisableBorder(),
-                          ),
-                          borderRadius: BorderRadius.circular(
-                            Dimensions.defaultRadius,
-                          ),
-                        ),
-                        suffixIcon: widget.isShowSuffixIcon
-                            ? widget.isPassword
-                                  ? IconButton(
-                                      icon: Icon(
-                                        obscureText
-                                            ? Icons.visibility_off
-                                            : Icons.visibility,
-                                        color: ColorResources.hintTextColor,
-                                        size: 20,
-                                      ),
-                                      onPressed: _toggle,
-                                    )
-                                  : widget.isIcon
                                   ? IconButton(
                                       onPressed: widget.onSuffixTap,
                                       icon: Icon(
                                         widget.isSearch
                                             ? Icons.search_outlined
                                             : widget.isCountryPicker
-                                            ? Icons.arrow_drop_down_outlined
-                                            : Icons.camera_alt_outlined,
+                                                ? Icons.arrow_drop_down_outlined
+                                                : Icons.camera_alt_outlined,
                                         size: 25,
                                         color: ColorResources.getPrimaryColor(),
                                       ),
                                     )
                                   : null
-                            : null,
-                      ),
-                      onFieldSubmitted: (text) => widget.nextFocus != null
-                          ? FocusScope.of(
-                              context,
-                            ).requestFocus(widget.nextFocus)
                           : null,
-                      onChanged: (text) => widget.onChanged!(text),
                     ),
-                  ],
-                )
+                    onFieldSubmitted: (text) => widget.nextFocus != null
+                        ? FocusScope.of(
+                            context,
+                          ).requestFocus(widget.nextFocus)
+                        : null,
+                    onChanged: (text) => widget.onChanged!(text),
+                  ),
+                ],
+              )
         : TextFormField(
             maxLines: widget.maxLines,
             readOnly: widget.readOnly,
@@ -330,30 +330,30 @@ class _CustomTextFieldState extends State<CustomTextField> {
               ),
               suffixIcon: widget.isShowSuffixIcon
                   ? widget.isPassword
-                        ? IconButton(
-                            icon: Icon(
-                              obscureText
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: ColorResources.hintTextColor,
-                              size: 20,
-                            ),
-                            onPressed: _toggle,
-                          )
-                        : widget.isIcon
-                        ? IconButton(
-                            onPressed: widget.onSuffixTap,
-                            icon: Icon(
-                              widget.isSearch
-                                  ? Icons.search_outlined
-                                  : widget.isCountryPicker
-                                  ? Icons.arrow_drop_down_outlined
-                                  : Icons.camera_alt_outlined,
-                                  size: 25,
-                                  color: ColorResources.getPrimaryColor(),
+                      ? IconButton(
+                          icon: Icon(
+                            obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: ColorResources.hintTextColor,
+                            size: 20,
+                          ),
+                          onPressed: _toggle,
+                        )
+                      : widget.isIcon
+                          ? IconButton(
+                              onPressed: widget.onSuffixTap,
+                              icon: Icon(
+                                widget.isSearch
+                                    ? Icons.search_outlined
+                                    : widget.isCountryPicker
+                                        ? Icons.arrow_drop_down_outlined
+                                        : Icons.camera_alt_outlined,
+                                size: 25,
+                                color: ColorResources.getPrimaryColor(),
                               ),
                             )
-                        : null
+                          : null
                   : null,
             ),
             onFieldSubmitted: (text) => widget.nextFocus != null

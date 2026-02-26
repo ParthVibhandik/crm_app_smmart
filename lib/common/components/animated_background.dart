@@ -25,7 +25,9 @@ class _AnimatedBackgroundState extends State<AnimatedBackground>
 
     for (int i = 0; i < 5; i++) {
       _orbs.add(Orb(
-        color: i % 2 == 0 ? ColorResources.neonCyan : ColorResources.electricPurple,
+        color: i % 2 == 0
+            ? ColorResources.neonCyan
+            : ColorResources.electricPurple,
         x: _random.nextDouble(),
         y: _random.nextDouble(),
         size: _random.nextDouble() * 150 + 50,

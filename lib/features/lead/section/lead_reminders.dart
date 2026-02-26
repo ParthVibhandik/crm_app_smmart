@@ -66,25 +66,25 @@ class _LeadRemindersState extends State<LeadReminders> {
           body: controller.isLoading
               ? const CustomLoader()
               : controller.remindersModel.status ?? false
-              ? RefreshIndicator(
-                  color: Theme.of(context).primaryColor,
-                  backgroundColor: Theme.of(context).cardColor,
-                  onRefresh: () async {
-                    controller.loadLeadReminders(widget.id);
-                  },
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(Dimensions.space10),
-                    itemBuilder: (context, index) {
-                      return ReminderCard(
-                        reminder: controller.remindersModel.data![index],
-                      );
-                    },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: Dimensions.space10),
-                    itemCount: controller.remindersModel.data!.length,
-                  ),
-                )
-              : const Center(child: NoDataWidget()),
+                  ? RefreshIndicator(
+                      color: Theme.of(context).primaryColor,
+                      backgroundColor: Theme.of(context).cardColor,
+                      onRefresh: () async {
+                        controller.loadLeadReminders(widget.id);
+                      },
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(Dimensions.space10),
+                        itemBuilder: (context, index) {
+                          return ReminderCard(
+                            reminder: controller.remindersModel.data![index],
+                          );
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: Dimensions.space10),
+                        itemCount: controller.remindersModel.data!.length,
+                      ),
+                    )
+                  : const Center(child: NoDataWidget()),
           floatingActionButton: AnimatedSlide(
             offset: showFab ? Offset.zero : const Offset(0, 2),
             duration: const Duration(milliseconds: 300),

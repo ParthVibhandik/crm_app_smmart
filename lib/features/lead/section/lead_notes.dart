@@ -66,26 +66,26 @@ class _LeadNotesState extends State<LeadNotes> {
           body: controller.isLoading
               ? const CustomLoader()
               : controller.notesModel.status ?? false
-              ? RefreshIndicator(
-                  color: Theme.of(context).primaryColor,
-                  backgroundColor: Theme.of(context).cardColor,
-                  onRefresh: () async {
-                    controller.loadLeadNotes(widget.id);
-                  },
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(Dimensions.space10),
-                    itemBuilder: (context, index) {
-                      return NoteCard(
-                        index: index,
-                        note: controller.notesModel.data!,
-                      );
-                    },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: Dimensions.space10),
-                    itemCount: controller.notesModel.data!.length,
-                  ),
-                )
-              : const Center(child: NoDataWidget()),
+                  ? RefreshIndicator(
+                      color: Theme.of(context).primaryColor,
+                      backgroundColor: Theme.of(context).cardColor,
+                      onRefresh: () async {
+                        controller.loadLeadNotes(widget.id);
+                      },
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(Dimensions.space10),
+                        itemBuilder: (context, index) {
+                          return NoteCard(
+                            index: index,
+                            note: controller.notesModel.data!,
+                          );
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: Dimensions.space10),
+                        itemCount: controller.notesModel.data!.length,
+                      ),
+                    )
+                  : const Center(child: NoDataWidget()),
           floatingActionButton: AnimatedSlide(
             offset: showFab ? Offset.zero : const Offset(0, 2),
             duration: const Duration(milliseconds: 300),

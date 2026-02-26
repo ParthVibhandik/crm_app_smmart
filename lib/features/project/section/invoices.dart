@@ -38,30 +38,30 @@ class _ProjectInvoicesState extends State<ProjectInvoices> {
           body: controller.isLoading
               ? const CustomLoader()
               : controller.invoicesModel.status ?? false
-              ? RefreshIndicator(
-                  color: Theme.of(context).primaryColor,
-                  backgroundColor: Theme.of(context).cardColor,
-                  onRefresh: () async {
-                    controller.loadProjectGroup(widget.id, 'invoices');
-                  },
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: Dimensions.space15,
-                    ),
-                    shrinkWrap: true,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return InvoiceCard(
-                        index: index,
-                        invoiceModel: controller.invoicesModel,
-                      );
-                    },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: Dimensions.space10),
-                    itemCount: controller.invoicesModel.data!.length,
-                  ),
-                )
-              : const Center(child: NoDataWidget()),
+                  ? RefreshIndicator(
+                      color: Theme.of(context).primaryColor,
+                      backgroundColor: Theme.of(context).cardColor,
+                      onRefresh: () async {
+                        controller.loadProjectGroup(widget.id, 'invoices');
+                      },
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: Dimensions.space15,
+                        ),
+                        shrinkWrap: true,
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return InvoiceCard(
+                            index: index,
+                            invoiceModel: controller.invoicesModel,
+                          );
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: Dimensions.space10),
+                        itemCount: controller.invoicesModel.data!.length,
+                      ),
+                    )
+                  : const Center(child: NoDataWidget()),
         );
       },
     );

@@ -225,9 +225,8 @@ class ProjectDetails {
     map['contact_notification'] = _contactNotification;
     map['notify_contacts'] = _notifyContacts;
     if (_sharedVaultEntries != null) {
-      map['shared_vault_entries'] = _sharedVaultEntries
-          ?.map((v) => v.toJson())
-          .toList();
+      map['shared_vault_entries'] =
+          _sharedVaultEntries?.map((v) => v.toJson()).toList();
     }
     if (_settings != null) {
       map['settings'] = _settings?.toJson();

@@ -130,13 +130,10 @@ class _UpdateInvoiceScreenState extends State<UpdateInvoiceScreen> {
                                           customer.billingStreet ?? '';
                                       controller.currencyController.text =
                                           customer.defaultCurrency == '0'
-                                          ? controller
-                                                    .settingsModel
-                                                    .data
-                                                    ?.currency
-                                                    ?.id ??
-                                                '0'
-                                          : customer.defaultCurrency ?? '0';
+                                              ? controller.settingsModel.data
+                                                      ?.currency?.id ??
+                                                  '0'
+                                              : customer.defaultCurrency ?? '0';
                                       controller.update();
                                     },
                                     validator: (value) {
@@ -184,8 +181,8 @@ class _UpdateInvoiceScreenState extends State<UpdateInvoiceScreen> {
                                     labelText: LocalStrings.date.tr,
                                     initialValue:
                                         DateConverter.convertStringToDatetime(
-                                          controller.dateController.text,
-                                        ),
+                                      controller.dateController.text,
+                                    ),
                                     onChanged: (DateTime? value) {
                                       controller.dateController.text =
                                           DateConverter.formatDate(value!);
@@ -203,11 +200,8 @@ class _UpdateInvoiceScreenState extends State<UpdateInvoiceScreen> {
                                 Expanded(
                                   child: CustomDateFormField(
                                     labelText: LocalStrings.dueDate.tr,
-                                    initialValue:
-                                        controller
-                                            .dueDateController
-                                            .text
-                                            .isNotEmpty
+                                    initialValue: controller
+                                            .dueDateController.text.isNotEmpty
                                         ? DateConverter.convertStringToDatetime(
                                             controller.dueDateController.text,
                                           )
@@ -304,12 +298,11 @@ class _UpdateInvoiceScreenState extends State<UpdateInvoiceScreen> {
                                     },
                                     items: controller.paymentModesModel.data!
                                         .map((value) {
-                                          return DropdownItem(
-                                            label: value.name?.tr ?? '',
-                                            value: value.id!,
-                                          );
-                                        })
-                                        .toList(),
+                                      return DropdownItem(
+                                        label: value.name?.tr ?? '',
+                                        value: value.id!,
+                                      );
+                                    }).toList(),
                                   );
                                 } else if (paymentModesList.data?.status ==
                                     false) {
@@ -387,8 +380,7 @@ class _UpdateInvoiceScreenState extends State<UpdateInvoiceScreen> {
                                             final item = value as Item;
                                             controller.itemController.text =
                                                 item.description ?? '';
-                                            controller
-                                                    .descriptionController
+                                            controller.descriptionController
                                                     .text =
                                                 item.longDescription ?? '';
                                             controller.qtyController.text = '1';
@@ -400,22 +392,19 @@ class _UpdateInvoiceScreenState extends State<UpdateInvoiceScreen> {
                                           },
                                           items: controller.itemsModel.data!
                                               .map((Item item) {
-                                                return DropdownMenuItem(
-                                                  value: item,
-                                                  child: Text(
-                                                    item.description ?? '',
-                                                    style: regularDefault
-                                                        .copyWith(
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .bodyMedium!
-                                                                  .color,
-                                                        ),
-                                                  ),
-                                                );
-                                              })
-                                              .toList(),
+                                            return DropdownMenuItem(
+                                              value: item,
+                                              child: Text(
+                                                item.description ?? '',
+                                                style: regularDefault.copyWith(
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium!
+                                                      .color,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
                                         );
                                       } else if (itemsList.data?.status ==
                                           false) {
@@ -598,8 +587,7 @@ class _UpdateInvoiceScreenState extends State<UpdateInvoiceScreen> {
                                           validator: (value) {
                                             if (value!.isEmpty) {
                                               return LocalStrings
-                                                  .enterItemName
-                                                  .tr;
+                                                  .enterItemName.tr;
                                             } else {
                                               return null;
                                             }
@@ -671,8 +659,7 @@ class _UpdateInvoiceScreenState extends State<UpdateInvoiceScreen> {
                                                 validator: (value) {
                                                   if (value!.isEmpty) {
                                                     return LocalStrings
-                                                        .enterRate
-                                                        .tr;
+                                                        .enterRate.tr;
                                                   } else {
                                                     return null;
                                                   }
@@ -735,16 +722,16 @@ class _UpdateInvoiceScreenState extends State<UpdateInvoiceScreen> {
             child: controller.isLoading
                 ? const SizedBox.shrink()
                 : controller.isSubmitLoading
-                ? const RoundedLoadingBtn()
-                : RoundedButton(
-                    text: LocalStrings.update.tr,
-                    press: () {
-                      controller.submitInvoice(
-                        invoiceId: widget.id,
-                        isUpdate: true,
-                      );
-                    },
-                  ),
+                    ? const RoundedLoadingBtn()
+                    : RoundedButton(
+                        text: LocalStrings.update.tr,
+                        press: () {
+                          controller.submitInvoice(
+                            invoiceId: widget.id,
+                            isUpdate: true,
+                          );
+                        },
+                      ),
           ),
         );
       },

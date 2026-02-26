@@ -55,10 +55,10 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 140.0, bottom: 30.0),
                       child: Center(
-                          child: Image.asset(
-                            MyImages.smmartLogo,
-                            height: 60,
-                          ),
+                        child: Image.asset(
+                          MyImages.smmartLogo,
+                          height: 60,
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -122,8 +122,8 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                                   ? const RoundedLoadingBtn()
                                   : RoundedButton(
                                       press: () {
-                                        if (_formKey.currentState!.validate()) {
-                                        }
+                                        if (_formKey.currentState!
+                                            .validate()) {}
                                       },
                                       text: LocalStrings.submit.tr,
                                     ),

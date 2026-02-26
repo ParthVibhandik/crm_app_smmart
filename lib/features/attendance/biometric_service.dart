@@ -8,9 +8,10 @@ class BiometricService {
     try {
       final canCheck = await _auth.canCheckBiometrics;
       final isSupported = await _auth.isDeviceSupported();
-      
-      print('BiometricService: canCheckBiometrics=$canCheck, isDeviceSupported=$isSupported');
-      
+
+      print(
+          'BiometricService: canCheckBiometrics=$canCheck, isDeviceSupported=$isSupported');
+
       if (!canCheck || !isSupported) {
         return false;
       }
@@ -18,10 +19,11 @@ class BiometricService {
       // Get available biometric types
       final availableBiometrics = await _auth.getAvailableBiometrics();
       print('BiometricService: Available biometrics: $availableBiometrics');
-      
+
       return availableBiometrics.isNotEmpty;
     } on PlatformException catch (e) {
-      print('BiometricService: Error checking biometric availability: ${e.code} - ${e.message}');
+      print(
+          'BiometricService: Error checking biometric availability: ${e.code} - ${e.message}');
       return false;
     }
   }
@@ -30,7 +32,8 @@ class BiometricService {
     try {
       return await _auth.getAvailableBiometrics();
     } on PlatformException catch (e) {
-      print('BiometricService: Error getting available biometrics: ${e.code} - ${e.message}');
+      print(
+          'BiometricService: Error getting available biometrics: ${e.code} - ${e.message}');
       return [];
     }
   }
@@ -38,7 +41,7 @@ class BiometricService {
   Future<bool> authenticate(String reason) async {
     try {
       print('BiometricService: Starting authentication...');
-      
+
       // First check if biometrics are available
       if (!await isBiometricAvailable()) {
         print('BiometricService: Biometrics not available on this device');
@@ -52,16 +55,17 @@ class BiometricService {
           biometricOnly: true,
         ),
       );
-      
+
       print('BiometricService: Authentication result: $result');
       return result;
     } on PlatformException catch (e) {
       print('BiometricService: Authentication error: ${e.code} - ${e.message}');
-      
+
       // Handle specific error codes
       switch (e.code) {
         case 'NotAvailable':
-          print('BiometricService: Biometric authentication is not available on this device');
+          print(
+              'BiometricService: Biometric authentication is not available on this device');
           break;
         case 'NotEnrolled':
           print('BiometricService: No biometrics are enrolled on this device');
@@ -73,18 +77,20 @@ class BiometricService {
           print('BiometricService: User cancelled biometric authentication');
           break;
         case 'UserFallback':
-          print('BiometricService: User selected fallback authentication method');
+          print(
+              'BiometricService: User selected fallback authentication method');
           break;
         case 'SystemCancel':
           print('BiometricService: System cancelled biometric authentication');
           break;
         case 'InvalidContext':
-          print('BiometricService: Invalid context for biometric authentication');
+          print(
+              'BiometricService: Invalid context for biometric authentication');
           break;
         default:
           print('BiometricService: Unknown error: ${e.code}');
       }
-      
+
       return false;
     } catch (e) {
       print('BiometricService: Unexpected error: $e');

@@ -189,7 +189,7 @@ class _UpdateTicketScreenState extends State<UpdateTaskScreen> {
                           const SizedBox(height: Dimensions.space15),
                           Row(
                             children: [
-                                Expanded(
+                              Expanded(
                                 child: CustomDateFormField(
                                   labelText: LocalStrings.startDate.tr,
                                   initialValue: controller

@@ -83,8 +83,10 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                                 (states) => BorderSide(
                                   width: 1.0,
                                   color: controller.isAdministrator
-                                      ? ColorResources.getTextFieldEnableBorder()
-                                      : ColorResources.getTextFieldDisableBorder(),
+                                      ? ColorResources
+                                          .getTextFieldEnableBorder()
+                                      : ColorResources
+                                          .getTextFieldDisableBorder(),
                                 ),
                               ),
                               onChanged: (value) {
@@ -114,8 +116,10 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                                   (states) => BorderSide(
                                     width: 1.0,
                                     color: controller.notStaffMember
-                                        ? ColorResources.getTextFieldEnableBorder()
-                                        : ColorResources.getTextFieldDisableBorder(),
+                                        ? ColorResources
+                                            .getTextFieldEnableBorder()
+                                        : ColorResources
+                                            .getTextFieldDisableBorder(),
                                   ),
                                 ),
                                 onChanged: (value) {

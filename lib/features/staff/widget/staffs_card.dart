@@ -60,11 +60,11 @@ class StaffsCard extends StatelessWidget {
             ),
             subtitle: InkWell(
               onTap: () => UrlLauncherHelper.mail(staffModel.email),
-                child: Text(
-                  staffModel.email ?? '',
-                  overflow: TextOverflow.ellipsis,
-                  style: regularSmall.copyWith(color: ColorResources.blueColor),
-                ),
+              child: Text(
+                staffModel.email ?? '',
+                overflow: TextOverflow.ellipsis,
+                style: regularSmall.copyWith(color: ColorResources.blueColor),
+              ),
             ),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,

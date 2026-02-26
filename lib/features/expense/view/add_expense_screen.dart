@@ -211,15 +211,15 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             return controller.isLoading
                 ? const SizedBox.shrink()
                 : controller.isSubmitLoading
-                ? const RoundedLoadingBtn()
-                : RoundedButton(
-                    text: LocalStrings.submit.tr,
-                    press: () {
-                      if (formKey.currentState!.validate()) {
-                        controller.submitExpense();
-                      }
-                    },
-                  );
+                    ? const RoundedLoadingBtn()
+                    : RoundedButton(
+                        text: LocalStrings.submit.tr,
+                        press: () {
+                          if (formKey.currentState!.validate()) {
+                            controller.submitExpense();
+                          }
+                        },
+                      );
           },
         ),
       ),

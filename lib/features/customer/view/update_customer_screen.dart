@@ -203,19 +203,18 @@ class _UpdateCustomerScreenState extends State<UpdateCustomerScreen> {
                                           controller.currencyController.text,
                                       items: controller.currenciesModel.data!
                                           .map((currency) {
-                                            return DropdownMenuItem(
-                                              value: currency.id,
-                                              child: Text(
-                                                currency.name?.tr ?? '',
-                                                style: regularDefault.copyWith(
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).textTheme.bodyMedium!.color,
-                                                ),
-                                              ),
-                                            );
-                                          })
-                                          .toList(),
+                                        return DropdownMenuItem(
+                                          value: currency.id,
+                                          child: Text(
+                                            currency.name?.tr ?? '',
+                                            style: regularDefault.copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).textTheme.bodyMedium!.color,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
                                     );
                                   } else if (currenciesList.data?.status ==
                                       false) {
@@ -277,19 +276,18 @@ class _UpdateCustomerScreenState extends State<UpdateCustomerScreen> {
                                           controller.countryController.text,
                                       items: controller.countriesModel.data!
                                           .map((country) {
-                                            return DropdownMenuItem(
-                                              value: country.countryId,
-                                              child: Text(
-                                                country.shortName?.tr ?? '',
-                                                style: regularDefault.copyWith(
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).textTheme.bodyMedium!.color,
-                                                ),
-                                              ),
-                                            );
-                                          })
-                                          .toList(),
+                                        return DropdownMenuItem(
+                                          value: country.countryId,
+                                          child: Text(
+                                            country.shortName?.tr ?? '',
+                                            style: regularDefault.copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).textTheme.bodyMedium!.color,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
                                     );
                                   } else if (countriesList.data?.status ==
                                       false) {
@@ -375,8 +373,7 @@ class _UpdateCustomerScreenState extends State<UpdateCustomerScreen> {
                                           value.toString();
                                     },
                                     selectedValue: controller
-                                        .billingCountryController
-                                        .text,
+                                        .billingCountryController.text,
                                     items: controller.countriesModel.data!.map((
                                       value,
                                     ) {
@@ -444,14 +441,11 @@ class _UpdateCustomerScreenState extends State<UpdateCustomerScreen> {
                                     hintText:
                                         LocalStrings.selectShippingCountry.tr,
                                     onChanged: (value) {
-                                      controller
-                                          .shippingCountryController
-                                          .text = value
-                                          .toString();
+                                      controller.shippingCountryController
+                                          .text = value.toString();
                                     },
                                     selectedValue: controller
-                                        .shippingCountryController
-                                        .text,
+                                        .shippingCountryController.text,
                                     items: controller.countriesModel.data!.map((
                                       value,
                                     ) {
@@ -486,16 +480,16 @@ class _UpdateCustomerScreenState extends State<UpdateCustomerScreen> {
             return controller.isLoading
                 ? const SizedBox.shrink()
                 : controller.isSubmitLoading
-                ? const RoundedLoadingBtn()
-                : RoundedButton(
-                    text: LocalStrings.update.tr,
-                    press: () {
-                      controller.submitCustomer(
-                        customerId: widget.id,
-                        isUpdate: true,
+                    ? const RoundedLoadingBtn()
+                    : RoundedButton(
+                        text: LocalStrings.update.tr,
+                        press: () {
+                          controller.submitCustomer(
+                            customerId: widget.id,
+                            isUpdate: true,
+                          );
+                        },
                       );
-                    },
-                  );
           },
         ),
       ),

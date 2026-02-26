@@ -24,7 +24,10 @@ class NeonButton extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           gradient: const LinearGradient(
-            colors: [ColorResources.primaryBlue, ColorResources.secondaryIndigo],
+            colors: [
+              ColorResources.primaryBlue,
+              ColorResources.secondaryIndigo
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -56,6 +59,8 @@ class NeonButton extends StatelessWidget {
                 ),
               ),
       ),
-    ).animate(target: isLoading ? 0 : 1).shimmer(duration: 2.seconds, color: Colors.white54);
+    )
+        .animate(target: isLoading ? 0 : 1)
+        .shimmer(duration: 2.seconds, color: Colors.white54);
   }
 }

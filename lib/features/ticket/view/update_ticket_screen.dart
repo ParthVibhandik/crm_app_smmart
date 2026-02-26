@@ -331,17 +331,17 @@ class _UpdateTicketScreenState extends State<UpdateTicketScreen> {
             return controller.isLoading
                 ? const SizedBox.shrink()
                 : controller.isSubmitLoading
-                ? const RoundedLoadingBtn()
-                : RoundedButton(
-                    text: LocalStrings.update.tr,
-                    press: () {
-                      controller.submitTicket(
-                        context,
-                        ticketId: widget.id,
-                        isUpdate: true,
+                    ? const RoundedLoadingBtn()
+                    : RoundedButton(
+                        text: LocalStrings.update.tr,
+                        press: () {
+                          controller.submitTicket(
+                            context,
+                            ticketId: widget.id,
+                            isUpdate: true,
+                          );
+                        },
                       );
-                    },
-                  );
           },
         ),
       ),

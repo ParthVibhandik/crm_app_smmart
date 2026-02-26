@@ -10,7 +10,6 @@ import 'package:flutex_admin/features/dashboard/model/dashboard_model.dart';
 import 'package:flutex_admin/features/dashboard/model/dashboard_stats_model.dart';
 import 'package:flutex_admin/features/dashboard/repo/dashboard_repo.dart';
 import 'package:flutex_admin/features/dashboard/model/reminder_model.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class DashboardSubordinate {
@@ -114,10 +113,10 @@ class DashboardController extends GetxController {
 
       // 3. From subordinatesTasks
       if (tasks.subordinatesTasks != null) {
-        print("[DEBUG] Controller: extracting tasks for subordinates: ${tasks.subordinatesTasks!.keys.toList()}");
+        print(
+            "[DEBUG] Controller: extracting tasks for subordinates: ${tasks.subordinatesTasks!.keys.toList()}");
         scanMap(tasks.subordinatesTasks, true);
       }
-
     }
 
     // Convert to list and sort: those with data first, then those without
@@ -197,9 +196,8 @@ class DashboardController extends GetxController {
           if (responseData.containsKey('reminders')) {
             var remindersJson = responseData['reminders'];
             if (remindersJson is List) {
-              selectedDayReminders = remindersJson
-                  .map((e) => ReminderModel.fromJson(e))
-                  .toList();
+              selectedDayReminders =
+                  remindersJson.map((e) => ReminderModel.fromJson(e)).toList();
             } else {
               selectedDayReminders = [];
             }
@@ -235,12 +233,14 @@ class DashboardController extends GetxController {
       try {
         var decoded = jsonDecode(responseModel.responseJson);
         print("[DEBUG] Dashboard Data Decoded. Keys: ${decoded.keys.toList()}");
-        
-        if(decoded.containsKey('leads_tasks')) {
+
+        if (decoded.containsKey('leads_tasks')) {
           var lt = decoded['leads_tasks'];
-          print("[DEBUG] leads_tasks keys: ${lt is Map ? lt.keys.toList() : 'Not a Map'}");
-          if(lt is Map && lt.containsKey('subordinates_tasks')) {
-             print("[DEBUG] subordinates_tasks keys: ${lt['subordinates_tasks']?.keys.toList()}");
+          print(
+              "[DEBUG] leads_tasks keys: ${lt is Map ? lt.keys.toList() : 'Not a Map'}");
+          if (lt is Map && lt.containsKey('subordinates_tasks')) {
+            print(
+                "[DEBUG] subordinates_tasks keys: ${lt['subordinates_tasks']?.keys.toList()}");
           }
         }
 

@@ -172,12 +172,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                               ColorResources.primaryColor,
                                           checkColor: ColorResources.colorWhite,
                                           value: controller.remember,
-                                          side: WidgetStateBorderSide.resolveWith(
+                                          side:
+                                              WidgetStateBorderSide.resolveWith(
                                             (states) => BorderSide(
                                               width: 1.0,
                                               color: controller.remember
-                                                  ? ColorResources.getTextFieldEnableBorder()
-                                                  : ColorResources.getTextFieldDisableBorder(),
+                                                  ? ColorResources
+                                                      .getTextFieldEnableBorder()
+                                                  : ColorResources
+                                                      .getTextFieldDisableBorder(),
                                             ),
                                           ),
                                           onChanged: (value) {

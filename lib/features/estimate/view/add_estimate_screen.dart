@@ -114,13 +114,10 @@ class _AddEstimateScreenState extends State<AddEstimateScreen> {
                                   customer.billingStreet!;
                               controller.currencyController.text =
                                   customer.defaultCurrency == '0'
-                                  ? controller
-                                            .settingsModel
-                                            .data
-                                            ?.currency
-                                            ?.id ??
-                                        '0'
-                                  : customer.defaultCurrency ?? '0';
+                                      ? controller.settingsModel.data?.currency
+                                              ?.id ??
+                                          '0'
+                                      : customer.defaultCurrency ?? '0';
                               controller.update();
                             },
                             validator: (value) {
@@ -184,9 +181,7 @@ class _AddEstimateScreenState extends State<AddEstimateScreen> {
                             initialValue: DateTime.now().add(
                               Duration(
                                 days: int.parse(
-                                  controller
-                                          .settingsModel
-                                          .data
+                                  controller.settingsModel.data
                                           ?.estimateDueAfter ??
                                       '0',
                                 ),
@@ -254,8 +249,8 @@ class _AddEstimateScreenState extends State<AddEstimateScreen> {
                             //(value) {
                             //  controller.currencyController.text = value;
                             //},
-                            selectedValue:
-                                controller.currencyController.text.isEmpty
+                            selectedValue: controller
+                                    .currencyController.text.isEmpty
                                 ? controller.settingsModel.data?.currency?.id
                                 : controller.currencyController.text,
                             items: controller.currenciesModel.data!.map((
@@ -526,8 +521,7 @@ class _AddEstimateScreenState extends State<AddEstimateScreen> {
                               children: [
                                 CustomTextField(
                                   labelText: LocalStrings.itemName.tr,
-                                  controller: controller
-                                      .estimateItemList[index]
+                                  controller: controller.estimateItemList[index]
                                       .itemNameController,
                                   textInputType: TextInputType.text,
                                   validator: (value) {
@@ -544,8 +538,7 @@ class _AddEstimateScreenState extends State<AddEstimateScreen> {
                                 CustomTextField(
                                   labelText: LocalStrings.description.tr,
                                   textInputType: TextInputType.text,
-                                  controller: controller
-                                      .estimateItemList[index]
+                                  controller: controller.estimateItemList[index]
                                       .descriptionController,
                                   onChanged: (value) {
                                     return;
@@ -654,18 +647,18 @@ class _AddEstimateScreenState extends State<AddEstimateScreen> {
           bottomNavigationBar: controller.isLoading
               ? const CustomLoader()
               : controller.isSubmitLoading
-              ? const RoundedLoadingBtn()
-              : Padding(
-                  padding: const EdgeInsets.all(Dimensions.space10),
-                  child: RoundedButton(
-                    text: LocalStrings.submit.tr,
-                    press: () {
-                      if (formKey.currentState!.validate()) {
-                        controller.submitEstimate();
-                      }
-                    },
-                  ),
-                ),
+                  ? const RoundedLoadingBtn()
+                  : Padding(
+                      padding: const EdgeInsets.all(Dimensions.space10),
+                      child: RoundedButton(
+                        text: LocalStrings.submit.tr,
+                        press: () {
+                          if (formKey.currentState!.validate()) {
+                            controller.submitEstimate();
+                          }
+                        },
+                      ),
+                    ),
         );
       },
     );

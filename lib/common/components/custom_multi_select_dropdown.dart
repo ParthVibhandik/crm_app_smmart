@@ -7,24 +7,26 @@ import 'package:get/get.dart';
 
 class CustomMultiSelectDropDown extends StatefulWidget {
   final String? hintText;
-  final List<dynamic> items; // Expecting objects with 'id' and 'name' properties or similar
+  final List<dynamic>
+      items; // Expecting objects with 'id' and 'name' properties or similar
   final List<String> initialSelectedIds;
   final Function(List<String> selectedIds) onChanged;
   final bool isSearchable;
   final bool isRequired;
 
   const CustomMultiSelectDropDown({
-    Key? key,
+    super.key,
     this.hintText,
     required this.items,
     this.initialSelectedIds = const [],
     required this.onChanged,
     this.isSearchable = false,
     this.isRequired = false,
-  }) : super(key: key);
+  });
 
   @override
-  State<CustomMultiSelectDropDown> createState() => _CustomMultiSelectDropDownState();
+  State<CustomMultiSelectDropDown> createState() =>
+      _CustomMultiSelectDropDownState();
 }
 
 class _CustomMultiSelectDropDownState extends State<CustomMultiSelectDropDown> {
@@ -63,7 +65,7 @@ class _CustomMultiSelectDropDownState extends State<CustomMultiSelectDropDown> {
       } catch (e) {
         item = null;
       }
-      
+
       if (item != null) {
         selectedNames.add(item.name?.toString() ?? '');
       }
@@ -153,11 +155,10 @@ class _MultiSelectDialog extends StatefulWidget {
   final Function(List<String>) onConfirm;
 
   const _MultiSelectDialog({
-    Key? key,
     required this.items,
     required this.initialSelectedIds,
     required this.onConfirm,
-  }) : super(key: key);
+  });
 
   @override
   State<_MultiSelectDialog> createState() => _MultiSelectDialogState();
@@ -175,7 +176,8 @@ class _MultiSelectDialogState extends State<_MultiSelectDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(LocalStrings.select.tr), // Make sure LocalStrings is imported or handle generic
+      title: Text(LocalStrings
+          .select.tr), // Make sure LocalStrings is imported or handle generic
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,

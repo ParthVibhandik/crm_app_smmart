@@ -183,7 +183,7 @@ class LeadProfile extends StatelessWidget {
                           leadModel.alternatePhoneNumber ?? '-',
                           textAlign: TextAlign.end,
                           overflow: TextOverflow.ellipsis,
-                           style: regularDefault.copyWith(
+                          style: regularDefault.copyWith(
                               color: ColorResources.primaryColor,
                               decoration: TextDecoration.underline),
                         ),
@@ -204,8 +204,7 @@ class LeadProfile extends StatelessWidget {
                   children: [
                     Expanded(
                       child: InkWell(
-                        onTap: () =>
-                            UrlLauncherHelper.mail(leadModel.email),
+                        onTap: () => UrlLauncherHelper.mail(leadModel.email),
                         child: Text(
                           leadModel.email ?? '',
                           overflow: TextOverflow.ellipsis,

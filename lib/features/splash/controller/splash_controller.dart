@@ -40,15 +40,15 @@ class SplashController extends GetxController {
     //     Get.offAndToNamed(RouteHelper.onboardScreen);
     //   });
     // } else {
-      if (isRemember) {
-        Future.delayed(const Duration(seconds: 1), () {
-          Get.offAndToNamed(RouteHelper.dashboardScreen);
-        });
-      } else {
-        Future.delayed(const Duration(seconds: 1), () {
-          Get.offAndToNamed(RouteHelper.loginScreen);
-        });
-      }
+    if (isRemember) {
+      Future.delayed(const Duration(seconds: 1), () {
+        Get.offAndToNamed(RouteHelper.dashboardScreen);
+      });
+    } else {
+      Future.delayed(const Duration(seconds: 1), () {
+        Get.offAndToNamed(RouteHelper.loginScreen);
+      });
+    }
     // }
   }
 

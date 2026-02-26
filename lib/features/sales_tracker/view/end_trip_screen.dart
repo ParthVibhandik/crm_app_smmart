@@ -68,22 +68,26 @@ class _EndTripScreenState extends State<EndTripScreen> {
         final model = InvoicesModel.fromJson(jsonDecode(response.responseJson));
         if (model.data != null) {
           final now = DateTime.now();
-          final todayStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-          
+          final todayStr =
+              "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
           List<Invoice> sortedInvoices = model.data!;
           // Sort by ID descending (newest first)
           sortedInvoices.sort((a, b) {
-             return (int.tryParse(b.id ?? '0') ?? 0).compareTo(int.tryParse(a.id ?? '0') ?? 0);
+            return (int.tryParse(b.id ?? '0') ?? 0)
+                .compareTo(int.tryParse(a.id ?? '0') ?? 0);
           });
-          
+
           setState(() {
             _invoices = sortedInvoices;
-            
+
             // Auto-select if there is an invoice created today
             try {
               final recentInvoice = _invoices.firstWhere((inv) {
-                 bool isToday = inv.date == todayStr || (inv.dateCreated != null && inv.dateCreated!.startsWith(todayStr));
-                 return isToday;
+                bool isToday = inv.date == todayStr ||
+                    (inv.dateCreated != null &&
+                        inv.dateCreated!.startsWith(todayStr));
+                return isToday;
               });
               _selectedInvoiceId = recentInvoice.id;
             } catch (_) {
@@ -124,9 +128,7 @@ class _EndTripScreenState extends State<EndTripScreen> {
     setState(() => _isSubmitting = true);
     try {
       final response = await _salesTrackerRepo.endTrip(
-          callRemark: remark, 
-          invoiceId: _selectedInvoiceId
-      );
+          callRemark: remark, invoiceId: _selectedInvoiceId);
       if (response.status) {
         CustomSnackBar.success(successList: ['Trip ended successfully']);
         // Clear any stored trip session data
@@ -187,7 +189,6 @@ class _EndTripScreenState extends State<EndTripScreen> {
                           style: TextStyle(fontSize: 14, color: Colors.grey),
                         ),
                         const SizedBox(height: 20),
-                        
                         Row(
                           children: [
                             Expanded(
@@ -226,37 +227,41 @@ class _EndTripScreenState extends State<EndTripScreen> {
                           ],
                         ),
                         const SizedBox(height: 20),
-
                         if (_isLoadingInvoices)
-                           const Center(child: LinearProgressIndicator())
+                          const Center(child: LinearProgressIndicator())
                         else if (_invoices.isNotEmpty)
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text("Link Created Invoice (Optional)", style: TextStyle(fontWeight: FontWeight.bold)),
+                              const Text("Link Created Invoice (Optional)",
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
                               const SizedBox(height: 8),
                               DropdownButtonFormField<String>(
-                                value: _selectedInvoiceId,
+                                initialValue: _selectedInvoiceId,
                                 isExpanded: true,
                                 decoration: InputDecoration(
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 12),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8)),
                                 ),
                                 hint: const Text("Select Invoice"),
                                 items: [
                                   const DropdownMenuItem<String>(
                                     value: null,
-                                    child: Text("None (Do not send any invoice)"),
+                                    child:
+                                        Text("None (Do not send any invoice)"),
                                   ),
                                   ..._invoices.take(50).map((inv) {
-                                     return DropdownMenuItem<String>(
-                                       value: inv.id,
-                                       child: Text(
-                                         "${inv.prefix ?? ''}${inv.number ?? ''} - ${inv.clientName ?? 'Unknown'} - ${inv.total ?? ''} (${inv.date ?? ''})",
-                                         overflow: TextOverflow.ellipsis,
-                                         style: const TextStyle(fontSize: 13),
-                                       ),
-                                     );
+                                    return DropdownMenuItem<String>(
+                                      value: inv.id,
+                                      child: Text(
+                                        "${inv.prefix ?? ''}${inv.number ?? ''} - ${inv.clientName ?? 'Unknown'} - ${inv.total ?? ''} (${inv.date ?? ''})",
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                    );
                                   }),
                                 ].toList(),
                                 onChanged: (val) {
@@ -268,7 +273,6 @@ class _EndTripScreenState extends State<EndTripScreen> {
                               const SizedBox(height: 20),
                             ],
                           ),
-
                         CustomTextField(
                           controller: _callRemarkController,
                           labelText: 'Call Remark',
@@ -294,4 +298,3 @@ class _EndTripScreenState extends State<EndTripScreen> {
     );
   }
 }
-

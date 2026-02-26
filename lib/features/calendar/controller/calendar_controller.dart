@@ -14,7 +14,7 @@ class CalendarController extends GetxController {
   final LeadRepo leadRepo;
 
   CalendarController({
-    required this.taskRepo, 
+    required this.taskRepo,
     required this.attendanceService,
     required this.leadRepo,
   });
@@ -22,7 +22,7 @@ class CalendarController extends GetxController {
   bool isLoading = true;
   DateTime selectedDay = DateTime.now();
   DateTime focusedDay = DateTime.now();
-  
+
   List<Task> allTasks = [];
   List<Reminder> allReminders = [];
   AttendanceStatus? todayAttendance;
@@ -53,16 +53,17 @@ class CalendarController extends GetxController {
       // print('CalendarController: Loading tasks...');
       ResponseModel responseModel = await taskRepo.getAllTasks(page: 0);
       // print('CalendarController: Task response status: ${responseModel.status}');
-      
+
       // LOG RAW JSON
-      // print('CalendarController: Task RAW JSON: ${responseModel.responseJson}'); 
+      // print('CalendarController: Task RAW JSON: ${responseModel.responseJson}');
 
       if (responseModel.status) {
-        final tasksModel = TasksModel.fromJson(jsonDecode(responseModel.responseJson));
+        final tasksModel =
+            TasksModel.fromJson(jsonDecode(responseModel.responseJson));
         allTasks = tasksModel.data ?? [];
         // print('CalendarController: Loaded ${allTasks.length} tasks.');
         if (allTasks.isNotEmpty) {
-           // print('CalendarController: Sample Task Date: ${allTasks.first.startDate}');
+          // print('CalendarController: Sample Task Date: ${allTasks.first.startDate}');
         }
       }
     } catch (e) {
@@ -83,40 +84,41 @@ class CalendarController extends GetxController {
       // print('CalendarController: Loading leads for reminders...');
       ResponseModel leadsResponse = await leadRepo.getAllLeads();
       // print('CalendarController: Leads response status: ${leadsResponse.status}');
-      
+
       // LOG RAW JSON
-      // print('CalendarController: Leads RAW JSON: ${leadsResponse.responseJson}'); 
+      // print('CalendarController: Leads RAW JSON: ${leadsResponse.responseJson}');
 
       if (leadsResponse.status) {
         var decoded = jsonDecode(leadsResponse.responseJson);
         List<dynamic> leadsList = [];
         if (decoded is Map && decoded.containsKey('data')) {
           if (decoded['data'] is List) {
-             leadsList = decoded['data'];
-          } else if (decoded['data'] is Map && decoded['data'].containsKey('leads')) {
-             leadsList = decoded['data']['leads']; // Handle pagination structure
+            leadsList = decoded['data'];
+          } else if (decoded['data'] is Map &&
+              decoded['data'].containsKey('leads')) {
+            leadsList = decoded['data']['leads']; // Handle pagination structure
           }
         } else if (decoded is List) {
-           leadsList = decoded;
+          leadsList = decoded;
         }
-        
+
         // print('CalendarController: Found ${leadsList.length} leads (checking first 20).');
 
         List<Future<void>> futures = [];
-        for (var item in leadsList.take(20)) { 
-           if (item is Map) {
-             String leadId = '';
-             if (item.containsKey('id')) leadId = item['id'].toString();
-             
-             if (leadId.isNotEmpty) {
-               futures.add(_fetchRemindersForLead(leadId));
-             }
-           }
+        for (var item in leadsList.take(20)) {
+          if (item is Map) {
+            String leadId = '';
+            if (item.containsKey('id')) leadId = item['id'].toString();
+
+            if (leadId.isNotEmpty) {
+              futures.add(_fetchRemindersForLead(leadId));
+            }
+          }
         }
         await Future.wait(futures);
         // print('CalendarController: Loaded total ${allReminders.length} reminders.');
         if (allReminders.isNotEmpty) {
-           // print('CalendarController: Sample Reminder Date: ${allReminders.first.date}');
+          // print('CalendarController: Sample Reminder Date: ${allReminders.first.date}');
         }
       }
     } catch (e) {
@@ -128,7 +130,8 @@ class CalendarController extends GetxController {
     try {
       ResponseModel response = await leadRepo.getLeadReminders(leadId);
       if (response.status) {
-        final model = RemindersModel.fromJson(jsonDecode(response.responseJson));
+        final model =
+            RemindersModel.fromJson(jsonDecode(response.responseJson));
         if (model.data != null) {
           allReminders.addAll(model.data!);
         }
@@ -138,7 +141,7 @@ class CalendarController extends GetxController {
 
   List<dynamic> getEventsForDay(DateTime day) {
     List<dynamic> events = [];
-    
+
     // Tasks
     events.addAll(allTasks.where((task) {
       if (task.startDate == null) return false;
@@ -159,9 +162,9 @@ class CalendarController extends GetxController {
         DateTime reminderDate = DateTime.parse(reminder.date!);
         return isSameDay(reminderDate, day);
       } catch (_) {
-         // Debug failed parse
-         // print('CalendarController: Failed to parse reminder date: ${reminder.date}');
-         return false;
+        // Debug failed parse
+        // print('CalendarController: Failed to parse reminder date: ${reminder.date}');
+        return false;
       }
     }));
 
@@ -197,16 +200,18 @@ class CalendarController extends GetxController {
       return;
     }
 
-    AttendanceStatus? status = await attendanceService.getAttendanceForDate(date);
-    
+    AttendanceStatus? status =
+        await attendanceService.getAttendanceForDate(date);
+
     // Always store a status. If API returns null, assume Absent/No Data.
-    attendanceCache[dateKey] = status ?? AttendanceStatus(
-      punchedIn: false,
-      punchedOut: false,
-      statusLabel: 'Absent', 
-      punchInTime: '--',
-      punchOutTime: '--',
-    );
+    attendanceCache[dateKey] = status ??
+        AttendanceStatus(
+          punchedIn: false,
+          punchedOut: false,
+          statusLabel: 'Absent',
+          punchInTime: '--',
+          punchOutTime: '--',
+        );
     update();
   }
 }

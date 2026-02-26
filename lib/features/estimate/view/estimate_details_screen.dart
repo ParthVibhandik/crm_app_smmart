@@ -91,9 +91,7 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                controller
-                                        .estimateDetailsModel
-                                        .data!
+                                controller.estimateDetailsModel.data!
                                         .formattedNumber ??
                                     '${controller.estimateDetailsModel.data!.prefix ?? ''}${controller.estimateDetailsModel.data!.number ?? ''}',
                                 style: mediumLarge,
@@ -101,16 +99,12 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
                               Text(
                                 Converter.estimateStatusString(
                                   controller
-                                          .estimateDetailsModel
-                                          .data!
-                                          .status ??
+                                          .estimateDetailsModel.data!.status ??
                                       '',
                                 ),
                                 style: lightDefault.copyWith(
                                   color: ColorResources.estimateStatusColor(
-                                    controller
-                                            .estimateDetailsModel
-                                            .data!
+                                    controller.estimateDetailsModel.data!
                                             .status ??
                                         '',
                                   ),
@@ -142,18 +136,13 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      controller
-                                              .estimateDetailsModel
-                                              .data!
-                                              .clientData
-                                              ?.company ??
+                                      controller.estimateDetailsModel.data!
+                                              .clientData?.company ??
                                           '',
                                       style: regularDefault,
                                     ),
                                     Text(
-                                      controller
-                                              .estimateDetailsModel
-                                              .data!
+                                      controller.estimateDetailsModel.data!
                                               .referenceNo ??
                                           '-',
                                       style: regularDefault,
@@ -180,17 +169,13 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      controller
-                                              .estimateDetailsModel
-                                              .data!
+                                      controller.estimateDetailsModel.data!
                                               .date ??
                                           '',
                                       style: regularDefault,
                                     ),
                                     Text(
-                                      controller
-                                              .estimateDetailsModel
-                                              .data!
+                                      controller.estimateDetailsModel.data!
                                               .expiryDate ??
                                           '-',
                                       style: regularDefault,
@@ -221,24 +206,17 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
                               itemBuilder: (context, index) {
                                 return TableItem(
                                   item: controller
-                                      .estimateDetailsModel
-                                      .data!
-                                      .items![index],
-                                  currency: controller
-                                      .estimateDetailsModel
-                                      .data!
-                                      .currencySymbol,
+                                      .estimateDetailsModel.data!.items![index],
+                                  currency: controller.estimateDetailsModel
+                                      .data!.currencySymbol,
                                 );
                               },
                               separatorBuilder: (context, index) =>
                                   const CustomDivider(
-                                    space: Dimensions.space10,
-                                  ),
+                                space: Dimensions.space10,
+                              ),
                               itemCount: controller
-                                  .estimateDetailsModel
-                                  .data!
-                                  .items!
-                                  .length,
+                                  .estimateDetailsModel.data!.items!.length,
                             ),
                           ),
                           Padding(
@@ -269,9 +247,7 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
                                       style: lightDefault,
                                     ),
                                     Text(
-                                      controller
-                                              .estimateDetailsModel
-                                              .data!
+                                      controller.estimateDetailsModel.data!
                                               .discountTotal ??
                                           '',
                                       style: regularDefault,
@@ -287,9 +263,7 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
                                       style: lightDefault,
                                     ),
                                     Text(
-                                      controller
-                                              .estimateDetailsModel
-                                              .data!
+                                      controller.estimateDetailsModel.data!
                                               .totalTax ??
                                           '',
                                       style: regularDefault,
@@ -315,9 +289,7 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
                           ),
                           const SizedBox(height: Dimensions.space10),
                           if (controller
-                                  .estimateDetailsModel
-                                  .data!
-                                  .clientNote !=
+                                  .estimateDetailsModel.data!.clientNote !=
                               '')
                             CustomCard(
                               child: Column(
@@ -335,9 +307,7 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
                                     thickness: 0.50,
                                   ),
                                   Text(
-                                    controller
-                                            .estimateDetailsModel
-                                            .data!
+                                    controller.estimateDetailsModel.data!
                                             .clientNote ??
                                         '-',
                                     style: lightSmall,
@@ -364,9 +334,7 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
                                   ),
                                   Text(
                                     controller
-                                            .estimateDetailsModel
-                                            .data!
-                                            .terms ??
+                                            .estimateDetailsModel.data!.terms ??
                                         '-',
                                     style: lightSmall,
                                   ),

@@ -1,4 +1,4 @@
-import 'package:flutex_admin/features/task/model/task_model.dart';
+import 'package:flutex_admin/features/task/model/tasks_model.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -8,7 +8,7 @@ class TaskReminderService {
 
   TaskReminderService(this.fln);
 
-  Future<void> scheduleTaskReminder(TaskModel task) async {
+  Future<void> scheduleTaskReminder(Task task) async {
     if (task.dueDate == null) return;
 
     final dueDate = DateTime.parse(task.dueDate!);
@@ -34,8 +34,6 @@ class TaskReminderService {
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       payload: 'task_${task.id}',
     );
   }

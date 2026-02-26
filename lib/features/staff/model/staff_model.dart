@@ -116,7 +116,8 @@ class Staff {
     _isNotStaff = json["is_not_staff"];
     _hourlyRate = json["hourly_rate"];
     _emailSignature = json["email_signature"];
-    _fullName = json["full_name"] ?? '${json["firstname"] ?? ''} ${json["lastname"] ?? ''}'.trim();
+    _fullName = json["full_name"] ??
+        '${json["firstname"] ?? ''} ${json["lastname"] ?? ''}'.trim();
   }
 
   String? _id;

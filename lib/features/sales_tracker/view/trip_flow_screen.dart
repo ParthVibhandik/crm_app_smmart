@@ -62,18 +62,21 @@ class _TripFlowScreenState extends State<TripFlowScreen> {
 
     final lowered = raw.toLowerCase();
     if (lowered.contains('not_started')) return 'not_started';
-    if (lowered.contains('started') && !lowered.contains('call'))
+    if (lowered.contains('started') && !lowered.contains('call')) {
       return 'started';
+    }
     if (lowered.contains('reached')) return 'reached';
-    if (lowered.contains('call') && lowered.contains('started'))
+    if (lowered.contains('call') && lowered.contains('started')) {
       return 'call_started';
+    }
     return 'not_started';
   }
 
   String _normalizeStatus(String s) {
     final lowered = s.toLowerCase().replaceAll(' ', '_').replaceAll('-', '_');
-    if (lowered.contains('call') && lowered.contains('started'))
+    if (lowered.contains('call') && lowered.contains('started')) {
       return 'call_started';
+    }
     if (lowered == 'not_started') return 'not_started';
     if (lowered == 'started') return 'started';
     if (lowered == 'reached') return 'reached';

@@ -8,7 +8,6 @@ import 'package:flutex_admin/features/lead/model/reminders_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/intl.dart';
 import 'package:flutex_admin/core/utils/local_strings.dart';
 import 'package:flutex_admin/core/route/route.dart';
 import '../controller/calendar_controller.dart';
@@ -65,10 +64,10 @@ class CalendarScreen extends StatelessWidget {
                       calendarBuilders: CalendarBuilders(
                         markerBuilder: (context, date, events) {
                           if (events.isEmpty) return const SizedBox();
-                          
+
                           // Prioritize Reminder (Red) then Task (Orange)
                           bool hasReminder = events.any((e) => e is Reminder);
-                          
+
                           return Positioned(
                             bottom: 1,
                             child: Container(
@@ -84,10 +83,11 @@ class CalendarScreen extends StatelessWidget {
                       ),
                     ),
                     const Divider(),
-                    if (controller.allReminders.isEmpty && !controller.isLoading)
-                       // Optional: Warning/Info if reminders are still loading or empty
-                       // Not showing anything to keep UI clean, but debugging helps.
-                       const SizedBox.shrink(),
+                    if (controller.allReminders.isEmpty &&
+                        !controller.isLoading)
+                      // Optional: Warning/Info if reminders are still loading or empty
+                      // Not showing anything to keep UI clean, but debugging helps.
+                      const SizedBox.shrink(),
                     Expanded(
                       child: _buildEventList(controller),
                     ),
@@ -200,11 +200,9 @@ class _AttendanceTile extends StatelessWidget {
       child: ListTile(
         leading: const Icon(Icons.fingerprint, color: Colors.green),
         title: Text(LocalStrings.attendance.tr),
-        subtitle: Text(
-          status.punchedIn 
+        subtitle: Text(status.punchedIn
             ? '${LocalStrings.checkIn.tr}: ${status.punchInTime ?? '--'}'
-            : LocalStrings.notCheckedIn.tr
-        ),
+            : LocalStrings.notCheckedIn.tr),
         trailing: Text(status.punchedOut ? 'Closed' : 'Active'),
       ),
     );
@@ -223,13 +221,16 @@ class _ReminderTile extends StatelessWidget {
       shadowColor: Colors.red.withOpacity(0.3),
       child: ListTile(
         leading: const Icon(Icons.notifications_active, color: Colors.red),
-        title: Text(reminder.description ?? 'Untitled Reminder', style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(reminder.description ?? 'Untitled Reminder',
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text('Staff: ${reminder.staffId ?? 'Unknown'}'),
-        trailing: Text(reminder.date ?? '', style: const TextStyle(color: Colors.red)),
+        trailing: Text(reminder.date ?? '',
+            style: const TextStyle(color: Colors.red)),
         onTap: () {
           // Navigate to lead details screen using relId (lead ID)
           if (reminder.relId != null && reminder.relId!.isNotEmpty) {
-            Get.toNamed(RouteHelper.leadDetailsScreen, arguments: reminder.relId);
+            Get.toNamed(RouteHelper.leadDetailsScreen,
+                arguments: reminder.relId);
           }
         },
       ),

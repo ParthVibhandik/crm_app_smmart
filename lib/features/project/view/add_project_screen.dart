@@ -206,13 +206,13 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
             return controller.isLoading
                 ? const SizedBox.shrink()
                 : controller.submitLoading
-                ? const RoundedLoadingBtn()
-                : RoundedButton(
-                    text: LocalStrings.submit.tr,
-                    press: () {
-                      controller.submitProject();
-                    },
-                  );
+                    ? const RoundedLoadingBtn()
+                    : RoundedButton(
+                        text: LocalStrings.submit.tr,
+                        press: () {
+                          controller.submitProject();
+                        },
+                      );
           },
         ),
       ),
