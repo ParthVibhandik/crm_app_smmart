@@ -8,7 +8,7 @@ class ProspectingRepo {
   ProspectingRepo({required this.apiClient});
 
   Future<ResponseModel> getData() async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.spancoUrl}prospect";
+    String url = UrlContainer.baseUrl + UrlContainer.spancoUrl + "prospect";
     return await apiClient.request(url, Method.getMethod, null,
         passHeader: true);
   }
@@ -22,21 +22,36 @@ class ProspectingRepo {
 
   Future<ResponseModel> updateData(Map<String, dynamic> body) async {
     String url =
-        "\${UrlContainer.baseUrl}\${UrlContainer.spancoUrl}update-prospect";
+        UrlContainer.baseUrl + UrlContainer.spancoUrl + "update-prospecting";
     return await apiClient.request(url, Method.postMethod, body,
         passHeader: true);
   }
 
   Future<ResponseModel> getIndustries() async {
-    String url = "\${UrlContainer.baseUrl}\${UrlContainer.industriesUrl}";
+    String url = UrlContainer.baseUrl + UrlContainer.industriesUrl;
     return await apiClient.request(url, Method.getMethod, null,
         passHeader: true);
   }
 
   Future<ResponseModel> getSources() async {
     String url =
-        "\${UrlContainer.baseUrl}\${UrlContainer.miscellaneousUrl}/leads_sources";
+        "${UrlContainer.baseUrl}${UrlContainer.miscellaneousUrl}/leads_sources";
     return await apiClient.request(url, Method.getMethod, null,
+        passHeader: true);
+  }
+
+  Future<ResponseModel> getPrograms() async {
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.miscellaneousUrl}/interested_in";
+    return await apiClient.request(url, Method.getMethod, null,
+        passHeader: true);
+  }
+
+  Future<ResponseModel> moveToApproach(String opportunityId) async {
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.spancoUrl}move-to-approach";
+    return await apiClient.request(
+        url, Method.postMethod, {'opportunity_id': opportunityId},
         passHeader: true);
   }
 }

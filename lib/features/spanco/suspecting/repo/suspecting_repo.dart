@@ -8,7 +8,7 @@ class SuspectingRepo {
   SuspectingRepo({required this.apiClient});
 
   Future<ResponseModel> getData() async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.spancoUrl}suspect";
+    String url = UrlContainer.baseUrl + UrlContainer.spancoUrl + "suspect";
     return await apiClient.request(url, Method.getMethod, null,
         passHeader: true);
   }
@@ -22,13 +22,13 @@ class SuspectingRepo {
 
   Future<ResponseModel> updateData(Map<String, dynamic> body) async {
     String url =
-        "${UrlContainer.baseUrl}${UrlContainer.spancoUrl}update-suspect";
+        UrlContainer.baseUrl + UrlContainer.spancoUrl + "update-suspecting";
     return await apiClient.request(url, Method.postMethod, body,
         passHeader: true);
   }
 
   Future<ResponseModel> getIndustries() async {
-    String url = "${UrlContainer.baseUrl}${UrlContainer.industriesUrl}";
+    String url = UrlContainer.baseUrl + UrlContainer.industriesUrl;
     return await apiClient.request(url, Method.getMethod, null,
         passHeader: true);
   }
@@ -36,6 +36,13 @@ class SuspectingRepo {
   Future<ResponseModel> getSources() async {
     String url =
         "${UrlContainer.baseUrl}${UrlContainer.miscellaneousUrl}/leads_sources";
+    return await apiClient.request(url, Method.getMethod, null,
+        passHeader: true);
+  }
+
+  Future<ResponseModel> getPrograms() async {
+    String url =
+        "${UrlContainer.baseUrl}${UrlContainer.miscellaneousUrl}/interested_in";
     return await apiClient.request(url, Method.getMethod, null,
         passHeader: true);
   }

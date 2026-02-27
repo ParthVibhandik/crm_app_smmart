@@ -15,7 +15,7 @@ class ProspectingDetailsScreen extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Row Details',
+            title: Text('Details',
                 style: regularLarge.copyWith(color: Colors.white)),
             backgroundColor: Theme.of(context).primaryColor,
             elevation: 0,
@@ -52,8 +52,19 @@ class ProspectingDetailsScreen extends StatelessWidget {
                                   e.key != 'id' &&
                                   e.key != 'stage_data')
                               .map((entry) {
-                            return _buildDetailRow(context, controller,
-                                entry.key, entry.value?.toString() ?? '-');
+                            String stringVal = entry.value?.toString() ?? '-';
+                            if (entry.key == 'recommended_programs' &&
+                                entry.value is List) {
+                              stringVal = (entry.value as List)
+                                  .map((e) => e is Map
+                                      ? e['name']?.toString() ?? ''
+                                      : '')
+                                  .where((e) => e.isNotEmpty)
+                                  .join(', ');
+                              if (stringVal.isEmpty) stringVal = '-';
+                            }
+                            return _buildDetailRow(
+                                context, controller, entry.key, stringVal);
                           }),
                           if (controller.editableDetails!['stage_data']
                               is Map) ...[
@@ -61,6 +72,14 @@ class ProspectingDetailsScreen extends StatelessWidget {
                             ...(controller.editableDetails!['stage_data']
                                     as Map)
                                 .entries
+                                .where((e) => ![
+                                      'roadblocks',
+                                      'opportunities',
+                                      'capabilities',
+                                      'rmi_mode',
+                                      'rmi_attachment',
+                                      'follow_up_date'
+                                    ].contains(e.key))
                                 .map((e) {
                               return _buildStageDataRow(
                                   context, controller, e.key, e.value);
@@ -91,6 +110,32 @@ class ProspectingDetailsScreen extends StatelessWidget {
                                       style: regularLarge.copyWith(
                                           color: Colors.white)),
                             ),
+                          if (!controller.isEditing)
+                            const SizedBox(height: Dimensions.space10),
+                          if (!controller.isEditing)
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green.shade700,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: Dimensions.space15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(Dimensions.space10),
+                                ),
+                              ),
+                              onPressed: () {
+                                controller.moveToApproach();
+                              },
+                              child: controller.isMoveLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          color: Colors.white, strokeWidth: 2))
+                                  : Text('Move to Approach',
+                                      style: regularLarge.copyWith(
+                                          color: Colors.white)),
+                            ),
                         ],
                       ),
                     ),
@@ -105,13 +150,28 @@ class ProspectingDetailsScreen extends StatelessWidget {
         key == 'assigned' ||
         key == 'dateadded' ||
         key == 'id' ||
-        key == 'status';
+        key == 'status' ||
+        key == 'recommended_programs';
 
     Widget valueWidget;
 
     if (isReadOnly) {
+      String displayValue = value.isEmpty ? '-' : value;
+      if (key == 'source') {
+        try {
+          var matched = controller.sourceList
+              .firstWhere((s) => s.id?.toString() == value || s.name == value);
+          displayValue = matched.name ?? displayValue;
+        } catch (e) {}
+      } else if (key == 'company_industry') {
+        try {
+          var matched = controller.industryList
+              .firstWhere((i) => i.id?.toString() == value || i.name == value);
+          displayValue = matched.name ?? displayValue;
+        } catch (e) {}
+      }
       valueWidget = Text(
-        value.isEmpty ? '-' : value,
+        displayValue,
         style: regularDefault.copyWith(color: Colors.black87),
       );
     } else if (key == 'company_industry' &&
@@ -204,6 +264,9 @@ class ProspectingDetailsScreen extends StatelessWidget {
       if (displayValue.toLowerCase() == 'true') displayValue = 'Yes';
       if (displayValue.toLowerCase() == 'false') displayValue = 'No';
       if (displayValue.isEmpty) displayValue = '-';
+      if (displayValue.contains('T') && displayValue.length >= 15) {
+        displayValue = displayValue.replaceAll('T', ' ');
+      }
 
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
@@ -238,7 +301,8 @@ class ProspectingDetailsScreen extends StatelessWidget {
       'man_identified',
       'money_identified',
       'authority_identified',
-      'need_identified'
+      'need_identified',
+      'proposal_sent',
     ].contains(key)) {
       bool isChecked = value?.toString().toLowerCase() == 'true';
       valueWidget = Align(
@@ -256,13 +320,28 @@ class ProspectingDetailsScreen extends StatelessWidget {
           DateTime? picked = await showDatePicker(
             context: context,
             initialDate: DateTime.now(),
-            firstDate: DateTime(2000),
+            firstDate: DateTime.now().subtract(const Duration(days: 365)),
             lastDate: DateTime(2100),
           );
           if (picked != null) {
-            String dateFormatted =
-                "\${picked.year}-\${picked.month.toString().padLeft(2,'0')}-\${picked.day.toString().padLeft(2,'0')}";
-            controller.updateStageDataField(key, dateFormatted);
+            TimeOfDay? timePicked = await showTimePicker(
+              context: context,
+              initialTime: TimeOfDay.now(),
+            );
+            if (timePicked != null) {
+              DateTime finalDate = DateTime(picked.year, picked.month,
+                  picked.day, timePicked.hour, timePicked.minute);
+              String dateFormatted = finalDate.year.toString().padLeft(4, '0') +
+                  "-" +
+                  finalDate.month.toString().padLeft(2, '0') +
+                  "-" +
+                  finalDate.day.toString().padLeft(2, '0') +
+                  "T" +
+                  finalDate.hour.toString().padLeft(2, '0') +
+                  ":" +
+                  finalDate.minute.toString().padLeft(2, '0');
+              controller.updateStageDataField(key, dateFormatted);
+            }
           }
         },
         child: Container(
@@ -272,12 +351,15 @@ class ProspectingDetailsScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(8)),
           child: Text(
               value?.toString().isEmpty ?? true
-                  ? 'Select Date'
-                  : value.toString(),
+                  ? 'Select Date & Time'
+                  : value.toString().replaceAll('T', ' '),
               style: regularDefault),
         ),
       );
-    } else if (key == 'need_description') {
+    } else if (key == 'need_description' ||
+        key == 'discovery_summary' ||
+        key == 'three_year_vision' ||
+        key == 'top_3_challenges') {
       valueWidget = TextFormField(
         initialValue: value?.toString() ?? '',
         maxLines: 4,

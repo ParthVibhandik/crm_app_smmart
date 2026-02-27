@@ -140,7 +140,7 @@ class SuspectingController extends GetxController {
     update();
   }
 
-  void updateEditableField(String key, String value) {
+  void updateEditableField(String key, dynamic value) {
     if (editableDetails != null) {
       editableDetails![key] = value;
       update();
@@ -163,19 +163,39 @@ class SuspectingController extends GetxController {
     update();
 
     Map<String, dynamic> body = {
-      'lead_id': editableDetails!['id']?.toString() ?? '',
+      'opportunity_id': editableDetails!['opportunity_id']?.toString() ?? '',
       'name': editableDetails!['name']?.toString() ?? '',
       'company': editableDetails!['company']?.toString() ?? '',
-      'company_industry':
-          editableDetails!['company_industry']?.toString() ?? '',
+      'company_industry': industryList
+              .any((e) => e.name == editableDetails!['company_industry'])
+          ? industryList
+              .firstWhere((e) => e.name == editableDetails!['company_industry'])
+              .id
+          : editableDetails!['company_industry']?.toString() ?? '',
       'phonenumber': editableDetails!['phonenumber']?.toString() ?? '',
       'email': editableDetails!['email']?.toString() ?? '',
-      'source': editableDetails!['source']?.toString() ?? '',
+      'source': sourceList.any((e) => e.name == editableDetails!['source'])
+          ? sourceList
+              .firstWhere((e) => e.name == editableDetails!['source'])
+              .id
+          : editableDetails!['source']?.toString() ?? '',
       'city': editableDetails!['city']?.toString() ?? '',
     };
 
+    if (editableDetails!['recommended_programs'] is List) {
+      List progs = editableDetails!['recommended_programs'];
+      for (int i = 0; i < progs.length; i++) {
+        var p = progs[i];
+        String pId = p is Map
+            ? p['id']?.toString() ?? p['program_id']?.toString() ?? ''
+            : p.toString();
+        body['recommended_programs[$i]'] = pId;
+      }
+    }
+
     if (editableDetails!['stage_data'] is Map) {
       Map? sd = editableDetails!['stage_data'];
+      body['proposal_sent'] = sd?['proposal_sent']?.toString() ?? 'false';
       body['man_identified'] = sd?['man_identified']?.toString() ?? 'false';
       body['money_identified'] = sd?['money_identified']?.toString() ?? 'false';
       body['money_value'] = sd?['money_value']?.toString() ?? '';

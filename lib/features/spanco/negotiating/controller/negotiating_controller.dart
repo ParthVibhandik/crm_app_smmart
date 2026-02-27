@@ -89,7 +89,6 @@ class NegotiatingController extends GetxController {
     isEditing = false;
     update();
 
-    // Fetch dropdowns in background if needed
     loadDropdowns();
   }
 
@@ -134,7 +133,6 @@ class NegotiatingController extends GetxController {
   void toggleEditing() {
     isEditing = !isEditing;
     if (!isEditing && details != null) {
-      // Reset on cancel
       editableDetails = Map<String, dynamic>.from(details!);
     }
     update();
@@ -163,14 +161,23 @@ class NegotiatingController extends GetxController {
     update();
 
     Map<String, dynamic> body = {
+      'opportunity_id': editableDetails!['opportunity_id']?.toString() ?? '',
       'lead_id': editableDetails!['id']?.toString() ?? '',
       'name': editableDetails!['name']?.toString() ?? '',
       'company': editableDetails!['company']?.toString() ?? '',
-      'company_industry':
-          editableDetails!['company_industry']?.toString() ?? '',
+      'company_industry': industryList
+              .any((e) => e.name == editableDetails!['company_industry'])
+          ? industryList
+              .firstWhere((e) => e.name == editableDetails!['company_industry'])
+              .id
+          : editableDetails!['company_industry']?.toString() ?? '',
       'phonenumber': editableDetails!['phonenumber']?.toString() ?? '',
       'email': editableDetails!['email']?.toString() ?? '',
-      'source': editableDetails!['source']?.toString() ?? '',
+      'source': sourceList.any((e) => e.name == editableDetails!['source'])
+          ? sourceList
+              .firstWhere((e) => e.name == editableDetails!['source'])
+              .id
+          : editableDetails!['source']?.toString() ?? '',
       'city': editableDetails!['city']?.toString() ?? '',
     };
 
@@ -186,16 +193,18 @@ class NegotiatingController extends GetxController {
       body['appointment'] = sd?['appointment']?.toString() ?? '';
     }
 
+    print('DEBUG Negotiating Body Payload: $body');
     ResponseModel responseModel = await repo.updateData(body);
+    print('DEBUG Negotiating API Response: ${responseModel.responseJson}');
 
     isUpdateLoading = false;
     update();
 
     if (responseModel.status == true) {
-      Get.back(); // close details
+      Get.back();
       Get.snackbar('Success', 'Updated successfully.',
           snackPosition: SnackPosition.BOTTOM);
-      loadData(); // Refresh list
+      loadData();
     } else {
       Get.snackbar('Error', responseModel.message,
           snackPosition: SnackPosition.BOTTOM);
